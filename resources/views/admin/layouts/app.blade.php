@@ -16,10 +16,8 @@
     <link rel="stylesheet" href="{{ asset('storage/admin/nestable2/jquery.nestable.css') }}">
     <link rel="stylesheet" href="{{ asset('storage/admin/assets/style.css') }}">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-
-    <!-- custom css -->
-    <!-- Move jQuery to the head section -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    @yield('styles')
 </head>
 
 <body>
@@ -36,16 +34,18 @@
     </div>
 
     <!-- bootstrap js -->
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/nestable2/1.6.0/jquery.nestable.min.js"
         integrity="sha512-7bS2beHr26eBtIOb/82sgllyFc1qMsDcOOkGK3NLrZ34yTbZX8uJi5sE0NNDYFNflwx1TtnDKkEq+k2DCGfb5w=="
         crossorigin="anonymous"></script>
     <script src="https://cdn.ckeditor.com/ckeditor5/34.0.0/classic/ckeditor.js"></script>
     <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0" crossorigin="anonymous">
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Move this after jQuery is loaded -->
     <script src="{{ asset('storage/admin/assets/main.js') }}"></script>
+    @stack('scripts')
 </body>
 
 </html>

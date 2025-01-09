@@ -56,4 +56,9 @@ class Page extends Model
 
         return collect(Config::get('pageTypes'))->where('id', $this->type_id)->first()['fields'];
     }
+
+    public function sections()
+    {
+        return $this->hasMany(Section::class)->orderBy('sort_order');
+    }
 }

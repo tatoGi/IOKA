@@ -55,17 +55,25 @@ class PageController extends Controller
      * Generate a unique slug by appending a suffix if necessary.
      */
     private function generateUniqueSlug(string $slug): string
-    {
-        $originalSlug = $slug;
-        $counter = 1;
+{
+    // Replace spaces with dashes
+    $slug = str_replace(' ', '-', $slug);
 
-        while (Page::where('slug', $slug)->exists()) {
-            $slug = "{$originalSlug}-{$counter}";
-            $counter++;
-        }
+    // Alternatively, use Laravel's helper for a cleaner slug
+    // $slug = \Illuminate\Support\Str::slug($slug);
 
-        return $slug;
+    $originalSlug = $slug;
+    $counter = 1;
+
+    // Ensure the slug is unique
+    while (Page::where('slug', $slug)->exists()) {
+        $slug = "{$originalSlug}-{$counter}";
+        $counter++;
     }
+
+    return $slug;
+}
+
 
     // Method to show the edit form for a page
     public function edit($id)
