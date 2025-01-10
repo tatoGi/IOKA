@@ -27,6 +27,7 @@
                 <span class="mx-2">Blog Posts</span>
             </li>
         </a>
+
         <!-- Homepage Section Dropdown -->
         @php
             $pageTypes = collect(Config::get('PageTypes'))->sortBy('id');
@@ -43,41 +44,49 @@
                         </button>
                     </h2>
                     <div id="collapse{{ $type['id'] }}" class="accordion-collapse collapse"
-                    aria-labelledby="heading{{ $type['id'] }}" data-bs-parent="#sidebar">
-                    <ul class="accordion-body list-unstyled">
-                        @if (isset($type['sections']) && is_array($type['sections']))
-                            @foreach ($type['sections'] as $sectionKey => $section)
+                        aria-labelledby="heading{{ $type['id'] }}" data-bs-parent="#sidebar">
+                        <ul class="accordion-body list-unstyled">
+                            @if (isset($type['sections']) && is_array($type['sections']))
+                                @foreach ($type['sections'] as $sectionKey => $section)
+                                    <li>
+                                        @php
+                                            $page = \App\Models\Page::where('type_id', $type['id'])->first();
+                                            $sectionExists =
+                                                $page &&
+                                                \App\Models\Section::where('section_key', $sectionKey)->exists();
 
-                                <li>
-                                    @php
-                                        $page = \App\Models\Page::where('type_id', $type['id'])->first();
-                                        $sectionExists = $page && \App\Models\Section::where('section_key', $sectionKey)->exists();
-
-                                        $route = $sectionExists ? 'admin.sections.edit' : 'admin.sections.create';
-                                    @endphp
-                                    @if ($page)
-                                        <a href="{{ route($route, [
-                                            'pageId' => $page->id,
-                                            'sectionKey' => $sectionKey,
-                                        ]) }}"
-                                            class="dropdown-item text-white text-truncate"
-                                            style="text-decoration: none; max-width: 250px;">
-                                            {{ $section['label'] }}
-                                            @if (!$sectionExists)
-                                                <small class="text-warning ms-1">(Not Created)</small>
-                                            @endif
-                                        </a>
-                                    @else
-                                        <small class="text-danger ms-1">(Page Not Found)</small>
-                                    @endif
-                                </li>
-                            @endforeach
-                        @endif
-                    </ul>
-                </div>
+                                            $route = $sectionExists ? 'admin.sections.edit' : 'admin.sections.create';
+                                        @endphp
+                                        @if ($page)
+                                            <a href="{{ route($route, [
+                                                'pageId' => $page->id,
+                                                'sectionKey' => $sectionKey,
+                                            ]) }}"
+                                                class="dropdown-item text-white text-truncate"
+                                                style="text-decoration: none; max-width: 250px;">
+                                                {{ $section['label'] }}
+                                                @if (!$sectionExists)
+                                                    <small class="text-warning ms-1">(Not Created)</small>
+                                                @endif
+                                            </a>
+                                        @else
+                                            <small class="text-danger ms-1">(Page Not Found)</small>
+                                        @endif
+                                    </li>
+                                @endforeach
+                            @endif
+                        </ul>
+                    </div>
 
                 </div>
             @endif
         @endforeach
+        <a href="{{ url('ioka_admin/partners') }}" style="text-decoration: none;">
+            <li class="nav-link">
+                <i class='bx bx-slideshow bx-tada'></i>
+                <span class="mx-2">Partners</span>
+            </li>
+        </a>
     </ul>
+
 </div>

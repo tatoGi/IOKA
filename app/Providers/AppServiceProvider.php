@@ -5,6 +5,8 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use App\Repositories\Interface\PageRepositoryInterface;
 use App\Repositories\PageRepository;
+use App\Models\Partner;
+use Illuminate\Support\Facades\View;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -23,5 +25,9 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         //
+
+        View::composer(['home', 'about'], function ($view) {
+            $view->with('partners', Partner::latest()->get());
+        });
     }
 }
