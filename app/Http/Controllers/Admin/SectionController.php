@@ -28,6 +28,7 @@ class SectionController extends Controller
 
 
         return view('admin.sections.create', [
+            'page' => $page,
             'pageId' => $pageId,
             'sectionKey' => $sectionKey,
             'section' => $pageType['sections'][$sectionKey]
@@ -36,9 +37,7 @@ class SectionController extends Controller
 
     public function store(StoreSectionRequest $request, $pageId)
     {
-
-        // First check if the page exists in the database
-        $page = Page::where('id', $pageId)->first();
+        $page = Page::findOrFail($pageId);
 
         $pageType = collect(Config::get('PageTypes'))->firstWhere('id', $page->type_id);
         if (!$pageType) {
@@ -46,110 +45,32 @@ class SectionController extends Controller
         }
 
         $sectionKey = $request->input('section_key');
-$sectionConfig = $pageType['sections'][$sectionKey] ?? null;
+        $sectionConfig = $pageType['sections'][$sectionKey] ?? null;
         if (!$sectionConfig) {
             abort(404);
         }
 
-        // Validate and process the fields
+        // Process fields
         $fields = $request->fields ?? [];
-
         $processedFields = $this->processFields($request, $fields, $sectionConfig['fields']);
 
-
-
-        // Create new section
+        // Create section
         $section = new Section();
-        $section->title = $fields['title'];
-        $section->description = $request->input('description'); // Get description from CKEditor
-        $section->slug = Str::slug($request->title);
+        $section->title = $processedFields['title'] ?? 'Untitled Section';
+        $section->description = $request->input('description');
+        $section->slug = Str::slug($processedFields['title'] . '-' . time());
         $section->page_id = $page->id;
         $section->section_key = $sectionKey;
         $section->additional_fields = $processedFields;
         $section->save();
 
         return redirect()
-            ->route('admin.sections.edit', ['pageId' => $section->page_id, 'sectionKey' => $sectionKey])
+            ->route('admin.sections.edit', ['pageId' => $pageId, 'sectionKey' => $sectionKey])
             ->with('success', 'Section created successfully');
     }
 
-    protected function processFields(Request $request, array $fields, array $configFields)
-    {
-        $processed = [];
-
-        foreach ($configFields as $key => $config) {
-            if ($config['type'] === 'repeater') {
-                // Pass 'items' to the repeater processing logic
-                $processed[$key] = $this->processRepeaterField($request, $fields[$key]['items'] ?? [], $key, $config);
-            } elseif ($config['type'] === 'image') {
-                if ($request->hasFile("fields.{$key}")) {
-                    $files = $request->file("fields.{$key}.items");
-                    if (!is_array($files)) {
-                        $files = $files ? [$files] : []; // Ensure $files is an array
-                    }
-                    $processedImages = [];
-                    foreach ($files as $file) {
-                        if ($file) {
-                            $processedImages[] = $this->processImageField($file);
-                        }
-                    }
-                    $processed[$key] = $processedImages;
-                } else {
-                    $processed[$key] = $fields[$key] ?? null; // Default if no file uploaded
-                }
-            } else {
-                $processed[$key] = $fields[$key] ?? null; // Process simple fields
-            }
-        }
-
-        return $processed;
-    }
-
-    protected function processRepeaterField(Request $request, array $repeaterData, string $fieldName, array $config)
-    {
-        $processed = [];
-
-        if (!empty($repeaterData)) {
-            foreach ($repeaterData as $item) {
-                $processedItem = [];
-
-                foreach ($config['fields'] as $subKey => $subField) {
-                    if ($subField['type'] === 'image') {
-                        // Handle image field
-                        if (isset($item[$subKey]) && $item[$subKey] instanceof \Illuminate\Http\UploadedFile) {
-                            $processedItem[$subKey] = $this->processImageField($item[$subKey]);
-                        } else {
-                            $processedItem[$subKey] = $item[$subKey] ?? null;
-                        }
-                    } else {
-                        // Process other fields
-                        $processedItem[$subKey] = $item[$subKey] ?? null;
-                    }
-                }
-
-                $processed[] = $processedItem;
-            }
-        }
-
-        return $processed;
-    }
-
-
-
-    protected function processImageField($file)
-{
-
-    if ($file instanceof \Illuminate\Http\UploadedFile) {
-        $path = $file->store('sections', 'public');
-        return $path;
-    }
-
-    return null;
-}
-
     public function edit($pageId, $sectionKey)
     {
-
         // Get the page using type_id instead of id
         $page = Page::where('id', $pageId)->firstOrFail();
         // Get page type from config
@@ -169,6 +90,9 @@ $sectionConfig = $pageType['sections'][$sectionKey] ?? null;
             abort(404);
         }
 
+        // Add this debug line
+
+
         return view('admin.sections.edit', [
             'section' => $section,
             'sectionConfig' => $sectionConfig,
@@ -184,8 +108,7 @@ $sectionConfig = $pageType['sections'][$sectionKey] ?? null;
             ->where('section_key', $sectionKey)
             ->firstOrFail();
 
-        // Get the page and page type to validate section configuration
-        $page = Page::where('id', $pageId)->firstOrFail();
+        $page = Page::findOrFail($pageId);
         $pageType = collect(Config::get('PageTypes'))->firstWhere('id', $page->type_id);
 
         if (!$pageType || !isset($pageType['sections'][$sectionKey])) {
@@ -194,12 +117,13 @@ $sectionConfig = $pageType['sections'][$sectionKey] ?? null;
 
         $sectionConfig = $pageType['sections'][$sectionKey];
 
-        // Process the fields
-        $fields = $request->input('fields', []);
+        // Process fields
+        $fields = $request->fields ?? [];
         $processedFields = $this->processFields($request, $fields, $sectionConfig['fields']);
 
-        // Update the section
-        $section->title = $fields['title'] ?? $section->title; // Get title from fields array
+        // Update section
+        $section->title = $processedFields['title'] ?? $section->title;
+        $section->slug = Str::slug($processedFields['title'] . '-' . time());
         $section->description = $request->input('description', $section->description);
         $section->additional_fields = $processedFields;
         $section->save();
@@ -256,6 +180,7 @@ $sectionConfig = $pageType['sections'][$sectionKey] ?? null;
 
         switch ($field['type']) {
             case 'image':
+            case 'photo':
                 $rules[] = 'nullable|image|max:2048';
                 break;
             case 'url':
@@ -277,6 +202,7 @@ $sectionConfig = $pageType['sections'][$sectionKey] ?? null;
 
     public function destroy($id)
     {
+
         $section = Section::findOrFail($id);
         $pageId = $section->page_id;
 
@@ -286,7 +212,7 @@ $sectionConfig = $pageType['sections'][$sectionKey] ?? null;
 
         $section->delete();
 
-        return redirect()->route('admin.pages.edit', $pageId)
+        return redirect()->route('admin.sections.index', $pageId)
             ->with('success', 'Section deleted successfully');
     }
 
@@ -299,5 +225,123 @@ $sectionConfig = $pageType['sections'][$sectionKey] ?? null;
         }
 
         return response()->json(['success' => true]);
+    }
+
+    public function index($pageId)
+    {
+        $page = Page::findOrFail($pageId);
+        $pageType = collect(Config::get('PageTypes'))->firstWhere('id', $page->type_id);
+
+        // Get available contact section types
+        $availableSections = collect($pageType['sections'] ?? [])->map(function ($section, $key) {
+            return [
+                'key' => $key,
+                'label' => $section['label']
+            ];
+        });
+
+        $sections = Section::where('page_id', $pageId)
+            ->with('page')
+            ->latest()
+            ->get();
+
+        return view('admin.sections.index', compact('sections', 'pageId', 'availableSections', 'page'));
+    }
+
+    protected function processFields(Request $request, array $fields, array $configFields)
+    {
+        $processedFields = [];
+
+        foreach ($configFields as $key => $config) {
+            switch ($config['type']) {
+                case 'repeater':
+                    $processedFields[$key] = $this->processRepeaterField($request, $fields[$key] ?? [], $config);
+                    break;
+
+                case 'image':
+                case 'photo':
+                    if (isset($fields[$key]) && $fields[$key] instanceof \Illuminate\Http\UploadedFile) {
+                        $processedFields[$key] = $fields[$key]->store('sections', 'public');
+                    } else {
+                        // Keep existing image if no new one uploaded
+                        $processedFields[$key] = $request->input("old_{$key}") ??
+                            ($request->section->additional_fields[$key] ?? null);
+                    }
+                    break;
+
+                case 'tabs':
+                    $processedFields[$key] = $this->processTabsField($request, $fields[$key] ?? [], $config);
+                    break;
+
+                case 'group':
+                    $processedFields[$key] = $this->processGroupField($request, $fields[$key] ?? [], $config);
+                    break;
+
+                default:
+                    $processedFields[$key] = $fields[$key] ?? null;
+            }
+        }
+
+        return $processedFields;
+    }
+
+    protected function processRepeaterField(Request $request, array $repeaterData, array $config)
+    {
+        $processed = [];
+
+        if (!empty($repeaterData)) {
+            foreach ($repeaterData as $index => $item) {
+                $processedItem = [];
+                foreach ($config['fields'] as $fieldKey => $fieldConfig) {
+                    if ($fieldConfig['type'] === 'image') {
+                        if (isset($item[$fieldKey]) && $item[$fieldKey] instanceof \Illuminate\Http\UploadedFile) {
+                            $processedItem[$fieldKey] = $item[$fieldKey]->store('sections', 'public');
+                        } else {
+                            // Keep existing image if no new one uploaded
+                            $processedItem[$fieldKey] = $request->input("old_{$fieldKey}_{$index}") ??
+                                ($request->section->additional_fields[$fieldKey][$index][$fieldKey] ?? null);
+                        }
+                    } else {
+                        $processedItem[$fieldKey] = $item[$fieldKey] ?? null;
+                    }
+                }
+                $processed[] = $processedItem;
+            }
+        }
+
+        return $processed;
+    }
+
+    protected function processTabsField(Request $request, array $tabsData, array $config)
+    {
+        $processed = [];
+
+        foreach ($config['tabs'] as $tabKey => $tabConfig) {
+            if (isset($tabConfig['fields'])) {
+                $processed[$tabKey] = [];
+                foreach ($tabConfig['fields'] as $fieldKey => $fieldConfig) {
+                    if (
+                        $fieldConfig['type'] === 'image' &&
+                        isset($tabsData[$tabKey][$fieldKey]) &&
+                        $tabsData[$tabKey][$fieldKey] instanceof \Illuminate\Http\UploadedFile
+                    ) {
+                        $processed[$tabKey][$fieldKey] = $tabsData[$tabKey][$fieldKey]->store('sections', 'public');
+                    } else if ($fieldConfig['type'] === 'image') {
+                        // Keep existing image if no new one uploaded
+                        $processed[$tabKey][$fieldKey] = $request->input("old_{$tabKey}_{$fieldKey}") ??
+                            ($request->section->additional_fields[$tabKey][$fieldKey] ?? null);
+                    } else {
+                        $processed[$tabKey][$fieldKey] = $tabsData[$tabKey][$fieldKey] ?? null;
+                    }
+                }
+            }
+        }
+
+        return $processed;
+    }
+
+    protected function processGroupField(Request $request, array $groupData, array $config)
+    {
+        return $this->processFields($request, $groupData, $config['fields']);
     }
 }

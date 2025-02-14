@@ -36,7 +36,7 @@
 
                     <div class="mb-3">
                         <label for="body" class="form-label">Body</label>
-                        <textarea class="form-control @error('body') is-invalid @enderror" id="body" name="body" rows="10"
+                        <textarea class="form-control editor @error('body') is-invalid @enderror" id="body" name="body" rows="10"
                             required>{{ old('body') }}</textarea>
                         @error('body')
                             <div class="invalid-feedback">{{ $message }}</div>
@@ -89,7 +89,6 @@
     </div>
 @endsection
 
-@push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             $('#tags').select2({
@@ -127,4 +126,3 @@
             $('#tags').trigger('change');
         });
     </script>
-@endpush

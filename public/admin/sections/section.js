@@ -10,129 +10,38 @@ document.addEventListener("DOMContentLoaded", function () {
     console.log("Loaded section data:", sectionData); // Debug log
 
     // Handle repeater fields
-    const repeaterContainers = document.querySelectorAll(".repeater-container");
-
-    if (repeaterContainers.length === 0) {
-        console.warn("No repeater containers found on the page");
-        return;
-    }
-
-    repeaterContainers.forEach((container) => {
+    document.querySelectorAll(".repeater-container").forEach((container) => {
         const addButton = container.querySelector(".add-repeater-item");
         const itemsContainer = container.querySelector(".repeater-items");
         const fieldName = container.dataset.field;
+        const repeaterConfig = sectionData.fields[fieldName];
 
-        console.log("Processing repeater:", fieldName); // Debug log
+        addButton.addEventListener("click", function () {
+            const index = itemsContainer.children.length;
+            const template = createRepeaterTemplate(
+                fieldName,
+                index,
+                repeaterConfig.fields
+            );
+            itemsContainer.insertAdjacentHTML("beforeend", template);
 
-        // Add null checks to prevent errors
-        if (!addButton || !itemsContainer) {
-            console.warn("Required repeater elements not found in container:", {
-                containerHTML: container.innerHTML,
-                addButton: !!addButton,
-                itemsContainer: !!itemsContainer,
-                fieldName: fieldName,
-            });
-            return;
-        }
-
-        // Verify field configuration exists
-        if (!fieldName || !sectionData.fields?.[fieldName]) {
-            console.warn("Field configuration not found:", {
-                fieldName: fieldName,
-                availableFields: Object.keys(sectionData.fields || {}),
-            });
-            return;
-        }
-
-        const minItems = parseInt(container.dataset.min) || 0;
-        const maxItems = parseInt(container.dataset.max) || null;
-
-        // Function to create new repeater item
-        function createRepeaterItem(values = {}) {
-            const itemDiv = document.createElement("div");
-            itemDiv.className =
-                "repeater-item border rounded p-3 mb-3 position-relative";
-
-            // Get the field structure from sectionData
-            const repeaterFields = sectionData.fields[fieldName].fields;
-
-            // Create fields based on the structure
-            Object.entries(repeaterFields).forEach(([key, field]) => {
-                const fieldDiv = document.createElement("div");
-                fieldDiv.className = "mb-3";
-
-                const label = document.createElement("label");
-                label.className = "form-label";
-                label.textContent = field.label;
-
-                let input;
-
-                switch (field.type) {
-                    case "image":
-                        input = document.createElement("input");
-                        input.type = "file";
-                        input.accept = "image/*";
-                        break;
-                    case "textarea":
-                        input = document.createElement("textarea");
-                        break;
-                    default:
-                        input = document.createElement("input");
-                        input.type = field.type || "text";
-                }
-
-                input.className = "form-control";
-                input.name = `fields[${fieldName}][items][]`;
-                input.required = field.required || false;
-
-                if (values[key]) {
-                    input.value = values[key];
-                }
-
-                fieldDiv.appendChild(label);
-                fieldDiv.appendChild(input);
-                itemDiv.appendChild(fieldDiv);
-            });
-
-            // Add remove button
-            const removeButton = document.createElement("button");
-            removeButton.type = "button";
-            removeButton.className =
-                "btn btn-danger btn-sm position-absolute top-0 end-0 m-2";
-            removeButton.innerHTML = "&times;";
-            removeButton.onclick = () => {
-                if (itemsContainer.children.length > minItems) {
-                    itemDiv.remove();
-                    updateAddButtonState();
-                }
-            };
-
-            itemDiv.appendChild(removeButton);
-            return itemDiv;
-        }
-
-        // Function to update add button state
-        function updateAddButtonState() {
-            if (maxItems) {
-                addButton.disabled = itemsContainer.children.length >= maxItems;
-            }
-        }
-
-        // Add initial items if min_items is set
-        for (let i = 0; i < minItems; i++) {
-            itemsContainer.appendChild(createRepeaterItem());
-        }
-
-        // Add button click handler
-        addButton.addEventListener("click", () => {
-            if (!maxItems || itemsContainer.children.length < maxItems) {
-                itemsContainer.appendChild(createRepeaterItem());
-                updateAddButtonState();
-            }
+            // Add event listener to new remove button
+            const newItem = itemsContainer.lastElementChild;
+            newItem
+                .querySelector(".remove-repeater-item")
+                .addEventListener("click", function () {
+                    newItem.remove();
+                });
         });
 
-        // Initial button state
-        updateAddButtonState();
+        // Add event listeners to existing remove buttons
+        container
+            .querySelectorAll(".remove-repeater-item")
+            .forEach((button) => {
+                button.addEventListener("click", function () {
+                    button.closest(".repeater-item").remove();
+                });
+            });
     });
 
     // Initialize Bootstrap tabs
@@ -143,3 +52,40 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 });
+
+function createRepeaterTemplate(fieldName, index, fields) {
+    let fieldsHtml = "";
+
+    for (const [key, field] of Object.entries(fields)) {
+        // Determine input type based on field key and type
+        let inputType = field.type;
+        if (key === "phone") {
+            inputType = "tel";
+        } else if (key === "email") {
+            inputType = "email";
+        }
+
+        fieldsHtml += `
+            <div class="mb-3">
+                <label class="form-label">${field.label}</label>
+                <input type="${inputType}"
+                    class="form-control"
+                    name="fields[${fieldName}][${index}][${key}]"
+                    ${field.required ? "required" : ""}>
+            </div>
+        `;
+    }
+
+    return `
+        <div class="repeater-item card mb-3">
+            <div class="card-body">
+                <div class="d-flex justify-content-end mb-2">
+                    <button type="button" class="btn btn-danger btn-sm remove-repeater-item">
+                        <i class="fas fa-trash"></i> Remove
+                    </button>
+                </div>
+                ${fieldsHtml}
+            </div>
+        </div>
+    `;
+}

@@ -2,7 +2,7 @@
 
 return [
     'id' => 1,
-    'type' => 'home',
+    'type' => 1,
     'name' => 'Homepage Management',
     'sections' => [
         'section_one' => [
@@ -29,6 +29,7 @@ return [
                         ],
                     ],
                 ],
+
             ],
         ],
         'section_two' => [
@@ -93,105 +94,55 @@ return [
                         ],
                     ],
                 ],
+
             ],
         ],
         'section_three' => [
-    'label' => 'Section Three - New Properties',
-    'fields' => [
-        'title' => [
-            'type' => 'text',
-            'label' => 'Section Title',
-            'default' => 'New properties in DUBAI',
-            'required' => true,
-        ],
-        'tabs' => [
-            'type' => 'tabs',
-            'label' => 'Property Types',
-            'tabs' => [
-                'offplan' => [
-                    'label' => 'Offplan',
-                    'fields' => [
-                        'image_field' => [
-                            'type' => 'image',
-                            'label' => 'Image Field',
-                            'required' => true,
-                        ],
-                        'title_one' => [
-                            'type' => 'text',
-                            'label' => 'Title One',
-                            'default' => 'Title One Example',
-                            'required' => true,
-                        ],
-                        'title_two' => [
-                            'type' => 'text',
-                            'label' => 'Title Two',
-                            'default' => 'Title Two Example',
-                            'required' => true,
-                        ],
-                        'number' => [
-                            'type' => 'number',
-                            'label' => 'Number',
-                            'required' => true,
-                        ],
-                        'number_suffix' => [
-                            'type' => 'text',
-                            'label' => 'Number Suffix',
-                            'default' => 'Units',
-                        ],
-                        'bulletpoint_add_section' => [
-                            'type' => 'repeater',
-                            'label' => 'Bullet Points Add Section',
+            'label' => 'Section Three - New Properties',
+            'fields' => [
+                'title' => [
+                    'type' => 'text',
+                    'label' => 'Section Title',
+                    'default' => 'New properties in DUBAI',
+                    'required' => true,
+                ],
+                'tabs' => [
+                    'type' => 'tabs',
+                    'label' => 'Property Types',
+                    'tabs' => [
+                        'offplan' => [
+                            'label' => 'Offplan',
                             'fields' => [
-                                'text' => [
-                                    'type' => 'text',
-                                    'label' => 'Point Text',
-                                    'required' => true,
-                                ],
-                            ],
-                        ],
-                        'url' => [
-                            'type' => 'url',
-                            'label' => 'See More URL',
-                            'required' => true,
-                        ],
-                        'properties' => [
-                            'type' => 'repeater',
-                            'label' => 'Properties',
-                            'fields' => [
-                                'image' => [
+                                'image_field' => [
                                     'type' => 'image',
-                                    'label' => 'Property Image',
+                                    'label' => 'Image Field',
                                     'required' => true,
                                 ],
-                                'title' => [
+                                'title_one' => [
                                     'type' => 'text',
-                                    'label' => 'Property Title',
-                                    'default' => 'Address Residences at DHE',
+                                    'label' => 'Title One',
+                                    'default' => 'Title One Example',
                                     'required' => true,
                                 ],
-                                'subtitle' => [
+                                'title_two' => [
                                     'type' => 'text',
-                                    'label' => 'Property Subtitle',
-                                    'default' => '1 - 3 Bedroom spacious Apartment',
+                                    'label' => 'Title Two',
+                                    'default' => 'Title Two Example',
                                     'required' => true,
                                 ],
-                                'price_prefix' => [
+                                'number' => [
+                                    'type' => 'number',
+                                    'label' => 'Number',
+                                    'required' => true,
+                                ],
+                                'number_suffix' => [
                                     'type' => 'text',
-                                    'label' => 'Value Prefix',
-                                    'default' => 'AED',
-                                    'required' => true,
+                                    'label' => 'Number Suffix',
+                                    'default' => 'Units',
                                 ],
-                                'price' => [
-                                    'type' => 'text',
-                                    'label' => 'Price Value',
-                                    'default' => '1,930,000',
-                                    'required' => true,
-                                    'placeholder' => 'Example: 1,930,000 or 1.930.000',
-                                ],
-                                'bullet_points' => [
+                                'bulletpoint_add_section' => [
                                     'type' => 'repeater',
-                                    'label' => 'Bullet Points',
-                                    'min_items' => 1,
+                                    'label' => 'Bullet Points Add Section',
                                     'fields' => [
                                         'text' => [
                                             'type' => 'text',
@@ -203,212 +154,279 @@ return [
                                 'url' => [
                                     'type' => 'url',
                                     'label' => 'See More URL',
+                                    'required' => true,
+                                ],
+                                'properties' => [
+                                    'type' => 'repeater',
+                                    'label' => 'Properties',
+                                    'fields' => [
+                                        'image' => [
+                                            'type' => 'image',
+                                            'label' => 'Property Image',
+                                            'required' => true,
+                                        ],
+                                        'title' => [
+                                            'type' => 'text',
+                                            'label' => 'Property Title',
+                                            'default' => 'Address Residences at DHE',
+                                            'required' => true,
+                                        ],
+                                        'subtitle' => [
+                                            'type' => 'text',
+                                            'label' => 'Property Subtitle',
+                                            'default' => '1 - 3 Bedroom spacious Apartment',
+                                            'required' => true,
+                                        ],
+                                        'price_prefix' => [
+                                            'type' => 'text',
+                                            'label' => 'Value Prefix',
+                                            'default' => 'AED',
+                                            'required' => true,
+                                        ],
+                                        'price' => [
+                                            'type' => 'text',
+                                            'label' => 'Price Value',
+                                            'default' => '1,930,000',
+                                            'required' => true,
+                                            'placeholder' => 'Example: 1,930,000 or 1.930.000',
+                                        ],
+                                        'bullet_points' => [
+                                            'type' => 'repeater',
+                                            'label' => 'Bullet Points',
+                                            'min_items' => 1,
+                                            'fields' => [
+                                                'text' => [
+                                                    'type' => 'text',
+                                                    'label' => 'Point Text',
+                                                    'required' => true,
+                                                ],
+                                            ],
+                                        ],
+                                        'url' => [
+                                            'type' => 'url',
+                                            'label' => 'See More URL',
+                                            'required' => true,
+                                        ],
+                                    ],
+                                ],
+
+                            ],
+                        ],
+                        'resale' => [
+                            'label' => 'Resale',
+                            'fields' => [
+                                'image_field' => [
+                                    'type' => 'image',
+                                    'label' => 'Image Field',
+                                    'required' => true,
+                                ],
+                                'title_one' => [
+                                    'type' => 'text',
+                                    'label' => 'Title One',
+                                    'default' => 'Title One Example',
+                                    'required' => true,
+                                ],
+                                'title_two' => [
+                                    'type' => 'text',
+                                    'label' => 'Title Two',
+                                    'default' => 'Title Two Example',
+                                    'required' => true,
+                                ],
+                                'number' => [
+                                    'type' => 'number',
+                                    'label' => 'Number',
+                                    'required' => true,
+                                ],
+                                'number_suffix' => [
+                                    'type' => 'text',
+                                    'label' => 'Number Suffix',
+                                    'default' => 'Units',
+                                ],
+                                'bulletpoint_add_section' => [
+                                    'type' => 'repeater',
+                                    'label' => 'Bullet Points Add Section',
+                                    'fields' => [
+                                        'text' => [
+                                            'type' => 'text',
+                                            'label' => 'Point Text',
+                                            'required' => true,
+                                        ],
+                                    ],
+                                ],
+                                'url' => [
+                                    'type' => 'url',
+                                    'label' => 'See More URL',
+                                    'required' => true,
+                                ],
+                                'properties' => [
+                                    'type' => 'repeater',
+                                    'label' => 'Properties',
+                                    'fields' => [
+                                        'image' => [
+                                            'type' => 'image',
+                                            'label' => 'Property Image',
+                                            'required' => true,
+                                        ],
+                                        'title' => [
+                                            'type' => 'text',
+                                            'label' => 'Property Title',
+                                            'required' => true,
+                                        ],
+                                        'subtitle' => [
+                                            'type' => 'text',
+                                            'label' => 'Property Subtitle',
+                                            'required' => true,
+                                        ],
+                                        'price_prefix' => [
+                                            'type' => 'text',
+                                            'label' => 'Value Prefix',
+                                            'default' => 'AED',
+                                            'required' => true,
+                                        ],
+                                        'price' => [
+                                            'type' => 'text',
+                                            'label' => 'Price Value',
+                                            'required' => true,
+                                            'placeholder' => 'Example: 1,930,000 or 1.930.000',
+                                        ],
+                                        'bullet_points' => [
+                                            'type' => 'repeater',
+                                            'label' => 'Bullet Points',
+                                            'min_items' => 1,
+                                            'fields' => [
+                                                'text' => [
+                                                    'type' => 'text',
+                                                    'label' => 'Point Text',
+                                                    'required' => true,
+                                                ],
+                                            ],
+                                        ],
+                                        'url' => [
+                                            'type' => 'url',
+                                            'label' => 'See More URL',
+                                            'required' => true,
+                                        ],
+                                    ],
+                                ],
+                                'image_or_like_this' => [
+                                    'type' => 'photo',
+                                    'label' => 'Image or Like This',
+                                    'required' => true,
+                                ],
+                            ],
+                        ],
+                        'rental' => [
+                            'label' => 'Rental',
+                            'fields' => [
+                                'image_field' => [
+                                    'type' => 'image',
+                                    'label' => 'Image Field',
+                                    'required' => true,
+                                ],
+                                'title_one' => [
+                                    'type' => 'text',
+                                    'label' => 'Title One',
+                                    'default' => 'Title One Example',
+                                    'required' => true,
+                                ],
+                                'title_two' => [
+                                    'type' => 'text',
+                                    'label' => 'Title Two',
+                                    'default' => 'Title Two Example',
+                                    'required' => true,
+                                ],
+                                'number' => [
+                                    'type' => 'number',
+                                    'label' => 'Number',
+                                    'required' => true,
+                                ],
+                                'number_suffix' => [
+                                    'type' => 'text',
+                                    'label' => 'Number Suffix',
+                                    'default' => 'Units',
+                                ],
+                                'bulletpoint_add_section' => [
+                                    'type' => 'repeater',
+                                    'label' => 'Bullet Points Add Section',
+                                    'fields' => [
+                                        'text' => [
+                                            'type' => 'text',
+                                            'label' => 'Point Text',
+                                            'required' => true,
+                                        ],
+                                    ],
+                                ],
+                                'url' => [
+                                    'type' => 'url',
+                                    'label' => 'See More URL',
+                                    'required' => true,
+                                ],
+                                'properties' => [
+                                    'type' => 'repeater',
+                                    'label' => 'Properties',
+                                    'fields' => [
+                                        'image' => [
+                                            'type' => 'image',
+                                            'label' => 'Property Image',
+                                            'required' => true,
+                                        ],
+                                        'title' => [
+                                            'type' => 'text',
+                                            'label' => 'Property Title',
+                                            'required' => true,
+                                        ],
+                                        'subtitle' => [
+                                            'type' => 'text',
+                                            'label' => 'Property Subtitle',
+                                            'required' => true,
+                                        ],
+                                        'price_prefix' => [
+                                            'type' => 'text',
+                                            'label' => 'Value Prefix',
+                                            'default' => 'AED',
+                                            'required' => true,
+                                        ],
+                                        'price' => [
+                                            'type' => 'text',
+                                            'label' => 'Price Value',
+                                            'required' => true,
+                                            'placeholder' => 'Example: 1,930,000 or 1.930.000',
+                                        ],
+                                        'bullet_points' => [
+                                            'type' => 'repeater',
+                                            'label' => 'Bullet Points',
+                                            'min_items' => 1,
+                                            'fields' => [
+                                                'text' => [
+                                                    'type' => 'text',
+                                                    'label' => 'Point Text',
+                                                    'required' => true,
+                                                ],
+                                            ],
+                                        ],
+                                        'url' => [
+                                            'type' => 'url',
+                                            'label' => 'See More URL',
+                                            'required' => true,
+                                        ],
+                                    ],
+                                ],
+                                'image_or_like_this' => [
+                                    'type' => 'image_or_like_this',
+                                    'label' => 'Image or Like This',
                                     'required' => true,
                                 ],
                             ],
                         ],
                     ],
                 ],
-                'resale' => [
-                    'label' => 'Resale',
-                    'fields' => [
-                        'image_field' => [
-                            'type' => 'image',
-                            'label' => 'Image Field',
-                            'required' => true,
-                        ],
-                        'title_one' => [
-                            'type' => 'text',
-                            'label' => 'Title One',
-                            'default' => 'Title One Example',
-                            'required' => true,
-                        ],
-                        'title_two' => [
-                            'type' => 'text',
-                            'label' => 'Title Two',
-                            'default' => 'Title Two Example',
-                            'required' => true,
-                        ],
-                        'number' => [
-                            'type' => 'number',
-                            'label' => 'Number',
-                            'required' => true,
-                        ],
-                        'number_suffix' => [
-                            'type' => 'text',
-                            'label' => 'Number Suffix',
-                            'default' => 'Units',
-                        ],
-                        'bulletpoint_add_section' => [
-                            'type' => 'repeater',
-                            'label' => 'Bullet Points Add Section',
-                            'fields' => [
-                                'text' => [
-                                    'type' => 'text',
-                                    'label' => 'Point Text',
-                                    'required' => true,
-                                ],
-                            ],
-                        ],
-                        'url' => [
-                            'type' => 'url',
-                            'label' => 'See More URL',
-                            'required' => true,
-                        ],
-                        'properties' => [
-                            'type' => 'repeater',
-                            'label' => 'Properties',
-                            'fields' => [
-                                'image' => [
-                                    'type' => 'image',
-                                    'label' => 'Property Image',
-                                    'required' => true,
-                                ],
-                                'title' => [
-                                    'type' => 'text',
-                                    'label' => 'Property Title',
-                                    'required' => true,
-                                ],
-                                'subtitle' => [
-                                    'type' => 'text',
-                                    'label' => 'Property Subtitle',
-                                    'required' => true,
-                                ],
-                                'price_prefix' => [
-                                    'type' => 'text',
-                                    'label' => 'Value Prefix',
-                                    'default' => 'AED',
-                                    'required' => true,
-                                ],
-                                'price' => [
-                                    'type' => 'text',
-                                    'label' => 'Price Value',
-                                    'required' => true,
-                                    'placeholder' => 'Example: 1,930,000 or 1.930.000',
-                                ],
-                                'bullet_points' => [
-                                    'type' => 'repeater',
-                                    'label' => 'Bullet Points',
-                                    'min_items' => 1,
-                                    'fields' => [
-                                        'text' => [
-                                            'type' => 'text',
-                                            'label' => 'Point Text',
-                                            'required' => true,
-                                        ],
-                                    ],
-                                ],
-                                'url' => [
-                                    'type' => 'url',
-                                    'label' => 'See More URL',
-                                    'required' => true,
-                                ],
-                            ],
-                        ],
-                    ],
-                ],
-                'rental' => [
-                    'label' => 'Rental',
-                    'fields' => [
-                        'image_field' => [
-                            'type' => 'image',
-                            'label' => 'Image Field',
-                            'required' => true,
-                        ],
-                        'title_one' => [
-                            'type' => 'text',
-                            'label' => 'Title One',
-                            'default' => 'Title One Example',
-                            'required' => true,
-                        ],
-                        'title_two' => [
-                            'type' => 'text',
-                            'label' => 'Title Two',
-                            'default' => 'Title Two Example',
-                            'required' => true,
-                        ],
-                        'number' => [
-                            'type' => 'number',
-                            'label' => 'Number',
-                            'required' => true,
-                        ],
-                        'number_suffix' => [
-                            'type' => 'text',
-                            'label' => 'Number Suffix',
-                            'default' => 'Units',
-                        ],
-                        'bulletpoint_add_section' => [
-                            'type' => 'repeater',
-                            'label' => 'Bullet Points Add Section',
-                            'fields' => [
-                                'text' => [
-                                    'type' => 'text',
-                                    'label' => 'Point Text',
-                                    'required' => true,
-                                ],
-                            ],
-                        ],
-                        'url' => [
-                            'type' => 'url',
-                            'label' => 'See More URL',
-                            'required' => true,
-                        ],
-                        'properties' => [
-                            'type' => 'repeater',
-                            'label' => 'Properties',
-                            'fields' => [
-                                'image' => [
-                                    'type' => 'image',
-                                    'label' => 'Property Image',
-                                    'required' => true,
-                                ],
-                                'title' => [
-                                    'type' => 'text',
-                                    'label' => 'Property Title',
-                                    'required' => true,
-                                ],
-                                'subtitle' => [
-                                    'type' => 'text',
-                                    'label' => 'Property Subtitle',
-                                    'required' => true,
-                                ],
-                                'price_prefix' => [
-                                    'type' => 'text',
-                                    'label' => 'Value Prefix',
-                                    'default' => 'AED',
-                                    'required' => true,
-                                ],
-                                'price' => [
-                                    'type' => 'text',
-                                    'label' => 'Price Value',
-                                    'required' => true,
-                                    'placeholder' => 'Example: 1,930,000 or 1.930.000',
-                                ],
-                                'bullet_points' => [
-                                    'type' => 'repeater',
-                                    'label' => 'Bullet Points',
-                                    'min_items' => 1,
-                                    'fields' => [
-                                        'text' => [
-                                            'type' => 'text',
-                                            'label' => 'Point Text',
-                                            'required' => true,
-                                        ],
-                                    ],
-                                ],
-                                'url' => [
-                                    'type' => 'url',
-                                    'label' => 'See More URL',
-                                    'required' => true,
-                                ],
-                            ],
-                        ],
-                    ],
+                'image_or_like_this' => [
+                    'type' => 'image_or_like_this',
+                    'label' => 'Image or Like This',
+                    'required' => true,
                 ],
             ],
         ],
-    ],
-],
 
         'section_five' => [
             'label' => 'Section Five - Our Team',
@@ -443,6 +461,11 @@ return [
                             'placeholder' => 'Enter second subtitle',
                         ],
                     ],
+                ],
+                'image_or_like_this' => [
+                    'type' => 'image_or_like_this',
+                    'label' => 'Image or Like This',
+                    'required' => true,
                 ],
             ],
         ],
@@ -519,6 +542,7 @@ return [
                         ],
                     ],
                 ],
+
             ],
         ],
     ],
