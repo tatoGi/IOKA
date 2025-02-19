@@ -73,6 +73,7 @@ class SectionController extends Controller
     {
         // Get the page using type_id instead of id
         $page = Page::where('id', $pageId)->firstOrFail();
+
         // Get page type from config
         $pageType = collect(Config::get('PageTypes'))->firstWhere('id', $page->type_id);
         if (!$pageType || !isset($pageType['sections'][$sectionKey])) {
@@ -90,15 +91,13 @@ class SectionController extends Controller
             abort(404);
         }
 
-        // Add this debug line
-
-
         return view('admin.sections.edit', [
             'section' => $section,
             'sectionConfig' => $sectionConfig,
             'page' => $page,
             'pageId' => $pageId,
-            'sectionKey' => $sectionKey
+            'sectionKey' => $sectionKey,
+            'additionalFields' => $section->additional_fields // Ensure additional fields are passed to the view
         ]);
     }
 

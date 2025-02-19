@@ -1,5 +1,5 @@
 <div class="side-navbar active-nav d-flex justify-content-between flex-wrap flex-column" id="sidebar">
-    <ul class="nav flex-column text-white w-100 overflow-auto" style="max-height: calc(100vh - 60px);">
+    <ul class="nav flex-column text-white w-100 overflow-auto">
         <a href="#" class="nav-link h3 text-white my-2" style="text-decoration: none;">
             <img src="{{ asset('storage/admin/logo/logo.png') }}" alt="logo" class="w-1/2 h-100">
         </a>
@@ -112,7 +112,18 @@
                 <span class="mx-2">Messages</span>
             </li>
         </a>
-
+        <a href="{{ url('ioka_admin/postypes/rental_resale') }}" style="text-decoration: none;">
+            <li class="nav-link ">
+                <i class='bx bx-menu'></i>
+                <span class="mx-2">Rental Resale</span>
+            </li>
+        </a>
+        <a href="{{ url('ioka_admin/postypes/offplan') }}" style="text-decoration: none;">
+            <li class="nav-link ">
+                <i class='bx bx-menu'></i>
+                <span class="mx-2">Offplan</span>
+            </li>
+        </a>
     </ul>
 
 </div>

@@ -1,312 +1,292 @@
-@foreach ($section['fields'] as $fieldKey => $field)
-    <div class="mb-3">
-        <label for="{{ $fieldKey }}" class="form-label">{{ $field['label'] }}</label>
+@php
+    // Get the section configuration from the page type
+    $page = \App\Models\Page::find($pageId);
+    $pageType = collect(Config::get('PageTypes'))->firstWhere('id', $page->type_id);
+    $sectionConfig = $pageType['sections'][$sectionKey] ?? null;
 
-        @switch($field['type'])
-            @case('text')
-                <input type="text" class="form-control @error($fieldKey) is-invalid @enderror"
-                    id="{{ $fieldKey }}" name="fields[{{ $fieldKey }}]"
-                    value="{{ old("fields.$fieldKey", $field['default'] ?? '') }}"
-                    {{ isset($field['required']) && $field['required'] ? 'required' : '' }}>
-            @break
+    // Helper function to safely get value
+    function getSafeValue($value) {
 
-            @case('textarea')
-                <textarea
-                    class="editor form-control @error($fieldKey) is-invalid @enderror"
-                    id="{{ $fieldKey }}"
-                    name="fields[{{ $fieldKey }}]"
-                    {{ isset($field['required']) && $field['required'] ? 'required' : '' }}
-                >{{ old("fields.$fieldKey", $field['default'] ?? '') }}</textarea>
-            @break
+        if (is_array($value)) {
 
-            @case('image')
-                <input type="file" class="form-control @error($fieldKey) is-invalid @enderror"
-                    id="{{ $fieldKey }}" name="fields[{{ $fieldKey }}]" accept="image/*"
-                    {{ isset($field['required']) && $field['required'] ? 'required' : '' }}>
-            @break
+            return json_encode($value);
+        }
+        return $value;
+    }
 
-            @case('url')
-                <input type="url" class="form-control @error($fieldKey) is-invalid @enderror"
-                    id="{{ $fieldKey }}" name="fields[{{ $fieldKey }}]"
-                    value="{{ old("fields.$fieldKey", $field['default'] ?? '') }}"
-                    {{ isset($field['required']) && $field['required'] ? 'required' : '' }}>
-            @break
+@endphp
 
-            @case('number')
-                <input type="number" class="form-control @error($fieldKey) is-invalid @enderror"
-                    id="{{ $fieldKey }}" name="fields[{{ $fieldKey }}]"
-                    value="{{ old("fields.$fieldKey", $field['default'] ?? '') }}"
-                    {{ isset($field['required']) && $field['required'] ? 'required' : '' }}>
-            @break
+@if($sectionConfig && isset($sectionConfig['fields']))
+    @foreach($sectionConfig['fields'] as $fieldKey => $field)
+        <div class="mb-3">
+            <label for="{{ $fieldKey }}" class="form-label">{{ $field['label'] }}</label>
 
-            @case('image_or_like_this')
-                <input type="file" class="form-control @error($fieldKey) is-invalid @enderror"
-                    id="{{ $fieldKey }}" name="fields[{{ $fieldKey }}]" accept="image/*"
-                    {{ isset($field['required']) && $field['required'] ? 'required' : '' }}>
-                <button type="button" class="btn btn-secondary mt-2" onclick="previewImage('{{ $fieldKey }}')">Preview</button>
-                <div id="preview-{{ $fieldKey }}" class="mt-2"></div>
-            @break
+            @switch($field['type'])
+                @case('text')
+                    <input type="text" class="form-control @error($fieldKey) is-invalid @enderror"
+                        id="{{ $fieldKey }}" name="fields[{{ $fieldKey }}]"
+                        value="{{ old("fields.$fieldKey", $additionalFields[$fieldKey] ?? $field['default'] ?? '') }}"
+                        {{ isset($field['required']) && $field['required'] ? 'required' : '' }}>
+                @break
 
-            @case('repeater')
-                <div class="repeater-container" data-field="{{ $fieldKey }}"
-                    data-min="{{ $field['min'] ?? 0 }}" data-max="{{ $field['max'] ?? '' }}">
-                    <div class="repeater-items">
-                        @if (old("fields.$fieldKey"))
-                            @foreach (old("fields.$fieldKey") as $index => $item)
-                                <div class="repeater-item card mb-3">
-                                    <div class="card-body">
-                                        <div class="d-flex justify-content-end mb-2">
-                                            <button type="button"
-                                                class="btn btn-danger btn-sm remove-repeater-item">
-                                                <i class="fas fa-trash"></i> Remove
-                                            </button>
-                                        </div>
-                                        @foreach ($field['fields'] as $repeaterFieldKey => $repeaterField)
-                                            <div class="mb-3">
-                                                <label
-                                                    class="form-label">{{ $repeaterField['label'] }}</label>
-                                                @php
-                                                    $inputType = $repeaterField['type'];
-                                                    if ($repeaterFieldKey === 'phone') {
-                                                        $inputType = 'tel';
-                                                    } elseif (
-                                                        $repeaterFieldKey === 'email'
-                                                    ) {
-                                                        $inputType = 'email';
-                                                    }
-                                                @endphp
-                                                <input type="{{ $inputType }}"
-                                                    class="form-control @error("fields.{$fieldKey}.{$index}.{$repeaterFieldKey}") is-invalid @enderror"
-                                                    name="fields[{{ $fieldKey }}][{{ $index }}][{{ $repeaterFieldKey }}]"
-                                                    value="{{ $item[$repeaterFieldKey] ?? '' }}"
-                                                    {{ isset($repeaterField['required']) && $repeaterField['required'] ? 'required' : '' }}>
-                                                @error("fields.{$fieldKey}.{$index}.{$repeaterFieldKey}")
-                                                    <div class="invalid-feedback">{{ $message }}</div>
-                                                @enderror
+                @case('textarea')
+                    <textarea class="editor form-control @error($fieldKey) is-invalid @enderror"
+                        id="{{ $fieldKey }}" name="fields[{{ $fieldKey }}]"
+                        {{ isset($field['required']) && $field['required'] ? 'required' : '' }}
+                    >{{ getSafeValue($additionalFields[$fieldKey] ?? $field['default'] ?? '') }}</textarea>
+                @break
+
+                @case('image')
+                    @if(isset($additionalFields[$fieldKey]))
+                        <div class="mb-2">
+                            <img src="{{ Storage::url($additionalFields[$fieldKey]) }}"
+                                alt="Current Image"
+                                class="img-thumbnail"
+                                style="max-height: 200px;">
+                        </div>
+                        <input type="hidden" name="old_{{ $fieldKey }}" value="{{ $additionalFields[$fieldKey] }}">
+                    @endif
+                    <input type="file" class="form-control @error($fieldKey) is-invalid @enderror"
+                        id="{{ $fieldKey }}" name="fields[{{ $fieldKey }}]" accept="image/*"
+                        {{ isset($field['required']) && $field['required'] ? 'required' : '' }}>
+                @break
+
+                @case('photo')
+                    @if(isset($additionalFields[$fieldKey]))
+                        <div class="mb-2">
+                            <img src="{{ Storage::url($additionalFields[$fieldKey]) }}"
+                                alt="Current Image"
+                                class="img-thumbnail"
+                                style="max-height: 200px;">
+                        </div>
+                        <input type="hidden" name="old_{{ $fieldKey }}" value="{{ $additionalFields[$fieldKey] }}">
+                    @endif
+                    <input type="file" class="form-control @error($fieldKey) is-invalid @enderror"
+                        id="{{ $fieldKey }}" name="fields[{{ $fieldKey }}]" accept="image/*"
+                        {{ isset($field['required']) && $field['required'] ? 'required' : '' }}>
+                @break
+
+                @case('repeater')
+                    <div class="repeater-container" data-field="{{ $fieldKey }}">
+                        <div class="repeater-items">
+                            @if(isset($additionalFields[$fieldKey]) && is_array($additionalFields[$fieldKey]))
+                                @foreach($additionalFields[$fieldKey] as $index => $item)
+                                    <div class="repeater-item card mb-3">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-end mb-2">
+                                                <button type="button" class="btn btn-danger btn-sm remove-repeater-item">
+                                                    <i class="fas fa-trash"></i> Remove
+                                                </button>
                                             </div>
-                                        @endforeach
+                                            @foreach($field['fields'] as $repeaterFieldKey => $repeaterField)
+                                                <div class="mb-3">
+                                                    <label class="form-label">{{ $repeaterField['label'] }}</label>
+                                                    @switch($repeaterField['type'])
+                                                        @case('image')
+                                                            @if(isset($item[$repeaterFieldKey]))
+                                                                <div class="mb-2">
+                                                                    <img src="{{ Storage::url($item[$repeaterFieldKey]) }}"
+                                                                        alt="Current Image"
+                                                                        class="img-thumbnail"
+                                                                        style="max-height: 200px;">
+                                                                </div>
+                                                                <input type="hidden"
+                                                                    name="old_{{ $repeaterFieldKey }}_{{ $index }}"
+                                                                    value="{{ $item[$repeaterFieldKey] }}">
+                                                            @endif
+                                                            <input type="file"
+                                                                class="form-control"
+                                                                name="fields[{{ $fieldKey }}][{{ $index }}][{{ $repeaterFieldKey }}]"
+                                                                accept="image/*">
+                                                        @break
+
+                                                        @default
+                                                            <input type="{{ $repeaterField['type'] }}"
+                                                                class="form-control"
+                                                                name="fields[{{ $fieldKey }}][{{ $index }}][{{ $repeaterFieldKey }}]"
+                                                                value="{{ getSafeValue($item[$repeaterFieldKey] ?? '') }}"
+                                                                {{ isset($repeaterField['required']) && $repeaterField['required'] ? 'required' : '' }}>
+                                                    @endswitch
+                                                </div>
+                                            @endforeach
+                                        </div>
                                     </div>
-                                </div>
-                            @endforeach
-                        @else
-                            <div class="repeater-item card mb-3" style="display: none;">
+                                @endforeach
+                            @endif
+                        </div>
+
+                        <template class="repeater-template">
+                            <div class="repeater-item card mb-3">
                                 <div class="card-body">
                                     <div class="d-flex justify-content-end mb-2">
                                         <button type="button" class="btn btn-danger btn-sm remove-repeater-item">
                                             <i class="fas fa-trash"></i> Remove
                                         </button>
                                     </div>
-                                    @foreach ($field['fields'] as $repeaterFieldKey => $repeaterField)
+                                    @foreach($field['fields'] as $repeaterFieldKey => $repeaterField)
                                         <div class="mb-3">
                                             <label class="form-label">{{ $repeaterField['label'] }}</label>
-                                            @php
-                                                $inputType = $repeaterField['type'];
-                                                if ($repeaterFieldKey === 'phone') {
-                                                    $inputType = 'tel';
-                                                } elseif ($repeaterFieldKey === 'email') {
-                                                    $inputType = 'email';
-                                                }
-                                            @endphp
-                                            <input type="{{ $inputType }}"
-                                                class="form-control"
-                                                name="fields[{{ $fieldKey }}][0][{{ $repeaterFieldKey }}]"
-                                                value=""
-                                                {{ isset($repeaterField['required']) && $repeaterField['required'] ? 'required' : '' }}>
+                                            @switch($repeaterField['type'])
+                                                @case('image')
+                                                    <input type="file"
+                                                        class="form-control"
+                                                        name="fields[{{ $fieldKey }}][__INDEX__][{{ $repeaterFieldKey }}]"
+                                                        accept="image/*">
+                                                @break
+
+                                                @default
+                                                    <input type="{{ $repeaterField['type'] }}"
+                                                        class="form-control"
+                                                        name="fields[{{ $fieldKey }}][__INDEX__][{{ $repeaterFieldKey }}]"
+                                                        {{ isset($repeaterField['required']) && $repeaterField['required'] ? 'required' : '' }}>
+                                            @endswitch
                                         </div>
                                     @endforeach
                                 </div>
                             </div>
-                        @endif
+                        </template>
+
+                        <button type="button" class="btn btn-primary add-repeater-item mt-2">
+                            Add {{ $field['label'] }}
+                        </button>
                     </div>
-                    <button type="button" class="btn btn-primary add-repeater-item mt-2">
-                        Add {{ $field['label'] }}
-                    </button>
-                </div>
-            @break
+                @break
 
-            @case('group')
-                <div class="card">
-                    <div class="card-body">
-                        @foreach($field['fields'] as $groupFieldKey => $groupField)
-                            <div class="mb-3">
-                                <label class="form-label">{{ $groupField['label'] }}</label>
-                                @switch($groupField['type'])
-                                    @case('text')
-                                        <input type="text"
-                                            class="form-control @error("fields.{$fieldKey}.{$groupFieldKey}") is-invalid @enderror"
-                                            name="fields[{{ $fieldKey }}][{{ $groupFieldKey }}]"
-                                            value="{{ old("fields.{$fieldKey}.{$groupFieldKey}", $groupField['default'] ?? '') }}"
-                                            {{ isset($groupField['required']) && $groupField['required'] ? 'required' : '' }}>
-                                    @break
+                @case('group')
+                    <div class="card">
+                        <div class="card-body">
+                            @foreach($field['fields'] as $groupFieldKey => $groupField)
+                                <div class="mb-3">
+                                    <label class="form-label">{{ $groupField['label'] }}</label>
+                                    @switch($groupField['type'])
+                                        @case('textarea')
+                                            <textarea class="editor form-control"
+                                                name="fields[{{ $fieldKey }}][{{ $groupFieldKey }}]"
+                                                {{ isset($groupField['required']) && $groupField['required'] ? 'required' : '' }}
+                                            >{{ getSafeValue($additionalFields[$fieldKey][$groupFieldKey] ?? $groupField['value'] ?? '') }}</textarea>
+                                        @break
 
-                                    @case('textarea')
-                                        <textarea
-                                            class="editor form-control @error("fields.{$fieldKey}.{$groupFieldKey}") is-invalid @enderror"
-                                            name="fields[{{ $fieldKey }}][{{ $groupFieldKey }}]"
-                                            {{ isset($groupField['required']) && $groupField['required'] ? 'required' : '' }}
-                                        >{{ old("fields.{$fieldKey}.{$groupFieldKey}", $groupField['default'] ?? '') }}</textarea>
-                                    @break
-
-                                    @default
-                                        <input type="{{ $groupField['type'] }}"
-                                            class="form-control @error("fields.{$fieldKey}.{$groupFieldKey}") is-invalid @enderror"
-                                            name="fields[{{ $fieldKey }}][{{ $groupFieldKey }}]"
-                                            value="{{ old("fields.{$fieldKey}.{$groupFieldKey}", $groupField['default'] ?? '') }}"
-                                            {{ isset($groupField['required']) && $groupField['required'] ? 'required' : '' }}>
-                                @endswitch
-                                @error("fields.{$fieldKey}.{$groupFieldKey}")
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        @endforeach
+                                        @default
+                                            <input type="{{ $groupField['type'] }}"
+                                                class="form-control"
+                                                name="fields[{{ $fieldKey }}][{{ $groupFieldKey }}]"
+                                                value="{{ getSafeValue($additionalFields[$fieldKey][$groupFieldKey] ?? $groupField['value'] ?? '') }}"
+                                                {{ isset($groupField['required']) && $groupField['required'] ? 'required' : '' }}>
+                                    @endswitch
+                                </div>
+                            @endforeach
+                        </div>
                     </div>
-                </div>
-            @break
+                @break
 
-            @case('tabs')
-                <div class="tabs-container">
-                    <ul class="nav nav-tabs" role="tablist">
-                        @foreach ($field['tabs'] as $tabKey => $tab)
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link @if ($loop->first) active @endif"
-                                    id="tab-{{ $tabKey }}" data-bs-toggle="tab"
-                                    data-bs-target="#content-{{ $tabKey }}" type="button"
-                                    role="tab">
-                                    {{ $tab['label'] }}
-                                </button>
-                            </li>
-                        @endforeach
-                    </ul>
+                @case('tabs')
+                    <div class="tabs-container">
+                        <ul class="nav nav-tabs" role="tablist">
+                            @foreach($field['tabs'] as $tabKey => $tab)
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link @if($loop->first) active @endif"
+                                        id="tab-{{ $tabKey }}" data-bs-toggle="tab"
+                                        data-bs-target="#content-{{ $tabKey }}" type="button"
+                                        role="tab">
+                                        {{ $tab['label'] }}
+                                    </button>
+                                </li>
+                            @endforeach
+                        </ul>
 
-                    <div class="tab-content mt-3">
-                        @foreach ($field['tabs'] as $tabKey => $tab)
-                            <div class="tab-pane fade @if ($loop->first) show active @endif"
-                                id="content-{{ $tabKey }}" role="tabpanel">
-                                @if (isset($tab['fields']) && is_array($tab['fields']))
-                                    @foreach ($tab['fields'] as $tabFieldKey => $tabField)
+                        <div class="tab-content mt-3">
+                            @foreach($field['tabs'] as $tabKey => $tab)
+                                <div class="tab-pane fade @if($loop->first) show active @endif"
+                                    id="content-{{ $tabKey }}" role="tabpanel">
+                                    @foreach($tab['fields'] as $tabFieldKey => $tabField)
                                         <div class="mb-3">
-                                            <label
-                                                class="form-label">{{ $tabField['label'] ?? ucfirst($tabFieldKey) }}</label>
-
-                                            @switch($tabField['type'] ?? 'text')
-                                                @case('text')
-                                                    <input type="text"
-                                                        class="form-control @error("{$tabKey}.{$tabFieldKey}") is-invalid @enderror"
-                                                        name="fields[{{ $tabKey }}][{{ $tabFieldKey }}]"
-                                                        value="{{ old("fields.{$tabKey}.{$tabFieldKey}", $tabField['default'] ?? '') }}"
-                                                        {{ isset($tabField['required']) && $tabField['required'] ? 'required' : '' }}>
-                                                @break
-
-                                                @case('textarea')
-                                                    <textarea class="form-control @error("{$tabKey}.{$tabFieldKey}") is-invalid @enderror"
-                                                        name="fields[{{ $tabKey }}][{{ $tabFieldKey }}]" rows="3"
-                                                        id="paragraph"
-                                                        {{ isset($tabField['required']) && $tabField['required'] ? 'required' : '' }}>{{ old("fields.{$tabKey}.{$tabFieldKey}", $tabField['default'] ?? '') }}</textarea>
-                                                @break
-
+                                            <label class="form-label">{{ $tabField['label'] }}</label>
+                                            @switch($tabField['type'])
                                                 @case('image')
+                                                    @if(isset($additionalFields[$fieldKey][$tabKey][$tabFieldKey]))
+                                                        <div class="mb-2">
+                                                            <img src="{{ Storage::url($additionalFields[$fieldKey][$tabKey][$tabFieldKey]) }}"
+                                                                alt="Current Image"
+                                                                class="img-thumbnail"
+                                                                style="max-height: 200px;">
+                                                        </div>
+                                                        <input type="hidden"
+                                                            name="old_{{ $tabKey }}_{{ $tabFieldKey }}"
+                                                            value="{{ $additionalFields[$fieldKey][$tabKey][$tabFieldKey] }}">
+                                                    @endif
                                                     <input type="file"
-                                                        class="form-control @error("{$tabKey}.{$tabFieldKey}") is-invalid @enderror"
-                                                        name="fields[{{ $tabKey }}][{{ $tabFieldKey }}]"
-                                                        accept="image/*"
-                                                        {{ isset($tabField['required']) && $tabField['required'] ? 'required' : '' }}>
+                                                        class="form-control"
+                                                        name="fields[{{ $fieldKey }}][{{ $tabKey }}][{{ $tabFieldKey }}]"
+                                                        accept="image/*">
                                                 @break
 
                                                 @default
-                                                    <input type="text"
-                                                        class="form-control @error("{$tabKey}.{$tabFieldKey}") is-invalid @enderror"
-                                                        name="fields[{{ $tabKey }}][{{ $tabFieldKey }}]"
-                                                        value="{{ old("fields.{$tabKey}.{$tabFieldKey}", $tabField['default'] ?? '') }}"
+                                                    <input type="{{ $tabField['type'] }}"
+                                                        class="form-control"
+                                                        name="fields[{{ $fieldKey }}][{{ $tabKey }}][{{ $tabFieldKey }}]"
+                                                        value="{{ getSafeValue($additionalFields[$fieldKey][$tabKey][$tabFieldKey] ?? $tabField['default'] ?? '') }}"
                                                         {{ isset($tabField['required']) && $tabField['required'] ? 'required' : '' }}>
                                             @endswitch
-
-                                            @error("{$tabKey}.{$tabFieldKey}")
-                                                <div class="invalid-feedback">
-                                                    {{ $message }}
-                                                </div>
-                                            @enderror
                                         </div>
                                     @endforeach
-                                @else
-                                    <div class="alert alert-warning">
-                                        No fields defined for this tab.
-                                    </div>
-                                @endif
-                            </div>
-                        @endforeach
+                                </div>
+                            @endforeach
+                        </div>
                     </div>
-                </div>
-            @break
+                @break
 
-            @default
-                <input type="text"
-                    class="form-control @error($fieldKey) is-invalid @enderror"
-                    id="{{ $fieldKey }}" name="fields[{{ $fieldKey }}]"
-                    value="{{ old("fields.$fieldKey", $field['default'] ?? '') }}"
-                    {{ isset($field['required']) && $field['required'] ? 'required' : '' }}>
-        @endswitch
+                @default
+                    <input type="text" class="form-control @error($fieldKey) is-invalid @enderror"
+                        id="{{ $fieldKey }}" name="fields[{{ $fieldKey }}]"
+                        value="{{ getSafeValue($additionalFields[$fieldKey] ?? $field['default'] ?? '') }}"
+                        {{ isset($field['required']) && $field['required'] ? 'required' : '' }}>
+            @endswitch
 
-        @error($fieldKey)
-            <div class="invalid-feedback">
-                {{ $message }}
-            </div>
-        @enderror
+            @error($fieldKey)
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>
+    @endforeach
+@else
+    <div class="alert alert-warning">
+        No fields configuration found for this section.
     </div>
-@endforeach
+@endif
 
 <script>
-    function previewImage(fieldKey) {
-        const input = document.getElementById(fieldKey);
-        const previewContainer = document.getElementById(`preview-${fieldKey}`);
-        previewContainer.innerHTML = '';
-
-        if (input.files && input.files[0]) {
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                const img = document.createElement('img');
-                img.src = e.target.result;
-                img.classList.add('img-thumbnail');
-                previewContainer.appendChild(img);
-            };
-            reader.readAsDataURL(input.files[0]);
-        }
-    }
-
-    document.addEventListener('DOMContentLoaded', function () {
+    // Initialize repeater functionality
+    function initializeRepeaterHandlers() {
         document.querySelectorAll('.add-repeater-item').forEach(button => {
-            button.addEventListener('click', function () {
-                const container = this.closest('.repeater-container');
-                const itemsContainer = container.querySelector('.repeater-items');
-                const fieldKey = container.getAttribute('data-field');
-                const index = itemsContainer.children.length;
-                const templateItem = container.querySelector('.repeater-item');
-
-                if (templateItem) {
-                    const newItem = document.createElement('div');
-                    newItem.classList.add('repeater-item', 'card', 'mb-3');
-                    newItem.innerHTML = `
-                        <div class="card-body">
-                            <div class="d-flex justify-content-end mb-2">
-                                <button type="button" class="btn btn-danger btn-sm remove-repeater-item">
-                                    <i class="fas fa-trash"></i> Remove
-                                </button>
-                            </div>
-                            ${templateItem.innerHTML.replace(/\[0\]/g, `[${index}]`).replace(/\.0\./g, `.${index}.`)}
-                        </div>
-                    `;
-                    itemsContainer.appendChild(newItem);
-
-                    newItem.querySelector('.remove-repeater-item').addEventListener('click', function () {
-                        newItem.remove();
-                    });
-                }
-            });
+            button.removeEventListener('click', handleAddRepeaterItem);
+            button.addEventListener('click', handleAddRepeaterItem);
         });
 
         document.querySelectorAll('.remove-repeater-item').forEach(button => {
-            button.addEventListener('click', function () {
-                this.closest('.repeater-item').remove();
-            });
+            button.removeEventListener('click', handleRemoveRepeaterItem);
+            button.addEventListener('click', handleRemoveRepeaterItem);
         });
+    }
+
+    function handleAddRepeaterItem() {
+        const container = this.closest('.repeater-container');
+        const itemsContainer = container.querySelector('.repeater-items');
+        const template = container.querySelector('.repeater-template');
+        const index = itemsContainer.querySelectorAll('.repeater-item').length;
+
+        const templateContent = template.content.cloneNode(true);
+        templateContent.querySelectorAll('[name*="__INDEX__"]').forEach(input => {
+            input.name = input.name.replace('__INDEX__', index);
+        });
+
+        itemsContainer.appendChild(templateContent);
+        initializeRepeaterHandlers();
+    }
+
+    function handleRemoveRepeaterItem() {
+        this.closest('.repeater-item').remove();
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeRepeaterHandlers();
     });
 </script>

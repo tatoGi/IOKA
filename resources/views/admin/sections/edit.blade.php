@@ -18,7 +18,7 @@
                 @method('PUT')
                 <div class="card-body">
                     <div id="section-fields">
-                        @include('admin.sections.fields', ['section' => $section])
+                        @include('admin.sections.fields', ['section' => $sectionConfig])
                     </div>
                 </div>
 

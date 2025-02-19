@@ -7,13 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 class Section extends Model
 {
     protected $fillable = [
-        'section_key',
-        'page_id',
         'title',
-        'slug',
         'description',
-        'redirect_link',
-        'photo',
+        'slug',
+        'page_id',
+        'section_key',
         'additional_fields',
         'sort_order',
         'active'
