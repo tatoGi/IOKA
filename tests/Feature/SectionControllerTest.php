@@ -2,11 +2,10 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Tests\TestCase;
 use App\Models\Page;
 use App\Models\Section;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class SectionControllerTest extends TestCase
 {
@@ -25,10 +24,10 @@ class SectionControllerTest extends TestCase
             'fields' => [
                 'image' => [
                     'items' => [
-                        $this->createUploadedFile() // Simulate file upload
-                    ]
-                ]
-            ]
+                        $this->createUploadedFile(), // Simulate file upload
+                    ],
+                ],
+            ],
         ];
 
         // Send a POST request to create the section

@@ -23,6 +23,7 @@ class Page extends Model
 
         return $this->belongsTo(Page::class, 'parent_id');
     }
+
     public static function rearrange($array)
     {
 
@@ -51,6 +52,7 @@ class Page extends Model
 
         return $count;
     }
+
     public function getFieldsAttribute()
     {
 

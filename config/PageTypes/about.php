@@ -34,7 +34,7 @@ return [
                             'label' => 'Title',
                             'required' => true,
                         ],
-                    ]
+                    ],
                 ],
                 'paragraph' => [
                     'type' => 'group',
@@ -47,8 +47,8 @@ return [
                             'value' => 'As a brokerage rooted in one of the world\'s most iconic cities, we pride ourselves on',
                         ],
                     ],
-                ]
-            ]
+                ],
+            ],
 
         ],
 

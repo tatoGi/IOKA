@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
-use App\Models\User;  // Adjust to your admin model if it's named differently
+use Illuminate\Support\Facades\Hash;  // Adjust to your admin model if it's named differently
 
 class AdminSeeder extends Seeder
 {

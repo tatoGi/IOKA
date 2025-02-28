@@ -1,12 +1,11 @@
-<div class="side-navbar active-nav d-flex justify-content-between flex-wrap flex-column" id="sidebar">
-    <ul class="nav flex-column text-white w-100 overflow-auto">
+<div class="side-navbar active-nav d-flex justify-content-between flex-wrap flex-column overflow-y-auto" id="sidebar">
+    <ul class="nav flex-column text-white w-100 overflow-y-auto">
         <a href="#" class="nav-link h3 text-white my-2" style="text-decoration: none;">
             <img src="{{ asset('storage/admin/logo/logo.png') }}" alt="logo" class="w-1/2 h-100">
         </a>
         <a href="{{ route('admin.dashboard') }}" style="text-decoration: none;">
             <li class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
-                <i
-                    class='bx bxs-dashboard {{ request()->routeIs('admin.dashboard') ? 'bx-flashing' : 'bx-spin' }} bx-rotate-180'></i>
+                <i class='bx bxs-dashboard {{ request()->routeIs('admin.dashboard') ? 'bx-flashing' : 'bx-spin' }} bx-rotate-180'></i>
                 <span class="mx-2">Dashboard</span>
             </li>
         </a>
@@ -18,15 +17,13 @@
         </a>
         <a href="/ioka_admin/menu" style="text-decoration: none;">
             <li class="nav-link {{ request()->is('ioka_admin/menu*') ? 'active' : '' }}">
-                <i
-                    class='bx bx-menu {{ request()->is('ioka_admin/menu*') ? 'bx-flashing' : 'bx-tada' }} bx-rotate-180'></i>
+                <i class='bx bx-menu {{ request()->is('ioka_admin/menu*') ? 'bx-flashing' : 'bx-tada' }} bx-rotate-180'></i>
                 <span class="mx-2">Frontend Menu Controller</span>
             </li>
         </a>
         <a href="{{ route('blogposts.index') }}" style="text-decoration: none;">
             <li class="nav-link {{ request()->routeIs('blogposts.*') ? 'active' : '' }}">
-                <i
-                    class='bx bx-menu {{ request()->routeIs('blogposts.*') ? 'bx-flashing' : 'bx-tada' }} bx-rotate-180'></i>
+                <i class='bx bx-menu {{ request()->routeIs('blogposts.*') ? 'bx-flashing' : 'bx-tada' }} bx-rotate-180'></i>
                 <span class="mx-2">Blog Posts</span>
             </li>
         </a>
@@ -36,7 +33,7 @@
             $pageTypes = collect(Config::get('PageTypes'))->sortBy('id');
         @endphp
         @foreach ($pageTypes as $type)
-            @if (in_array($type['id'], [1, 3, 2, 7]))
+            @if (in_array($type['id'], [1, 3, 2]))
                 <div class="accordion-item bg-dark border-0">
                     <h2 class="accordion-header" id="heading{{ $type['id'] }}">
                         <button class="accordion-button text-white bg-dark collapsed custom-accordion-button"
@@ -46,12 +43,13 @@
                             <span class="mx-2 text-truncate">{{ $type['name'] }}</span>
                         </button>
                     </h2>
-                    <div id="collapse{{ $type['id'] }}" class="accordion-collapse collapse"
+                    <div id="collapse{{ $type['id'] }}" class="accordion-collapse collapse overflow-y-auto"
                         aria-labelledby="heading{{ $type['id'] }}" data-bs-parent="#sidebar">
                         <ul class="accordion-body list-unstyled">
                             @if ($type['id'] == 3)
                                 @php
                                     $page = \App\Models\Page::where('type_id', $type['id'])->first();
+                                    // Temporary debug statement
                                 @endphp
                                 @if ($page)
                                     <li>
@@ -62,25 +60,19 @@
                                         </a>
                                     </li>
                                 @endif
+
                             @else
                                 @if (isset($type['sections']) && is_array($type['sections']))
                                     @foreach ($type['sections'] as $sectionKey => $section)
                                         <li>
                                             @php
                                                 $page = \App\Models\Page::where('type_id', $type['id'])->first();
-                                                $sectionExists =
-                                                    $page &&
-                                                    \App\Models\Section::where('section_key', $sectionKey)->exists();
-
-                                                $route = $sectionExists
-                                                    ? 'admin.sections.edit'
-                                                    : 'admin.sections.create';
+                                                 // Temporary debug statement
+                                                $sectionExists = $page && \App\Models\Section::where('section_key', $sectionKey)->exists();
+                                                $route = $sectionExists ? 'admin.sections.edit' : 'admin.sections.create';
                                             @endphp
                                             @if ($page)
-                                                <a href="{{ route($route, [
-                                                    'pageId' => $page->id,
-                                                    'sectionKey' => $sectionKey,
-                                                ]) }}"
+                                                <a href="{{ route($route, ['pageId' => $page->id, 'sectionKey' => $sectionKey]) }}"
                                                     class="dropdown-item text-white text-truncate"
                                                     style="text-decoration: none; max-width: 250px;">
                                                     {{ $section['label'] }}
@@ -118,12 +110,23 @@
                 <span class="mx-2">Rental Resale</span>
             </li>
         </a>
-        <a href="{{ url('ioka_admin/postypes/offplan') }}" style="text-decoration: none;">
+        <a href="{{ url('ioka_admin/offplan/offplan') }}" style="text-decoration: none;">
             <li class="nav-link ">
                 <i class='bx bx-menu'></i>
                 <span class="mx-2">Offplan</span>
             </li>
         </a>
+        <a href="{{ url('ioka_admin/developer/list') }}" style="text-decoration: none;">
+            <li class="nav-link ">
+                <i class='bx bx-menu'></i>
+                <span class="mx-2">Developer</span>
+            </li>
+        </a>
+        <a href="{{ url('/ioka_admin/locations') }}" style="text-decoration: none;">
+            <li class="nav-link ">
+                <i class='bx bx-location-plus bx-tada'></i>
+                <span class="mx-2">locations</span>
+            </li>
+        </a>
     </ul>
-
 </div>

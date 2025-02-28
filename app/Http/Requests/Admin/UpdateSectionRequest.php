@@ -13,7 +13,7 @@ class UpdateSectionRequest extends FormRequest
         Log::info('UpdateSectionRequest being validated', [
             'method' => $this->method(),
             'all' => $this->all(),
-            'route' => $this->route()->getName()
+            'route' => $this->route()->getName(),
         ]);
 
         return true;

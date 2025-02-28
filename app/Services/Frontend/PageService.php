@@ -17,10 +17,10 @@ class PageService
         }])->get();
 
         return [
-            'pages' => $pages->map(fn($page) => $this->formatPage($page)),
+            'pages' => $pages->map(fn ($page) => $this->formatPage($page)),
             'meta' => [
-                'total' => $pages->count()
-            ]
+                'total' => $pages->count(),
+            ],
         ];
     }
 
@@ -33,12 +33,12 @@ class PageService
             $query->orderBy('sort_order', 'asc');
         }])->where('slug', $slug)->first();
 
-        if (!$page) {
+        if (! $page) {
             return null;
         }
 
         return [
-            'page' => $this->formatPage($page)
+            'page' => $this->formatPage($page),
         ];
     }
 
@@ -50,10 +50,10 @@ class PageService
         $sections = Section::orderBy('sort_order', 'asc')->get();
 
         return [
-            'sections' => $sections->map(fn($section) => $this->formatSection($section)),
+            'sections' => $sections->map(fn ($section) => $this->formatSection($section)),
             'meta' => [
-                'total' => $sections->count()
-            ]
+                'total' => $sections->count(),
+            ],
         ];
     }
 
@@ -64,12 +64,12 @@ class PageService
     {
         $section = Section::find($id);
 
-        if (!$section) {
+        if (! $section) {
             return null;
         }
 
         return [
-            'section' => $this->formatSection($section)
+            'section' => $this->formatSection($section),
         ];
     }
 
@@ -90,7 +90,7 @@ class PageService
             'active' => $page->active,
             'created_at' => $page->created_at,
             'updated_at' => $page->updated_at,
-            'sections' => $page->sections->map(fn($section) => $this->formatSection($section))
+            'sections' => $page->sections->map(fn ($section) => $this->formatSection($section)),
         ];
     }
 
@@ -107,12 +107,12 @@ class PageService
             'slug' => $section->slug,
             'description' => $section->description,
             'redirect_link' => $section->redirect_link,
-            'photo' => $section->photo ? asset('storage/' . $section->photo) : null,
+            'photo' => $section->photo ? asset('storage/'.$section->photo) : null,
             'additional_fields' => $section->additional_fields,
             'sort_order' => $section->sort_order,
             'active' => $section->active,
             'created_at' => $section->created_at,
-            'updated_at' => $section->updated_at
+            'updated_at' => $section->updated_at,
         ];
     }
 }

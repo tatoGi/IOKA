@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Website;
 use App\Http\Controllers\Controller;
 use App\Services\Frontend\PageService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class FrontendController extends Controller
 {
@@ -31,9 +30,9 @@ class FrontendController extends Controller
     {
         $page = $this->pageService->getPageBySlug($slug);
 
-        if (!$page) {
+        if (! $page) {
             return response()->json([
-                'error' => 'Page not found'
+                'error' => 'Page not found',
             ], 404);
         }
 
@@ -55,9 +54,9 @@ class FrontendController extends Controller
     {
         $section = $this->pageService->getSectionById($id);
 
-        if (!$section) {
+        if (! $section) {
             return response()->json([
-                'error' => 'Section not found'
+                'error' => 'Section not found',
             ], 404);
         }
 

@@ -48,6 +48,7 @@ class PageRepository implements PageRepositoryInterface
     public function updatePage($id, array $data)
     {
         $page = $this->findPageById($id);
+
         return $page ? $page->update($data) : null;
     }
 
@@ -57,6 +58,7 @@ class PageRepository implements PageRepositoryInterface
     public function deletePage($id)
     {
         $page = $this->findPageById($id);
+
         return $page ? $page->delete() : null;
     }
 

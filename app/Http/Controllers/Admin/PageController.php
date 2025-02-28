@@ -22,6 +22,7 @@ class PageController extends Controller
     public function index()
     {
         $pages = $this->pageRepository->getAllPages(); // Use the repository to get pages
+
         return view('admin.pages.index', compact('pages'));
     }
 
@@ -29,6 +30,7 @@ class PageController extends Controller
     public function create()
     {
         $parentPages = $this->pageRepository->getParentPages(); // Get parent pages using the repository
+
         return view('admin.pages.create', compact('parentPages'));
     }
 
@@ -55,31 +57,31 @@ class PageController extends Controller
      * Generate a unique slug by appending a suffix if necessary.
      */
     private function generateUniqueSlug(string $slug): string
-{
-    // Replace spaces with dashes
-    $slug = str_replace(' ', '-', $slug);
+    {
+        // Replace spaces with dashes
+        $slug = str_replace(' ', '-', $slug);
 
-    // Alternatively, use Laravel's helper for a cleaner slug
-    // $slug = \Illuminate\Support\Str::slug($slug);
+        // Alternatively, use Laravel's helper for a cleaner slug
+        // $slug = \Illuminate\Support\Str::slug($slug);
 
-    $originalSlug = $slug;
-    $counter = 1;
+        $originalSlug = $slug;
+        $counter = 1;
 
-    // Ensure the slug is unique
-    while (Page::where('slug', $slug)->exists()) {
-        $slug = "{$originalSlug}-{$counter}";
-        $counter++;
+        // Ensure the slug is unique
+        while (Page::where('slug', $slug)->exists()) {
+            $slug = "{$originalSlug}-{$counter}";
+            $counter++;
+        }
+
+        return $slug;
     }
-
-    return $slug;
-}
-
 
     // Method to show the edit form for a page
     public function edit($id)
     {
         $page = $this->pageRepository->findPageById($id); // Use the repository to find the page
         $parentPages = $this->pageRepository->getParentPages(); // Get parent pages using the repository
+
         return view('admin.pages.edit', compact('page', 'parentPages'));
     }
 

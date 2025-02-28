@@ -5,7 +5,7 @@ return [
     'type' => 4,
     'name' => 'Off Plane',
     'items' => [
-            ['label' => 'Submenu 1', 'url' => '/submenu1'],
-            ['label' => 'Submenu 2', 'url' => '/submenu2'],
-        ],
+        ['label' => 'Submenu 1', 'url' => '/submenu1'],
+        ['label' => 'Submenu 2', 'url' => '/submenu2'],
+    ],
 ];

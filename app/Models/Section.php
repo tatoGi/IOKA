@@ -14,12 +14,12 @@ class Section extends Model
         'section_key',
         'additional_fields',
         'sort_order',
-        'active'
+        'active',
     ];
 
     protected $casts = [
         'additional_fields' => 'array',
-        'active' => 'boolean'
+        'active' => 'boolean',
     ];
 
     public function page()

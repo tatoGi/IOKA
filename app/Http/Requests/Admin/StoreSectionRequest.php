@@ -19,14 +19,14 @@ class StoreSectionRequest extends FormRequest
         $sectionKey = $this->input('section_key');
         $sectionConfig = $pageType['sections'][$sectionKey] ?? null;
 
-        if (!$sectionConfig) {
+        if (! $sectionConfig) {
             return [];
         }
 
         return [
             'fields.title' => 'required|string|max:255',
             'fields' => 'array',
-            'section_key' => 'required|string'
+            'section_key' => 'required|string',
         ];
     }
 }

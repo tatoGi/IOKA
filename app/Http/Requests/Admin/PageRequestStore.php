@@ -32,6 +32,7 @@ class PageRequestStore extends FormRequest
             'active' => 'nullable|boolean',
         ];
     }
+
     /**
      * Get custom messages for validator errors.
      *

@@ -3,16 +3,14 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\ReorderSectionRequest;
+use App\Http\Requests\Admin\StoreSectionRequest;
 use App\Models\Page;
 use App\Models\Section;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Config;
-use App\Http\Requests\Admin\StoreSectionRequest;
-use App\Http\Requests\Admin\UpdateSectionRequest;
-use App\Http\Requests\Admin\ReorderSectionRequest;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class SectionController extends Controller
 {
@@ -22,16 +20,15 @@ class SectionController extends Controller
         $page = Page::where('id', $pageId)->first();
 
         $pageType = collect(Config::get('PageTypes'))->firstWhere('id', $page->type_id);
-        if (!$pageType || !isset($pageType['sections'][$sectionKey])) {
+        if (! $pageType || ! isset($pageType['sections'][$sectionKey])) {
             abort(404);
         }
-
 
         return view('admin.sections.create', [
             'page' => $page,
             'pageId' => $pageId,
             'sectionKey' => $sectionKey,
-            'section' => $pageType['sections'][$sectionKey]
+            'section' => $pageType['sections'][$sectionKey],
         ]);
     }
 
@@ -40,13 +37,13 @@ class SectionController extends Controller
         $page = Page::findOrFail($pageId);
 
         $pageType = collect(Config::get('PageTypes'))->firstWhere('id', $page->type_id);
-        if (!$pageType) {
+        if (! $pageType) {
             abort(404);
         }
 
         $sectionKey = $request->input('section_key');
         $sectionConfig = $pageType['sections'][$sectionKey] ?? null;
-        if (!$sectionConfig) {
+        if (! $sectionConfig) {
             abort(404);
         }
 
@@ -55,10 +52,10 @@ class SectionController extends Controller
         $processedFields = $this->processFields($request, $fields, $sectionConfig['fields']);
 
         // Create section
-        $section = new Section();
+        $section = new Section;
         $section->title = $processedFields['title'] ?? 'Untitled Section';
         $section->description = $request->input('description');
-        $section->slug = Str::slug($processedFields['title'] . '-' . time());
+        $section->slug = Str::slug($processedFields['title'].'-'.time());
         $section->page_id = $page->id;
         $section->section_key = $sectionKey;
         $section->additional_fields = $processedFields;
@@ -76,7 +73,7 @@ class SectionController extends Controller
 
         // Get page type from config
         $pageType = collect(Config::get('PageTypes'))->firstWhere('id', $page->type_id);
-        if (!$pageType || !isset($pageType['sections'][$sectionKey])) {
+        if (! $pageType || ! isset($pageType['sections'][$sectionKey])) {
             abort(404);
         }
 
@@ -87,7 +84,7 @@ class SectionController extends Controller
             ->where('section_key', $sectionKey)
             ->first();
 
-        if (!$section) {
+        if (! $section) {
             abort(404);
         }
 
@@ -97,7 +94,7 @@ class SectionController extends Controller
             'page' => $page,
             'pageId' => $pageId,
             'sectionKey' => $sectionKey,
-            'additionalFields' => $section->additional_fields // Ensure additional fields are passed to the view
+            'additionalFields' => $section->additional_fields, // Ensure additional fields are passed to the view
         ]);
     }
 
@@ -110,7 +107,7 @@ class SectionController extends Controller
         $page = Page::findOrFail($pageId);
         $pageType = collect(Config::get('PageTypes'))->firstWhere('id', $page->type_id);
 
-        if (!$pageType || !isset($pageType['sections'][$sectionKey])) {
+        if (! $pageType || ! isset($pageType['sections'][$sectionKey])) {
             abort(404);
         }
 
@@ -122,7 +119,7 @@ class SectionController extends Controller
 
         // Update section
         $section->title = $processedFields['title'] ?? $section->title;
-        $section->slug = Str::slug($processedFields['title'] . '-' . time());
+        $section->slug = Str::slug($processedFields['title'].'-'.time());
         $section->description = $request->input('description', $section->description);
         $section->additional_fields = $processedFields;
         $section->save();
@@ -135,6 +132,7 @@ class SectionController extends Controller
     protected function validateSectionData(Request $request, array $sectionConfig)
     {
         $rules = $this->buildValidationRules($sectionConfig['fields']);
+
         return $request->validate($rules);
     }
 
@@ -149,7 +147,7 @@ class SectionController extends Controller
                 case 'repeater':
                     $rules[$fieldName] = 'array';
                     if (isset($field['max_items'])) {
-                        $rules[$fieldName] .= '|max:' . $field['max_items'];
+                        $rules[$fieldName] .= '|max:'.$field['max_items'];
                     }
                     foreach ($field['fields'] as $subKey => $subField) {
                         $rules["{$fieldName}.*.{$subKey}"] = $this->getFieldRules($subField);
@@ -192,7 +190,7 @@ class SectionController extends Controller
                 $rules[] = 'nullable|string';
         }
 
-        if (!empty($field['required'])) {
+        if (! empty($field['required'])) {
             $rules[0] = str_replace('nullable', 'required', $rules[0]);
         }
 
@@ -235,7 +233,7 @@ class SectionController extends Controller
         $availableSections = collect($pageType['sections'] ?? [])->map(function ($section, $key) {
             return [
                 'key' => $key,
-                'label' => $section['label']
+                'label' => $section['label'],
             ];
         });
 
@@ -288,7 +286,7 @@ class SectionController extends Controller
     {
         $processed = [];
 
-        if (!empty($repeaterData)) {
+        if (! empty($repeaterData)) {
             foreach ($repeaterData as $index => $item) {
                 $processedItem = [];
                 foreach ($config['fields'] as $fieldKey => $fieldConfig) {
@@ -325,7 +323,7 @@ class SectionController extends Controller
                         $tabsData[$tabKey][$fieldKey] instanceof \Illuminate\Http\UploadedFile
                     ) {
                         $processed[$tabKey][$fieldKey] = $tabsData[$tabKey][$fieldKey]->store('sections', 'public');
-                    } else if ($fieldConfig['type'] === 'image') {
+                    } elseif ($fieldConfig['type'] === 'image') {
                         // Keep existing image if no new one uploaded
                         $processed[$tabKey][$fieldKey] = $request->input("old_{$tabKey}_{$fieldKey}") ??
                             ($request->section->additional_fields[$tabKey][$fieldKey] ?? null);

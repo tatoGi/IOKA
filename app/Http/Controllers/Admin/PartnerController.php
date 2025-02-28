@@ -12,6 +12,7 @@ class PartnerController extends Controller
     public function index()
     {
         $partners = Partner::latest()->paginate(10);
+
         return view('admin.partners.index', compact('partners'));
     }
 
@@ -25,7 +26,7 @@ class PartnerController extends Controller
         $validated = $request->validate([
             'title' => 'required|max:255',
             'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'url' => 'nullable|url'
+            'url' => 'nullable|url',
         ]);
 
         if ($request->hasFile('image')) {
@@ -49,7 +50,7 @@ class PartnerController extends Controller
         $validated = $request->validate([
             'title' => 'required|max:255',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'url' => 'nullable|url'
+            'url' => 'nullable|url',
         ]);
 
         if ($request->hasFile('image')) {
@@ -77,6 +78,7 @@ class PartnerController extends Controller
         return redirect()->route('admin.partners.index')
             ->with('success', 'Partner deleted successfully.');
     }
+
     public function deleteImage($id)
     {
         $partner = Partner::findOrFail($id);

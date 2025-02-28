@@ -2,11 +2,11 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
+use App\Models\Partner;
 use App\Repositories\Interface\PageRepositoryInterface;
 use App\Repositories\PageRepository;
-use App\Models\Partner;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {

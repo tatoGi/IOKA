@@ -2,9 +2,11 @@
 
 namespace App\Services;
 
-use App\Models\RentalResale;
+use App\Http\Requests\Admin\RentalResaleRequest;
+use App\Http\Requests\Admin\UpdateRentalResaleRequest;
 use App\Models\Amount;
 use App\Models\Page;
+use App\Models\RentalResale;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -17,10 +19,11 @@ class RentalResaleService
         foreach ($rentalResales as $rentalResale) {
             $tags = $tags->merge(Page::where('type_id', $rentalResale->tags)->get());
         }
+
         return compact('rentalResales', 'tags');
     }
 
-    public function storeRentalResale(Request $request)
+    public function storeRentalResale(RentalResaleRequest $request)
     {
         $validatedData = $request->validated();
 
@@ -63,7 +66,7 @@ class RentalResaleService
         $rentalResale = RentalResale::findOrFail($id);
         if ($rentalResale->qr_photo) {
             Storage::delete($rentalResale->qr_photo);
-            $rentalResale->qr_photo = null;
+            $rentalResale->qr_photo = '';
             $rentalResale->save();
         }
     }
@@ -83,11 +86,16 @@ class RentalResaleService
     public function getGalleryImages($id)
     {
         $rentalResale = RentalResale::findOrFail($id);
+
         return is_array($rentalResale->gallery_images) ? $rentalResale->gallery_images : json_decode($rentalResale->gallery_images, true);
     }
 
     public function uploadGalleryImages($id, Request $request)
     {
+        $validatedData = $request->validate([
+            'gallery_images.*' => 'image',
+        ]);
+
         $rentalResale = RentalResale::findOrFail($id);
         $galleryImages = is_array($rentalResale->gallery_images) ? $rentalResale->gallery_images : json_decode($rentalResale->gallery_images, true);
 
@@ -98,5 +106,37 @@ class RentalResaleService
             $rentalResale->gallery_images = json_encode($galleryImages);
             $rentalResale->save();
         }
+    }
+
+    public function updateRentalResale(UpdateRentalResaleRequest $request, $id)
+    {
+        $validatedData = $request->validated();
+
+        $rentalResale = RentalResale::findOrFail($id);
+
+        if ($request->hasFile('qr_photo')) {
+            // Delete the old QR photo if it exists
+            if ($rentalResale->qr_photo) {
+                Storage::delete($rentalResale->qr_photo);
+            }
+            $validatedData['qr_photo'] = $request->file('qr_photo')->store('qr_photos', 'public');
+        }
+
+        if ($request->hasFile('gallery_images')) {
+            $galleryImages = is_array($rentalResale->gallery_images) ? $rentalResale->gallery_images : json_decode($rentalResale->gallery_images, true);
+            foreach ($request->file('gallery_images') as $image) {
+                $galleryImages[] = $image->store('gallery_images', 'public');
+            }
+            $validatedData['gallery_images'] = json_encode($galleryImages);
+        }
+
+        unset($validatedData['amount']);
+        unset($validatedData['amount_dirhams']);
+
+        $rentalResale->update($validatedData);
+        $rentalResale->amount->update([
+            'amount' => $request->amount,
+            'amount_dirhams' => $request->amount_dirhams,
+        ]);
     }
 }

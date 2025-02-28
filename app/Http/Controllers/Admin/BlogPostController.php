@@ -26,6 +26,7 @@ class BlogPostController extends Controller
     public function create()
     {
         $tags = Tag::all();
+
         return view('admin.blogposts.create', compact('tags'));
     }
 
@@ -53,6 +54,7 @@ class BlogPostController extends Controller
     public function edit(BlogPost $blogPost)
     {
         $tags = Tag::all();
+
         return view('admin.blogposts.edit', compact('blogPost', 'tags'));
     }
 
@@ -80,6 +82,7 @@ class BlogPostController extends Controller
     public function destroy(BlogPost $blogPost)
     {
         $blogPost->delete();
+
         return redirect()->route('blogposts.index')->with('success', 'Blog post deleted successfully.');
     }
 }

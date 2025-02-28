@@ -18,6 +18,7 @@ class AuthController extends Controller
     {
         return view('admin.auth.login');
     }
+
     public function login(AdminLoginRequest $request)
     {
         // Get the validated data
@@ -27,14 +28,15 @@ class AuthController extends Controller
         $secretKey = env('RECAPTCHA_SECRET');
 
         $response = Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
-            'secret' => $secretKey
+            'secret' => $secretKey,
         ]);
 
         $recaptchaData = $response->json();
 
         // Log failed login attempt for invalid CAPTCHA
-        if (!$recaptchaData['success']) {
+        if (! $recaptchaData['success']) {
             $this->logLoginActivity($validated['name'], 'failed');
+
             return redirect()->route('admin.login')
                 ->withErrors(['g-recaptcha-response' => 'CAPTCHA verification failed. Please try again.'])
                 ->withInput();
@@ -47,10 +49,12 @@ class AuthController extends Controller
         if ($user && Auth::attempt(['name' => $validated['name'], 'password' => $validated['password']])) {
             Auth::logoutOtherDevices($validated['password']);  // Invalidate other devices
             $this->logLoginActivity($validated['name'], 'success');  // Log success
+
             return redirect()->route('admin.dashboard');
         }
 
         $this->logLoginActivity($validated['name'], 'failed');  // Log failed login
+
         return redirect()->route('admin.login')
             ->withErrors(['username' => 'Invalid credentials'])
             ->withInput();
@@ -58,12 +62,12 @@ class AuthController extends Controller
 
     private function logLoginActivity($username, $status)
     {
-        $agent = new Agent();
+        $agent = new Agent;
 
         AdminLoginActivity::create([
             'admin_username' => $username,
             'ip_address' => Request::ip(),
-            'device_details' => $agent->device() . ' - ' . $agent->platform() . ' - ' . $agent->browser(), // More detailed device info
+            'device_details' => $agent->device().' - '.$agent->platform().' - '.$agent->browser(), // More detailed device info
             'status' => $status,
         ]);
     }
