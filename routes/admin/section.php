@@ -11,4 +11,5 @@ Route::group(['prefix' => 'ioka_admin/pages/{pageId}/sections', 'as' => 'admin.s
     Route::put('{sectionKey}', [SectionController::class, 'update'])->name('update');
     Route::post('reorder', [SectionController::class, 'reorder'])->name('reorder');
     Route::delete('{sectionKey}', [SectionController::class, 'destroy'])->name('destroy');
+    Route::delete('{sectionKey}/delete-image', [SectionController::class, 'deleteImage'])->name('delete_image');
 });

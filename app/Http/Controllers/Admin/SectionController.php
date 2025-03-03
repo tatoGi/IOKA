@@ -341,4 +341,24 @@ class SectionController extends Controller
     {
         return $this->processFields($request, $groupData, $config['fields']);
     }
+
+    public function deleteImage(Request $request, $pageId, $sectionKey)
+    {
+        $section = Section::where('page_id', $pageId)
+            ->where('section_key', $sectionKey)
+            ->firstOrFail();
+
+        $fieldKey = $request->input('field_key');
+        $imagePath = $section->additional_fields[$fieldKey] ?? null;
+
+        if ($imagePath && Storage::disk('public')->exists($imagePath)) {
+            Storage::disk('public')->delete($imagePath);
+            $additionalFields = $section->additional_fields;
+            $additionalFields[$fieldKey] = null;
+            $section->setAttribute('additional_fields', $additionalFields);
+            $section->save();
+        }
+
+        return response()->json(['success' => true]);
+    }
 }

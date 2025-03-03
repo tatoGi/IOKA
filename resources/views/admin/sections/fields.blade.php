@@ -43,6 +43,9 @@
                                 alt="Current Image"
                                 class="img-thumbnail"
                                 style="max-height: 200px;">
+                            <button type="button" class="btn btn-danger btn-sm delete-image" data-field="{{ $fieldKey }}">
+                                Delete Image
+                            </button>
                         </div>
                         <input type="hidden" name="old_{{ $fieldKey }}" value="{{ $additionalFields[$fieldKey] }}">
                     @endif
@@ -58,6 +61,9 @@
                                 alt="Current Image"
                                 class="img-thumbnail"
                                 style="max-height: 200px;">
+                            <button type="button" class="btn btn-danger btn-sm delete-image" data-field="{{ $fieldKey }}">
+                                Delete Image
+                            </button>
                         </div>
                         <input type="hidden" name="old_{{ $fieldKey }}" value="{{ $additionalFields[$fieldKey] }}">
                     @endif
@@ -288,5 +294,48 @@
 
     document.addEventListener('DOMContentLoaded', function() {
         initializeRepeaterHandlers();
+        initializeDeleteImageHandlers();
     });
+
+    function initializeDeleteImageHandlers() {
+        document.querySelectorAll('.delete-image').forEach(button => {
+            button.addEventListener('click', handleDeleteImage);
+        });
+    }
+
+    function handleDeleteImage() {
+        const fieldKey = this.getAttribute('data-field');
+        const pageId = '{{ $pageId }}'; // Use pageId from the blade template
+        const sectionKey = '{{ $sectionKey }}'; // Use sectionKey as section ID
+        const url = `{{ route('admin.sections.delete_image', ['pageId' => '__PAGE_ID__', 'sectionKey' => '__SECTION_KEY__']) }}`
+            .replace('__PAGE_ID__', pageId)
+            .replace('__SECTION_KEY__', sectionKey);
+
+        fetch(url, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ field_key: fieldKey })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                const hiddenInput = document.querySelector(`input[name="old_${fieldKey}"]`);
+                if (hiddenInput) {
+                    hiddenInput.value = '';
+                }
+                this.closest('.mb-2').remove();
+            }
+        })
+        .catch(error => {
+            console.error('There was a problem with the fetch operation:', error);
+        });
+    }
 </script>
