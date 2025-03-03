@@ -3,7 +3,7 @@
 @section('content')
     <div class="container mt-5">
         <h1 class="text-center mb-4">Create Rental Resale Post</h1>
-        <form action="{{ route('admin.postypes.rental_resale.store') }}" method="POST" enctype="multipart/form-data" class="shadow p-4 rounded bg-light">
+        <form id="rental-resale-form" action="{{ route('admin.postypes.rental_resale.store') }}" method="POST" enctype="multipart/form-data" class="shadow p-4 rounded bg-light">
             @csrf
             @if ($errors->any())
                 <div class="alert alert-danger">
@@ -21,13 +21,21 @@
                     <option value="5">Rental</option>
                 </select>
             </div>
-            <div class="mb-3">
-                <label for="amount" class="form-label">Amount (in dollars)</label>
-                <input type="number" step="0.01" class="form-control amount" id="amount" name="amount" required>
-            </div>
-            <div class="mb-3">
-                <label for="amount_dirhams" class="form-label">Amount (in Dirhams)</label>
-                <input type="number" step="0.01" class="form-control amount_dirhams" id="amount_dirhams" name="amount_dirhams" readonly>
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="amount" class="form-label">Amount (in dollars)</label>
+                            <input type="number" step="0.01" class="form-control amount" id="amount" name="amount" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="amount_dirhams" class="form-label">Amount (in Dirhams)</label>
+                            <input type="number" step="0.01" class="form-control amount_dirhams" id="amount_dirhams" name="amount_dirhams" readonly>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="mb-3">
                 <label for="property_type" class="form-label">Property Type</label>
@@ -175,7 +183,6 @@
             </div>
             <div class="mb-3">
                 <label for="gallery" class="form-label">Gallery</label>
-                <input type="file" class="form-control" id="gallery" name="gallery_images[]" multiple required>
                 <button type="button" class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#galleryModal">Manage Gallery</button>
             </div>
             <button type="submit" class="btn btn-success w-100">Create</button>
@@ -194,112 +201,15 @@
                     <div id="gallery-images">
                         <!-- Gallery images will be loaded here dynamically -->
                     </div>
-                    <input type="file" class="form-control mt-3" id="new-gallery-image" multiple>
+                    <input type="file" name="gallery_images[]" class="form-control mt-3" id="new-gallery-image" multiple>
                     <button type="button" class="btn btn-primary mt-2" id="upload-new-image">Upload New Image</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <script>
-        document.getElementById('upload-new-image').addEventListener('click', function() {
-            const input = document.getElementById('new-gallery-image');
-            const files = input.files;
-            const galleryImages = document.getElementById('gallery-images');
+    <!-- Hidden element to pass uploadedImages variable -->
+    <div id="uploadedImages" style="display: none;">{{ json_encode($uploadedImages ?? []) }}</div>
 
-            for (let i = 0; i < files.length; i++) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const imgWrapper = document.createElement('div');
-                    imgWrapper.classList.add('gallery-image-wrapper');
-                    imgWrapper.innerHTML = `
-                        <img src="${e.target.result}" alt="Gallery Image">
-                        <button type="button" class="remove-gallery-image">&times;</button>
-                    `;
-                    galleryImages.appendChild(imgWrapper);
-                };
-                reader.readAsDataURL(files[i]);
-            }
-        });
-
-        function loadGalleryImages() {
-            const galleryImages = document.getElementById('gallery-images');
-            // Logic to display uploaded images
-            const uploadedImages = JSON.parse('{{ json_encode($uploadedImages ?? []) }}');
-            uploadedImages.forEach(src => {
-                const imgWrapper = document.createElement('div');
-                imgWrapper.classList.add('gallery-image-wrapper');
-                imgWrapper.innerHTML = `
-                    <img src="${src}" alt="Gallery Image">
-                    <button type="button" class="remove-gallery-image">&times;</button>
-                `;
-                galleryImages.appendChild(imgWrapper);
-            });
-        }
-
-        document.addEventListener('DOMContentLoaded', function() {
-            loadGalleryImages();
-        });
-
-        document.addEventListener('click', function(event) {
-            if (event.target.classList.contains('remove-gallery-image')) {
-                event.target.closest('.gallery-image-wrapper').remove();
-            }
-        });
-
-        document.getElementById('add-detail').addEventListener('click', function() {
-            const index = document.querySelectorAll('#details-repeater .repeater-item').length;
-            const newItem = document.createElement('div');
-            newItem.classList.add('repeater-item', 'mb-2');
-            newItem.innerHTML = `
-                <input type="text" class="form-control mb-2" name="details[${index}][title]" placeholder="Title" required>
-                <input type="text" class="form-control mb-2" name="details[${index}][info]" placeholder="Information" required>
-                <button type="button" class="btn btn-danger remove-detail">
-                    <i class="fas fa-trash-alt"></i>
-                </button>
-            `;
-            document.getElementById('details-repeater').appendChild(newItem);
-        });
-
-        document.getElementById('add-amenity').addEventListener('click', function() {
-            const index = document.querySelectorAll('#amenities-repeater .repeater-item').length;
-            const newItem = document.createElement('div');
-            newItem.classList.add('repeater-item', 'mb-2');
-            newItem.innerHTML = `
-                <input type="text" class="form-control mb-2" name="amenities[${index}]" placeholder="Amenity" required>
-                <button type="button" class="btn btn-danger remove-amenity">
-                    <i class="fas fa-trash-alt"></i>
-                </button>
-            `;
-            document.getElementById('amenities-repeater').appendChild(newItem);
-        });
-
-        document.getElementById('add-address').addEventListener('click', function() {
-            const index = document.querySelectorAll('#addresses-repeater .repeater-item').length;
-            const newItem = document.createElement('div');
-            newItem.classList.add('repeater-item', 'mb-2');
-            newItem.innerHTML = `
-                <input type="text" class="form-control mb-2" name="addresses[${index}]" placeholder="Address" required>
-                <button type="button" class="btn btn-danger remove-address">
-                    <i class="fas fa-trash-alt"></i>
-                </button>
-            `;
-            document.getElementById('addresses-repeater').appendChild(newItem);
-        });
-
-        document.addEventListener('click', function(event) {
-            if (event.target.classList.contains('remove-detail') || event.target.closest('.remove-detail')) {
-                const item = event.target.closest('.repeater-item');
-                if (item) item.remove();
-            }
-            if (event.target.classList.contains('remove-amenity') || event.target.closest('.remove-amenity')) {
-                const item = event.target.closest('.repeater-item');
-                if (item) item.remove();
-            }
-            if (event.target.classList.contains('remove-address') || event.target.closest('.remove-address')) {
-                const item = event.target.closest('.repeater-item');
-                if (item) item.remove();
-            }
-        });
-    </script>
+    <script src="{{ asset('storage/admin/assets/rental_resale.js') }}"></script>
 @endsection

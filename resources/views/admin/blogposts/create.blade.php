@@ -1,9 +1,4 @@
 @extends('admin.layouts.app')
-
-@section('styles')
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-@endsection
-
 @section('content')
     <div class="container-fluid">
         <div class="row mb-4">
@@ -62,7 +57,7 @@
 
                     <div class="mb-3">
                         <label for="tags" class="form-label">Tags</label>
-                        <select class="form-select" id="tags" name="tags[]" multiple="multiple">
+                        <select class="form-control tags" id="tags" name="tags[]" multiple="multiple">
                             @if (old('tags'))
                                 @foreach (old('tags') as $tag)
                                     <option value="{{ $tag }}" selected>{{ $tag }}</option>
@@ -89,40 +84,8 @@
     </div>
 @endsection
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            $('#tags').select2({
-                tags: true,
-                tokenSeparators: [',', ' '],
-                placeholder: 'Type or select tags',
-                allowClear: true,
-                theme: 'default',
-                width: '100%',
-                createTag: function(params) {
-                    // Don't create a tag if there's no input
-                    if (params.term.trim() === '') {
-                        return null;
-                    }
+@section('scripts')
+    <script src="{{ asset('storage/admin/assets/blogpost.js') }}"></script>
+@endsection
 
-                    return {
-                        id: params.term,
-                        text: params.term,
-                        newTag: true
-                    };
-                },
-                templateResult: function(data) {
-                    var $result = $("<span></span>");
-                    $result.text(data.text);
-                    return $result;
-                },
-                templateSelection: function(data) {
-                    var $result = $("<span></span>");
-                    $result.text(data.text);
-                    return $result;
-                }
-            });
 
-            // Optional: Trigger change event to properly initialize any existing values
-            $('#tags').trigger('change');
-        });
-    </script>

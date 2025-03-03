@@ -34,7 +34,7 @@
 
                     <div class="mb-3">
                         <label for="body" class="form-label">Body</label>
-                        <textarea class="form-control @error('body') is-invalid @enderror" id="body" name="body" rows="10"
+                        <textarea class="form-control editor @error('body')  is-invalid @enderror" id="body" name="body" rows="10"
                             required>{{ old('body', $blogPost->body) }}</textarea>
                         @error('body')
                             <div class="invalid-feedback">{{ $message }}</div>
@@ -64,7 +64,7 @@
 
                     <div class="mb-3">
                         <label for="tags" class="form-label">Tags</label>
-                        <select class="form-select" id="tags" name="tags[]" multiple>
+                        <select class="form-control tags" id="tags" name="tags[]" multiple>
                             @foreach ($tags as $tag)
                                 <option value="{{ $tag->name }}"
                                     {{ in_array($tag->name, $blogPost->tags->pluck('name')->toArray()) ? 'selected' : '' }}>
@@ -83,16 +83,8 @@
         </div>
     </div>
 
-    @push('scripts')
-        <script>
-            // Initialize select2 for tags
-            $(document).ready(function() {
-                $('#tags').select2({
-                    tags: true,
-                    tokenSeparators: [',', ' '],
-                    placeholder: 'Select or create tags'
-                });
-            });
-        </script>
-    @endpush
+
+@endsection
+@section('scripts')
+    <script src="{{ asset('storage/admin/assets/blogpost.js') }}"></script>
 @endsection
