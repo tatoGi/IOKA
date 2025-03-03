@@ -1,8 +1,8 @@
 <?php
 
 return [
-    'id' => '4' ,
-    'type' => '4',
+    'id' => 8 ,
+    'type' => 8,
     'name' => 'Popular Areas',
     'sections' => [
         'PoPular' => [

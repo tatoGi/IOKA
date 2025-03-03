@@ -33,7 +33,7 @@
             $pageTypes = collect(Config::get('PageTypes'))->sortBy('id');
         @endphp
         @foreach ($pageTypes as $type)
-            @if (in_array($type['id'], [1, 3, 2]))
+            @if (in_array($type['id'], [1, 3, 2, 8]))
                 <div class="accordion-item bg-dark border-0">
                     <h2 class="accordion-header" id="heading{{ $type['id'] }}">
                         <button class="accordion-button text-white bg-dark collapsed custom-accordion-button"
