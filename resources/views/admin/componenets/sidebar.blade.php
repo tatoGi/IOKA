@@ -46,10 +46,9 @@
                     <div id="collapse{{ $type['id'] }}" class="accordion-collapse collapse overflow-y-auto"
                         aria-labelledby="heading{{ $type['id'] }}" data-bs-parent="#sidebar">
                         <ul class="accordion-body list-unstyled">
-                            @if ($type['id'] == 3)
+                            @if ($type['id'] == 3 || $type['id'] == 8)
                                 @php
                                     $page = \App\Models\Page::where('type_id', $type['id'])->first();
-                                    // Temporary debug statement
                                 @endphp
                                 @if ($page)
                                     <li>
@@ -60,14 +59,12 @@
                                         </a>
                                     </li>
                                 @endif
-
                             @else
                                 @if (isset($type['sections']) && is_array($type['sections']))
                                     @foreach ($type['sections'] as $sectionKey => $section)
                                         <li>
                                             @php
                                                 $page = \App\Models\Page::where('type_id', $type['id'])->first();
-                                                 // Temporary debug statement
                                                 $sectionExists = $page && \App\Models\Section::where('section_key', $sectionKey)->exists();
                                                 $route = $sectionExists ? 'admin.sections.edit' : 'admin.sections.create';
                                             @endphp

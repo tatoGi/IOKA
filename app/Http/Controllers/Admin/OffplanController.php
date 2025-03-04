@@ -99,4 +99,16 @@ class OffplanController extends Controller
 
         return redirect()->route('admin.offplan.interior_gallery')->with('success', 'Interior photos uploaded successfully.');
     }
+
+    public function deleteImage(Request $request)
+    {
+        $type = $request->input('type');
+        $path = $request->input('path');
+
+        if ($type && $path && Storage::disk('public')->exists($path)) {
+            Storage::disk('public')->delete($path);
+            return response()->json(['success' => 'Image deleted successfully.']);
+        }
+        return response()->json(['error' => 'Image not found.'], 404);
+    }
 }
