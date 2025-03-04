@@ -7,6 +7,8 @@ use App\Http\Requests\Admin\RentalResaleRequest;
 use App\Http\Requests\Admin\UpdateRentalResaleRequest;
 use App\Services\RentalResaleService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Location;
 
 class PostypeController extends Controller
 {
@@ -26,7 +28,8 @@ class PostypeController extends Controller
 
     public function rentalcreate()
     {
-        return view('admin.rental_resale.create');
+        $locations = Location::all();
+        return view('admin.rental_resale.create', compact('locations'));
     }
 
     public function rentalstore(RentalResaleRequest $request)
@@ -39,8 +42,9 @@ class PostypeController extends Controller
     public function rentaledit($id)
     {
         $rentalResale = $this->rentalResaleService->getRentalResaleById($id);
+        $locations = Location::all();
 
-        return view('admin.rental_resale.edit', compact('rentalResale'));
+        return view('admin.rental_resale.edit', compact('rentalResale', 'locations'));
     }
 
     public function rentalupdate(UpdateRentalResaleRequest $request, $id)
@@ -78,10 +82,10 @@ class PostypeController extends Controller
         return response()->json(['images' => $images]);
     }
 
-    public function uploadGalleryImages($id, Request $request)
+    public function uploadGalleryImages(Request $request)
     {
-        $this->rentalResaleService->uploadGalleryImages($id, $request);
+        $result = $this->rentalResaleService->uploadGalleryImages($request);
 
-        return response()->json(['success' => true]);
+        return response()->json($result);
     }
 }

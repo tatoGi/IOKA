@@ -5,6 +5,7 @@
         <h1 class="text-center mb-4">Create Rental Resale Post</h1>
         <form id="rental-resale-form" action="{{ route('admin.postypes.rental_resale.store') }}" method="POST" enctype="multipart/form-data" class="shadow p-4 rounded bg-light">
             @csrf
+            <input type="hidden" id="postId" value="">
             @if ($errors->any())
                 <div class="alert alert-danger">
                     <ul>
@@ -168,6 +169,14 @@
             <div class="mb-3">
                 <label for="location_link" class="form-label">Location Link</label>
                 <input type="text" class="form-control" id="location_link" name="location_link" required>
+            </div>
+            <div class="mb-3">
+                <label for="location_id" class="form-label">Location</label>
+                <select class="form-control select2" id="location_id" name="location_id" required>
+                    @foreach($locations as $location)
+                        <option value="{{ $location->id }}">{{ $location->title }}</option>
+                    @endforeach
+                </select>
             </div>
             <div class="mb-3">
                 <label for="qr_photo" class="form-label">QR Photo</label>

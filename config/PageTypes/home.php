@@ -427,7 +427,26 @@ return [
                 ],
             ],
         ],
-
+        'section_four' => [
+            'label' => 'Section Four - Popular Areas',
+            'fields' => [
+                'title' => [
+                    'type' => 'text',
+                    'label' => 'Title',
+                    'required' => true,
+                ],
+                'redirect_link' => [
+                    'type' => 'text',
+                    'label' => 'Redirect Link',
+                    'required' => true,
+                ],
+                'image' => [
+                    'type' => 'image',
+                    'label' => 'Image',
+                    'required' => true,
+                ],
+            ],
+        ],
         'section_five' => [
             'label' => 'Section Five - Our Team',
             'fields' => [

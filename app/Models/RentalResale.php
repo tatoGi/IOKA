@@ -35,6 +35,7 @@ class RentalResale extends Model
         'gallery_images',
         'tags',
         'amount_id',
+        'location_id',
     ];
 
     protected $casts = [

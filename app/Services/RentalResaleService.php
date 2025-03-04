@@ -9,12 +9,14 @@ use App\Models\Page;
 use App\Models\RentalResale;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use App\Models\Location;
 
 class RentalResaleService
 {
     public function getRentalIndexData()
     {
         $rentalResales = RentalResale::all();
+
         $tags = collect();
         foreach ($rentalResales as $rentalResale) {
             $tags = $tags->merge(Page::where('type_id', $rentalResale->tags)->get());
@@ -36,7 +38,7 @@ class RentalResaleService
             foreach ($request->file('gallery_images') as $image) {
                 $galleryImages[] = $image->store('gallery_images', 'public');
             }
-            $validatedData['gallery_images'] = json_encode($galleryImages);
+            $validatedData['gallery_images'] = $galleryImages;
         }
 
         unset($validatedData['amount']);
@@ -90,22 +92,25 @@ class RentalResaleService
         return is_array($rentalResale->gallery_images) ? $rentalResale->gallery_images : json_decode($rentalResale->gallery_images, true);
     }
 
-    public function uploadGalleryImages($id, Request $request)
+    public function uploadGalleryImages(Request $request)
     {
         $validatedData = $request->validate([
-            'gallery_images.*' => 'image',
+            'image' => 'required|image',
         ]);
 
-        $rentalResale = RentalResale::findOrFail($id);
-        $galleryImages = is_array($rentalResale->gallery_images) ? $rentalResale->gallery_images : json_decode($rentalResale->gallery_images, true);
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $path = $image->store('public/gallery');
+            $imageUrl = asset(str_replace('public/', 'storage/', $path));
 
-        if ($request->hasFile('gallery_images')) {
-            foreach ($request->file('gallery_images') as $image) {
-                $galleryImages[] = $image->store('gallery_images', 'public');
-            }
-            $rentalResale->gallery_images = json_encode($galleryImages);
-            $rentalResale->save();
+            return [
+                'success' => true,
+                'image_url' => $imageUrl,
+                'image_id' => uniqid() // Replace with actual image ID if available
+            ];
         }
+
+        return ['success' => false, 'message' => 'No image uploaded'];
     }
 
     public function updateRentalResale(UpdateRentalResaleRequest $request, $id)

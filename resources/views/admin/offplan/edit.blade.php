@@ -55,6 +55,7 @@
                         <div class="features_item">
                             <input type="text" class="form-control mb-2" name="features[{{ $index }}]"
                                 value="{{ $feature }}" placeholder="Feature">
+                            <button type="button" class="btn btn-danger btn-sm remove-feature">Remove</button>
                         </div>
                     @endforeach
                 </div>
@@ -79,6 +80,7 @@
                             <input type="number" step="0.1" class="form-control mb-2"
                                 name="near_by[{{ $index }}][distance]" value="{{ $nearBy['distance'] }}"
                                 placeholder="Distance (e.g., 4.5)">
+                            <button type="button" class="btn btn-danger btn-sm remove-near-by">Remove</button>
                         </div>
                     @endforeach
                 </div>
@@ -322,6 +324,7 @@
             newItem.classList.add('features_item');
             newItem.innerHTML = `
             <input type="text" class="form-control mb-2" name="features[${index}]" placeholder="Feature">
+            <button type="button" class="btn btn-danger btn-sm remove-feature">Remove</button>
         `;
             repeater.appendChild(newItem);
         });
@@ -334,6 +337,7 @@
             newItem.innerHTML = `
             <input type="text" class="form-control mb-2" name="near_by[${index}][title]" placeholder="Title">
             <input type="number" step="0.1" class="form-control mb-2" name="near_by[${index}][distance]" placeholder="Distance (e.g., 4.5)">
+            <button type="button" class="btn btn-danger btn-sm remove-near-by">Remove</button>
         `;
             repeater.appendChild(newItem);
         });
@@ -355,6 +359,18 @@
                         this.parentElement.remove();
                     }
                 });
+            });
+        });
+
+        document.querySelectorAll('.remove-feature').forEach(button => {
+            button.addEventListener('click', function() {
+                this.parentElement.remove();
+            });
+        });
+
+        document.querySelectorAll('.remove-near-by').forEach(button => {
+            button.addEventListener('click', function() {
+                this.parentElement.remove();
             });
         });
     </script>
