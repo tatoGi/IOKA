@@ -62,4 +62,12 @@ class FrontendController extends Controller
 
         return response()->json($section);
     }
+    public function getblogs()
+    {
+        $blog = $this->pageService->getBlogs();
+
+
+        return response()->json($blog);
+
+    }
 }

@@ -4,6 +4,7 @@ namespace App\Services\Frontend;
 
 use App\Models\Page;
 use App\Models\Section;
+use App\Models\BlogPost;
 
 class PageService
 {
@@ -115,4 +116,9 @@ class PageService
             'updated_at' => $section->updated_at,
         ];
     }
+    public function getBlogs()
+    {
+        return BlogPost::where('show_on_main_page', 1)->with('tags')->get();
+    }
+
 }

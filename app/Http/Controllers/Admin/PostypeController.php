@@ -9,6 +9,7 @@ use App\Services\RentalResaleService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Location;
+use Illuminate\Support\Facades\View;
 
 class PostypeController extends Controller
 {
