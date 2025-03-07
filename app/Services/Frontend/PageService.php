@@ -118,7 +118,7 @@ class PageService
     }
     public function getBlogs()
     {
-        return BlogPost::where('show_on_main_page', 1)->with('tags')->get();
+        return BlogPost::with('tags')->paginate(10);
     }
 
 }

@@ -10,7 +10,7 @@
 
         <div class="card">
             <div class="card-body">
-                <form action="{{ route('blogposts.update', $blogPost) }}" method="POST">
+                <form action="{{ route('blogposts.update', $blogPost) }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
 
@@ -52,6 +52,19 @@
                         @enderror
                     </div>
 
+                    <div class="mb-3">
+                        <label for="image" class="form-label">Image</label>
+                        <input type="file" class="form-control @error('image') is-invalid @enderror" id="image" name="image">
+                        @error('image')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                        @if ($blogPost->image)
+                            <div class="mt-2">
+                                <img src="{{ asset('storage/' . $blogPost->image) }}" alt="Current Image" class="img-thumbnail" width="200">
+                                <button type="button" class="btn btn-danger mt-2" id="remove-image-btn">Remove Image</button>
+                            </div>
+                        @endif
+                    </div>
 
                     <div class="mb-3">
                         <div class="form-check">
@@ -82,9 +95,31 @@
             </div>
         </div>
     </div>
-
-
 @endsection
+
 @section('scripts')
     <script src="{{ asset('storage/admin/assets/blogpost.js') }}"></script>
+    <script>
+        document.getElementById('remove-image-btn').addEventListener('click', function() {
+            if (confirm('Are you sure you want to remove the image?')) {
+                fetch('{{ route('blogposts.removeImage', $blogPost) }}', {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        location.reload();
+                    } else {
+                        alert('Failed to remove image.');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            }
+        });
+    </script>
 @endsection

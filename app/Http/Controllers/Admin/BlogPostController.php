@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\BlogPost;
 use App\Models\Tag;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class BlogPostController extends Controller
 {
@@ -39,7 +40,12 @@ class BlogPostController extends Controller
             'date' => 'required|date',
             'show_on_main_page' => 'boolean',
             'tags' => 'array',
+            'image' => 'nullable|image|max:2048',
         ]);
+
+        if ($request->hasFile('image')) {
+            $validated['image'] = $request->file('image')->store('blog_images', 'public');
+        }
 
         $blogPost = BlogPost::create($validated);
         $tags = collect($request->tags)->map(function ($tagName) {
@@ -67,7 +73,15 @@ class BlogPostController extends Controller
             'date' => 'required|date',
             'show_on_main_page' => 'boolean',
             'tags' => 'array',
+            'image' => 'nullable|image|max:2048',
         ]);
+
+        if ($request->hasFile('image')) {
+            if ($blogPost->image) {
+                Storage::disk('public')->delete($blogPost->image);
+            }
+            $validated['image'] = $request->file('image')->store('blog_images', 'public');
+        }
 
         $blogPost->update($validated);
         $tags = collect($request->tags)->map(function ($tagName) {
@@ -79,8 +93,21 @@ class BlogPostController extends Controller
         return redirect()->route('blogposts.index')->with('success', 'Blog post updated successfully.');
     }
 
+    public function removeImage(BlogPost $blogPost)
+    {
+        if ($blogPost->image) {
+            Storage::disk('public')->delete($blogPost->image);
+            $blogPost->update(['image' => null]);
+        }
+
+        return response()->json(['success' => true, 'message' => 'Image removed successfully.']);
+    }
+
     public function destroy(BlogPost $blogPost)
     {
+        if ($blogPost->image) {
+            Storage::disk('public')->delete($blogPost->image);
+        }
         $blogPost->delete();
 
         return redirect()->route('blogposts.index')->with('success', 'Blog post deleted successfully.');

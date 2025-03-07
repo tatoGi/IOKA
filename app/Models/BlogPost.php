@@ -15,6 +15,7 @@ class BlogPost extends Model
         'body',
         'date',
         'show_on_main_page',
+        'image',
     ];
 
     /**

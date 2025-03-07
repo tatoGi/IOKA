@@ -10,4 +10,5 @@ Route::group(['prefix' => 'blogposts', 'as' => 'blogposts.'], function () {
     Route::get('/ioka_admin/{blogPost}/edit', [BlogPostController::class, 'edit'])->name('edit');
     Route::put('/{blogPost}', [BlogPostController::class, 'update'])->name('update');
     Route::delete('/{blogPost}', [BlogPostController::class, 'destroy'])->name('destroy');
+    Route::delete('/{blogPost}/remove-image', [BlogPostController::class, 'removeImage'])->name('removeImage');
 });
