@@ -133,8 +133,16 @@ class PageService
             return null;
         }
 
+        $relatedBlogs = BlogPost::with('tags')
+            ->whereHas('tags', function ($query) use ($blog) {
+                $query->whereIn('name', $blog->tags->pluck('name'));
+            })
+            ->where('id', '!=', $blog->id)
+            ->get();
+
         return [
             'blog' => $this->formatBlog($blog),
+            'related_blogs' => $relatedBlogs->map(fn ($relatedBlog) => $this->formatBlog($relatedBlog)),
         ];
     }
 

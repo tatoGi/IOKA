@@ -118,19 +118,21 @@ class BlogPostController extends Controller
         return redirect()->route('blogposts.index')->with('success', 'Blog post updated successfully.');
     }
 
-    public function removeImage(BlogPost $blogPost)
+    public function removeImage(Request $request, BlogPost $blogPost)
     {
-        if ($blogPost->image) {
+        $type = $request->input('type');
+
+        if ($type === 'image' && $blogPost->image) {
             Storage::disk('public')->delete($blogPost->image);
-            $blogPost->update(['image' => null]);
+            $blogPost->update(['image' => null, 'image_alt' => null]);
         }
 
-        if ($blogPost->banner_image) {
+        if ($type === 'banner_image' && $blogPost->banner_image) {
             Storage::disk('public')->delete($blogPost->banner_image);
             $blogPost->update(['banner_image' => null, 'banner_image_alt' => null]);
         }
 
-        return response()->json(['success' => true, 'message' => 'Image removed successfully.']);
+        return response()->json(['success' => true, 'message' => ucfirst(str_replace('_', ' ', $type)) . ' removed successfully.']);
     }
 
     public function destroy(BlogPost $blogPost)

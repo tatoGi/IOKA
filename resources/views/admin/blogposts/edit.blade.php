@@ -141,12 +141,13 @@
     <script>
         document.getElementById('remove-image-btn').addEventListener('click', function() {
             if (confirm('Are you sure you want to remove the image?')) {
-                fetch('{{ route('blogposts.removeImage', $blogPost) }}', {
+                fetch('{{ route('blogposts.removeImage', ['blogPost' => $blogPost]) }}', {
                     method: 'DELETE',
                     headers: {
                         'X-CSRF-TOKEN': '{{ csrf_token() }}',
                         'Content-Type': 'application/json'
-                    }
+                    },
+                    body: JSON.stringify({ type: 'image' })
                 })
                 .then(response => response.json())
                 .then(data => {
@@ -163,13 +164,13 @@
 
         document.getElementById('remove-banner-image-btn').addEventListener('click', function() {
             if (confirm('Are you sure you want to remove the banner image?')) {
-                fetch('{{ route('blogposts.removeImage', $blogPost) }}', {
+                fetch('{{ route('blogposts.removeImage', ['blogPost' => $blogPost]) }}', {
                     method: 'DELETE',
                     headers: {
                         'X-CSRF-TOKEN': '{{ csrf_token() }}',
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ banner_image: true })
+                    body: JSON.stringify({ type: 'banner_image' })
                 })
                 .then(response => response.json())
                 .then(data => {
