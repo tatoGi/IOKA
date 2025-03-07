@@ -9,4 +9,5 @@ Route::group(['middleware' => 'cors'], function () {
     Route::get('/sections', [FrontendController::class, 'getSections']);
     Route::get('/sections/{id}', [FrontendController::class, 'getSection']);
     Route::get('/blogs', [FrontendController::class, 'getBlogs']);
+    Route::get('/blogs/{slug}', [FrontendController::class, 'getBlog']);
 });

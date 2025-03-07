@@ -70,4 +70,19 @@ class FrontendController extends Controller
         return response()->json($blog);
 
     }
+
+    public function getBlog($slug): JsonResponse
+    {
+
+        $blog = $this->pageService->getBlogBySlug($slug);
+
+        if (! $blog) {
+            return response()->json([
+                'error' => 'Blog not found',
+            ], 404);
+        }
+
+        return response()->json($blog);
+    }
+
 }

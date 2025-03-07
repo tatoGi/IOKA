@@ -30,6 +30,15 @@
                     </div>
 
                     <div class="mb-3">
+                        <label for="slug" class="form-label">Slug</label>
+                        <input type="text" class="form-control @error('slug') is-invalid @enderror" id="slug"
+                            name="slug" value="{{ old('slug') }}" required>
+                        @error('slug')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="mb-3">
                         <label for="body" class="form-label">Body</label>
                         <textarea class="form-control editor @error('body') is-invalid @enderror" id="body" name="body" rows="10"
                             required>{{ old('body') }}</textarea>
@@ -52,6 +61,30 @@
                         <label for="image" class="form-label">Image</label>
                         <input type="file" class="form-control @error('image') is-invalid @enderror" id="image" name="image">
                         @error('image')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="banner_image" class="form-label">Banner Image</label>
+                        <input type="file" class="form-control @error('banner_image') is-invalid @enderror" id="banner_image" name="banner_image">
+                        @error('banner_image')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="banner_image_alt" class="form-label">Banner Image Alt Text</label>
+                        <input type="text" class="form-control @error('banner_image_alt') is-invalid @enderror" id="banner_image_alt" name="banner_image_alt" value="{{ old('banner_image_alt') }}">
+                        @error('banner_image_alt')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="image_alt" class="form-label">Image Alt Text</label>
+                        <input type="text" class="form-control @error('image_alt') is-invalid @enderror" id="image_alt" name="image_alt" value="{{ old('image_alt') }}">
+                        @error('image_alt')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>

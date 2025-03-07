@@ -33,6 +33,15 @@
                     </div>
 
                     <div class="mb-3">
+                        <label for="slug" class="form-label">Slug</label>
+                        <input type="text" class="form-control @error('slug') is-invalid @enderror" id="slug"
+                            name="slug" value="{{ old('slug', $blogPost->slug) }}" required>
+                        @error('slug')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="mb-3">
                         <label for="body" class="form-label">Body</label>
                         <textarea class="form-control editor @error('body')  is-invalid @enderror" id="body" name="body" rows="10"
                             required>{{ old('body', $blogPost->body) }}</textarea>
@@ -60,10 +69,40 @@
                         @enderror
                         @if ($blogPost->image)
                             <div class="mt-2">
-                                <img src="{{ asset('storage/' . $blogPost->image) }}" alt="Current Image" class="img-thumbnail" width="200">
+                                <img src="{{ asset('storage/' . $blogPost->image) }}" alt="{{ $blogPost->image_alt }}" class="img-thumbnail" width="200">
                                 <button type="button" class="btn btn-danger mt-2" id="remove-image-btn">Remove Image</button>
                             </div>
                         @endif
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="banner_image" class="form-label">Banner Image</label>
+                        <input type="file" class="form-control @error('banner_image') is-invalid @enderror" id="banner_image" name="banner_image">
+                        @error('banner_image')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                        @if ($blogPost->banner_image)
+                            <div class="mt-2">
+                                <img src="{{ asset('storage/' . $blogPost->banner_image) }}" alt="{{ $blogPost->banner_image_alt }}" class="img-thumbnail" width="200">
+                                <button type="button" class="btn btn-danger mt-2" id="remove-banner-image-btn">Remove Banner Image</button>
+                            </div>
+                        @endif
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="banner_image_alt" class="form-label">Banner Image Alt Text</label>
+                        <input type="text" class="form-control @error('banner_image_alt') is-invalid @enderror" id="banner_image_alt" name="banner_image_alt" value="{{ old('banner_image_alt', $blogPost->banner_image_alt) }}">
+                        @error('banner_image_alt')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="image_alt" class="form-label">Image Alt Text</label>
+                        <input type="text" class="form-control @error('image_alt') is-invalid @enderror" id="image_alt" name="image_alt" value="{{ old('image_alt', $blogPost->image_alt) }}">
+                        @error('image_alt')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
 
                     <div class="mb-3">
@@ -116,6 +155,29 @@
                         location.reload();
                     } else {
                         alert('Failed to remove image.');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            }
+        });
+
+        document.getElementById('remove-banner-image-btn').addEventListener('click', function() {
+            if (confirm('Are you sure you want to remove the banner image?')) {
+                fetch('{{ route('blogposts.removeImage', $blogPost) }}', {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ banner_image: true })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        location.reload();
+                    } else {
+                        alert('Failed to remove banner image.');
                     }
                 })
                 .catch(error => console.error('Error:', error));

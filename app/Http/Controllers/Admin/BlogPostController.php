@@ -37,14 +37,24 @@ class BlogPostController extends Controller
             'title' => 'required|string|max:255',
             'subtitle' => 'nullable|string|max:255',
             'body' => 'required',
+            'slug' => 'required|string|max:255|unique:blog_posts,slug',
             'date' => 'required|date',
             'show_on_main_page' => 'boolean',
             'tags' => 'array',
             'image' => 'nullable|image|max:2048',
+            'banner_image' => 'nullable|image|max:2048',
+            'image_alt' => 'nullable|string|max:255',
+            'banner_image_alt' => 'nullable|string|max:255',
         ]);
+
+        $validated['slug'] = $this->generateUniqueSlug($validated['slug']);
 
         if ($request->hasFile('image')) {
             $validated['image'] = $request->file('image')->store('blog_images', 'public');
+        }
+
+        if ($request->hasFile('banner_image')) {
+            $validated['banner_image'] = $request->file('banner_image')->store('blog_banners', 'public');
         }
 
         $blogPost = BlogPost::create($validated);
@@ -70,17 +80,32 @@ class BlogPostController extends Controller
             'title' => 'required|string|max:255',
             'subtitle' => 'nullable|string|max:255',
             'body' => 'required',
+            'slug' => 'required|string|max:255|unique:blog_posts,slug,' . $blogPost->id,
             'date' => 'required|date',
             'show_on_main_page' => 'boolean',
             'tags' => 'array',
             'image' => 'nullable|image|max:2048',
+            'banner_image' => 'nullable|image|max:2048',
+            'image_alt' => 'nullable|string|max:255',
+            'banner_image_alt' => 'nullable|string|max:255',
         ]);
+
+        if ($validated['slug'] !== $blogPost->slug) {
+            $validated['slug'] = $this->generateUniqueSlug($validated['slug']);
+        }
 
         if ($request->hasFile('image')) {
             if ($blogPost->image) {
                 Storage::disk('public')->delete($blogPost->image);
             }
             $validated['image'] = $request->file('image')->store('blog_images', 'public');
+        }
+
+        if ($request->hasFile('banner_image')) {
+            if ($blogPost->banner_image) {
+                Storage::disk('public')->delete($blogPost->banner_image);
+            }
+            $validated['banner_image'] = $request->file('banner_image')->store('blog_banners', 'public');
         }
 
         $blogPost->update($validated);
@@ -100,6 +125,11 @@ class BlogPostController extends Controller
             $blogPost->update(['image' => null]);
         }
 
+        if ($blogPost->banner_image) {
+            Storage::disk('public')->delete($blogPost->banner_image);
+            $blogPost->update(['banner_image' => null, 'banner_image_alt' => null]);
+        }
+
         return response()->json(['success' => true, 'message' => 'Image removed successfully.']);
     }
 
@@ -108,8 +138,32 @@ class BlogPostController extends Controller
         if ($blogPost->image) {
             Storage::disk('public')->delete($blogPost->image);
         }
+
+        if ($blogPost->banner_image) {
+            Storage::disk('public')->delete($blogPost->banner_image);
+        }
+
         $blogPost->delete();
 
         return redirect()->route('blogposts.index')->with('success', 'Blog post deleted successfully.');
+    }
+    private function generateUniqueSlug(string $slug): string
+    {
+        // Replace spaces with dashes
+        $slug = str_replace(' ', '-', $slug);
+
+        // Alternatively, use Laravel's helper for a cleaner slug
+        // $slug = \Illuminate\Support\Str::slug($slug);
+
+        $originalSlug = $slug;
+        $counter = 1;
+
+        // Ensure the slug is unique
+        while (BlogPost::where('slug', $slug)->exists()) {
+            $slug = "{$originalSlug}-{$counter}";
+            $counter++;
+        }
+
+        return $slug;
     }
 }

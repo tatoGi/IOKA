@@ -116,9 +116,48 @@ class PageService
             'updated_at' => $section->updated_at,
         ];
     }
+
     public function getBlogs()
     {
         return BlogPost::with('tags')->paginate(10);
     }
 
+    /**
+     * Get a specific blog by slug
+     */
+    public function getBlogBySlug($slug)
+    {
+        $blog = BlogPost::with('tags')->where('slug', $slug)->first();
+
+        if (! $blog) {
+            return null;
+        }
+
+        return [
+            'blog' => $this->formatBlog($blog),
+        ];
+    }
+
+    /**
+     * Format blog data
+     */
+    private function formatBlog($blog)
+    {
+        return [
+            'id' => $blog->id,
+            'title' => $blog->title,
+            'subtitle' => $blog->subtitle,
+            'body' => $blog->body,
+            'slug' => $blog->slug,
+            'date' => $blog->date,
+            'show_on_main_page' => $blog->show_on_main_page,
+            'banner_image' => $blog->banner_image,
+            'banner_image_alt' => $blog->banner_image_alt,
+            'image' => $blog->image,
+            'image_alt' => $blog->image_alt,
+            'tags' => $blog->tags->pluck('name'),
+            'created_at' => $blog->created_at,
+            'updated_at' => $blog->updated_at,
+        ];
+    }
 }

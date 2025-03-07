@@ -11,11 +11,15 @@ class BlogPost extends Model
 
     protected $fillable = [
         'title',
+        'slug',
         'subtitle',
         'body',
         'date',
         'show_on_main_page',
         'image',
+        'image_alt',
+        'banner_image',
+        'banner_image_alt'
     ];
 
     /**
