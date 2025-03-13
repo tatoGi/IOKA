@@ -192,13 +192,24 @@ class PageService
     }
     public function getOffplanBySlug($slug)
     {
+        // Fetch the current offplan by slug
         $offplan = Offplan::where('slug', $slug)->first();
 
-        if (! $offplan) {
+        if (!$offplan) {
             return null;
         }
 
-        return $offplan;
+        // Fetch the last 4 added offplans excluding the current one
+        $lastAddedOffplans = Offplan::where('id', '!=', $offplan->id)
+                                    ->orderBy('created_at', 'desc')
+                                    ->take(4)
+                                    ->get();
+
+        // Return the current offplan along with the last added offplans
+        return [
+            'offplan' => $offplan,
+            'lastAddedOffplans' => $lastAddedOffplans,
+        ];
     }
 
 }
