@@ -9,8 +9,8 @@
             <tr>
                 <th>Title</th>
                 <th>Subtitle</th>
-                <th>amount $</th>
-                <th>amount dirham</th>
+                <th>Amount $</th>
+                <th>Amount Dirham</th>
                 <th>Description</th>
                 <th>Actions</th>
             </tr>
@@ -23,7 +23,7 @@
                 <td>{{ $offplan->subtitle }}</td>
                 <td>{{ $offplan->amount }}</td>
                 <td>{{ $offplan->amount_dirham }}</td>
-                <td>{{ $offplan->description }}</td>
+                <td>{!! Str::limit($offplan->description, 100) !!}...</td> <!-- Limit description to 100 chars -->
                 <td>
                     <a href="{{ route('admin.offplan.edit', $offplan->id) }}" class="btn btn-primary">Edit</a>
                     <form action="{{ route('admin.offplan.destroy', $offplan->id) }}" method="POST" style="display:inline-block;">
@@ -37,5 +37,10 @@
             @endisset
         </tbody>
     </table>
+
+    <!-- Paginate Links -->
+    <div class="pagination">
+        {{ $offplans->links('admin.componenets.pagination') }} <!-- Use Bootstrap 4 pagination -->
+    </div>
 </div>
 @endsection

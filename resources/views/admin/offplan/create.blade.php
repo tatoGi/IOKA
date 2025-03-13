@@ -28,6 +28,12 @@
                             <input type="text" class="form-control" id="subtitle" name="subtitle">
                         </div>
                     </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="slug" class="form-label">slug</label>
+                            <input type="text" class="form-control" id="slug" name="slug">
+                        </div>
+                    </div>
                 </div>
                 <div class="row">
                     <div class="col-md-6">
@@ -103,6 +109,14 @@
                             <input type="file" class="form-control" id="main_photo" name="main_photo" accept="image/*">
                             <div id="main_photo_preview" class="uploaded-files"></div>
                             <input type="hidden" id="main_photo_path" name="main_photo_path">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label for="main_photo" class="form-label">Banner</label>
+                            <input type="file" class="form-control" id="main_banner" name="main_banner">
+                            <div id="main_banner_preview" class="uploaded-files"></div>
+                            <input type="hidden" id="main_banner_path" name="main_banner">
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -288,6 +302,9 @@
 
         document.getElementById('main_photo').addEventListener('change', function(event) {
             handleFileInput(event, 'main_photo_preview', 'main_photo_path');
+        });
+        document.getElementById('main_banner').addEventListener('change', function(event) {
+            handleFileInput(event, 'main_banner_preview', 'main_banner_path');
         });
 
         document.getElementById('exterior_gallery').addEventListener('change', function(event) {

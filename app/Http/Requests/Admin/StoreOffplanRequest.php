@@ -15,6 +15,7 @@ class StoreOffplanRequest extends FormRequest
     {
         return [
             'title' => 'required|string|max:255',
+            'slug' => 'required|string|max:255',
             'subtitle' => 'nullable|string|max:255',
             'amount' => 'required|numeric',
             'amount_dirhams' => 'nullable|numeric',
@@ -27,6 +28,7 @@ class StoreOffplanRequest extends FormRequest
             'map_location' => 'nullable|string',
             // File uploads
             'main_photo' => 'nullable|file|image|max:5120', // 5MB max
+             'banner_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'exterior_gallery.*' => 'nullable|file|image|max:5120',
             'interior_gallery.*' => 'nullable|file|image|max:5120',
             'property_type' => 'nullable|string|max:50',

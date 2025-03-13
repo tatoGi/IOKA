@@ -5,6 +5,8 @@ namespace App\Services\Frontend;
 use App\Models\Page;
 use App\Models\Section;
 use App\Models\BlogPost;
+use App\Models\Developer;
+use App\Models\Offplan;
 
 class PageService
 {
@@ -168,4 +170,35 @@ class PageService
             'updated_at' => $blog->updated_at,
         ];
     }
+    public function  getAllDevelopers()
+    {
+        return Developer::paginate(10);
+    }
+    public function  getDeveloperBySlug($slug)
+    {
+        $developer = Developer::where('slug', $slug)->with('awards')->first();
+
+        if (! $developer) {
+            return null;
+        }
+
+        return
+           $developer
+        ;
+    }
+    public function getAlloffplan()
+    {
+        return Offplan::paginate(10);
+    }
+    public function getOffplanBySlug($slug)
+    {
+        $offplan = Offplan::where('slug', $slug)->first();
+
+        if (! $offplan) {
+            return null;
+        }
+
+        return $offplan;
+    }
+
 }

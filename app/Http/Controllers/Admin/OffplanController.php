@@ -20,7 +20,7 @@ class OffplanController extends Controller
 
     public function index()
     {
-        $offplans = Offplan::all();
+        $offplans = Offplan::paginate(10);
 
         return view('admin.offplan.index', compact('offplans'));
     }
@@ -33,12 +33,31 @@ class OffplanController extends Controller
     public function store(StoreOffplanRequest $request)
     {
         $data = $request->validated();
+        $data['slug'] = $this->generateUniqueSlug($data['slug']);
         $this->offplanService->handleFileUploads($request, $data);
         $this->offplanService->createOffplan($data);
 
         return redirect()->route('admin.offplan.index')->with('success', 'Offplan created successfully.');
     }
+    private function generateUniqueSlug(string $slug): string
+    {
+        // Replace spaces with dashes
+        $slug = str_replace(' ', '-', $slug);
 
+        // Alternatively, use Laravel's helper for a cleaner slug
+        // $slug = \Illuminate\Support\Str::slug($slug);
+
+        $originalSlug = $slug;
+        $counter = 1;
+
+        // Ensure the slug is unique
+        while (Offplan::where('slug', $slug)->exists()) {
+            $slug = "{$originalSlug}-{$counter}";
+            $counter++;
+        }
+
+        return $slug;
+    }
     public function edit($id)
     {
         $offplan = Offplan::findOrFail($id);
@@ -50,6 +69,17 @@ class OffplanController extends Controller
     {
         $offplan = Offplan::findOrFail($id);
         $data = $request->validated();
+
+        // Check if the slug has changed
+        if ($request->has('slug') && $request->input('slug') !== $offplan->slug) {
+            // Generate a unique slug only if the slug has changed
+            $data['slug'] = $this->generateUniqueSlug($data['slug']);
+        } else {
+            // Keep the existing slug
+            $data['slug'] = $offplan->slug;
+        }
+
+        // Handle file uploads and update the offplan
         $this->offplanService->handleFileUploads($request, $data);
         $this->offplanService->updateOffplan($offplan, $data);
 
@@ -102,6 +132,7 @@ class OffplanController extends Controller
 
     public function deleteImage(Request $request)
     {
+
         $type = $request->input('type');
         $path = $request->input('path');
 

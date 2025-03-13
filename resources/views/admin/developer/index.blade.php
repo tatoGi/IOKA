@@ -19,8 +19,6 @@
                                         <th>Title</th>
                                         <th>Phone</th>
                                         <th>WhatsApp</th>
-                                        <th>Awards</th>
-                                        <th>photo</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
@@ -34,19 +32,8 @@
 
                                             <td>{{ $developer->whatsapp }}</td>
 
-                                            <td>
-                                                <ul>
-                                                    @foreach($developer->awards as $award)
-                                                        <li>{{ $award->award_title }} ({{ $award->award_year }})</li>
-                                                    @endforeach
-                                                </ul>
-                                            </td>
-                                            <td>
-                                                <div class="developer_image">
-                                                    <img src="{{ asset('storage/' . $developer->photo) }}" alt="Developer Photo" width="100">
-                                                </div>
 
-                                            </td>
+
                                             <td>
                                                 <a href="{{ route('admin.developer.edit', $developer->id) }}" class="btn btn-primary">Edit</a>
                                                 <form action="{{ route('admin.developer.delete', $developer->id) }}" method="POST" style="display: inline-block;">
@@ -65,6 +52,10 @@
                 </div>
             </div>
         </div>
+          <!-- Paginate Links -->
+    <div class="pagination">
+        {{ $developers->links('admin.componenets.pagination') }} <!-- Use Bootstrap 4 pagination -->
+    </div>
     </div>
 
 @endsection

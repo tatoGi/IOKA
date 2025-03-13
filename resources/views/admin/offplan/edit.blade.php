@@ -24,6 +24,12 @@
                 <label for="subtitle">Subtitle</label>
                 <input type="text" class="form-control" id="subtitle" name="subtitle" value="{{ $offplan->subtitle }}">
             </div>
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="slug" class="form-label">slug</label>
+                    <input type="text" class="form-control" id="slug" name="slug" value="{{ $offplan->slug }}">
+                </div>
+            </div>
             <div class="container">
                 <div class="row">
                     <div class="col-md-6">
@@ -91,13 +97,31 @@
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="main_photo">Main Photo</label>
-                            <input type="file" class="form-control" id="main_photo" name="main_photo" accept="image/*">
+                            <input type="file" class="form-control" id="main_photo" name="main_photo"
+                                accept="image/*">
                             <div id="main_photo_preview" class="uploaded-files">
                                 @if ($offplan->main_photo)
                                     <div class="uploaded-file">
                                         <img src="{{ asset('storage/' . $offplan->main_photo) }}" alt="Main Photo"
                                             class="img-thumbnail" style="max-width: 100px;">
-                                        <button type="button" class="btn btn-danger btn-sm remove-image" data-id="{{ $offplan->id }}" data-type="main_photo">Delete</button>
+                                        <button type="button" class="btn btn-danger btn-sm remove-image"
+                                            data-id="{{ $offplan->id }}" data-type="main_photo" data-path="{{ $offplan->main_photo }}">Delete</button>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="main_photo">Banner</label>
+                            <input type="file" class="form-control" id="banner_photo" name="banner_photo">
+                            <div id="main_photo_preview" class="uploaded-files">
+                                @if ($offplan->banner_photo)
+                                    <div class="uploaded-file">
+                                        <img src="{{ asset('storage/' . $offplan->banner_photo) }}" alt="Main Photo"
+                                            class="img-thumbnail" style="max-width: 100px;">
+                                        <button type="button" class="btn btn-danger btn-sm remove-image"
+                                            data-id="{{ $offplan->id }}" data-type="banner_photo" data-path="{{ $offplan->banner_photo }}">Delete</button>
                                     </div>
                                 @endif
                             </div>
@@ -109,15 +133,22 @@
                             <label for="exterior_gallery">Exterior Gallery</label>
                             <input type="file" class="form-control" id="exterior_gallery" name="exterior_gallery[]"
                                 multiple accept="image/*">
-                            <div id="exterior_gallery_preview" class="uploaded-files">
-                                @foreach (json_decode($offplan->exterior_gallery, true) as $photo)
-                                    <div class="uploaded-file">
-                                        <img src="{{ asset('storage/' . $photo) }}" alt="Exterior Photo"
-                                            class="img-thumbnail" style="max-width: 100px;">
-                                        <button type="button" class="btn btn-danger btn-sm remove-image" data-id="{{ $offplan->id }}" data-type="exterior_gallery" data-path="{{ $photo }}">Delete</button>
-                                    </div>
-                                @endforeach
-                            </div>
+                                <div id="exterior_gallery_preview" class="uploaded-files">
+                                    @if(!empty($offplan->exterior_gallery) && json_decode($offplan->exterior_gallery, true))
+                                        @foreach (json_decode($offplan->exterior_gallery, true) as $photo)
+                                            <div class="uploaded-file">
+                                                <img src="{{ asset('storage/' . $photo) }}" alt="Exterior Photo"
+                                                    class="img-thumbnail" style="max-width: 100px;">
+                                                <button type="button" class="btn btn-danger btn-sm remove-image"
+                                                    data-id="{{ $offplan->id }}" data-type="exterior_gallery"
+                                                    data-path="{{ $photo }}">Delete</button>
+                                            </div>
+                                        @endforeach
+                                    @else
+                                        <p>No exterior gallery photos available.</p>
+                                    @endif
+                                </div>
+
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -126,15 +157,22 @@
                             <label for="interior_gallery">Interior Gallery</label>
                             <input type="file" class="form-control" id="interior_gallery" name="interior_gallery[]"
                                 multiple accept="image/*">
-                            <div id="interior_gallery_preview" class="uploaded-files">
-                                @foreach (json_decode($offplan->interior_gallery, true) as $photo)
-                                    <div class="uploaded-file">
-                                        <img src="{{ asset('storage/' . $photo) }}" alt="Interior Photo"
-                                            class="img-thumbnail" style="max-width: 100px;">
-                                        <button type="button" class="btn btn-danger btn-sm remove-image" data-id="{{ $offplan->id }}" data-type="interior_gallery" data-path="{{ $photo }}">Delete</button>
-                                    </div>
-                                @endforeach
-                            </div>
+                                <div id="interior_gallery_preview" class="uploaded-files">
+                                    @if(!empty($offplan->interior_gallery) && json_decode($offplan->interior_gallery, true))
+                                        @foreach (json_decode($offplan->interior_gallery, true) as $photo)
+                                            <div class="uploaded-file">
+                                                <img src="{{ asset('storage/' . $photo) }}" alt="Interior Photo"
+                                                    class="img-thumbnail" style="max-width: 100px;">
+                                                <button type="button" class="btn btn-danger btn-sm remove-image"
+                                                    data-id="{{ $offplan->id }}" data-type="interior_gallery"
+                                                    data-path="{{ $photo }}">Delete</button>
+                                            </div>
+                                        @endforeach
+                                    @else
+                                        <p>No interior gallery photos available.</p>
+                                    @endif
+                                </div>
+
                         </div>
                     </div>
                 </div>
@@ -204,7 +242,8 @@
                         <div class="uploaded-file">
                             <img src="{{ asset('storage/' . $offplan->qr_photo) }}" alt="QR Photo" class="img-thumbnail"
                                 style="max-width: 100px;">
-                            <button type="button" class="btn btn-danger btn-sm remove-image" data-id="{{ $offplan->id }}" data-type="qr_photo">Delete</button>
+                            <button type="button" class="btn btn-danger btn-sm remove-image"
+                                data-id="{{ $offplan->id }}" data-type="qr_photo" data-path="{{ $offplan->qr_photo }}">Delete</button>
                         </div>
                     @endif
                 </div>
@@ -220,33 +259,41 @@
             </div>
             <div class="container">
                 <div class="row">
-                    <div class="col-md-2">  <div class="form-group mt-3">
-                        <label for="agent_title">Agent Title</label>
-                        <input type="text" class="form-control" id="agent_title" name="agent_title"
-                            value="{{ $offplan->agent_title }}">
-                    </div></div>
-                    <div class="col-md-2">   <div class="form-group mt-3">
-                        <label for="agent_status">Agent Status</label>
-                        <input type="text" class="form-control" id="agent_status" name="agent_status"
-                            value="{{ $offplan->agent_status }}">
-                    </div></div>
+                    <div class="col-md-2">
+                        <div class="form-group mt-3">
+                            <label for="agent_title">Agent Title</label>
+                            <input type="text" class="form-control" id="agent_title" name="agent_title"
+                                value="{{ $offplan->agent_title }}">
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group mt-3">
+                            <label for="agent_status">Agent Status</label>
+                            <input type="text" class="form-control" id="agent_status" name="agent_status"
+                                value="{{ $offplan->agent_status }}">
+                        </div>
+                    </div>
                     <div class="col-md-2">
                         <div class="form-group mt-3">
                             <label for="agent_telephone">Agent Telephone</label>
                             <input type="text" class="form-control" id="agent_telephone" name="agent_telephone"
                                 value="{{ $offplan->agent_telephone }}">
-                        </div></div>
+                        </div>
+                    </div>
                     <div class="col-md-2">
                         <div class="form-group mt-3">
                             <label for="agent_whatsapp">Agent WhatsApp</label>
                             <input type="text" class="form-control" id="agent_whatsapp" name="agent_whatsapp"
                                 value="{{ $offplan->agent_whatsapp }}">
-                        </div></div>
-                    <div class="col-md-2">  <div class="form-group mt-3">
-                        <label for="agent_linkedin">Agent LinkedIn</label>
-                        <input type="text" class="form-control" id="agent_linkedin" name="agent_linkedin"
-                            value="{{ $offplan->agent_linkedin }}">
-                    </div></div>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group mt-3">
+                            <label for="agent_linkedin">Agent LinkedIn</label>
+                            <input type="text" class="form-control" id="agent_linkedin" name="agent_linkedin"
+                                value="{{ $offplan->agent_linkedin }}">
+                        </div>
+                    </div>
 
 
                 </div>
@@ -263,7 +310,8 @@
                         <div class="uploaded-file">
                             <img src="{{ asset('storage/' . $offplan->agent_image) }}" alt="Agent Image"
                                 class="img-thumbnail" style="max-width: 100px;">
-                            <button type="button" class="btn btn-danger btn-sm remove-image" data-id="{{ $offplan->id }}" data-type="agent_image">Delete</button>
+                            <button type="button" class="btn btn-danger btn-sm remove-image"
+                                data-id="{{ $offplan->id }}" data-type="agent_image" data-path="{{ $offplan->agent_image }}">Delete</button>
                         </div>
                     @endif
                 </div>
@@ -300,7 +348,9 @@
         document.getElementById('main_photo').addEventListener('change', function(event) {
             handleFileInput(event, 'main_photo_preview');
         });
-
+        document.getElementById('banner_photo').addEventListener('change', function(event) {
+            handleFileInput(event, 'main_banner_preview');
+        });
         document.getElementById('exterior_gallery').addEventListener('change', function(event) {
             handleFileInput(event, 'exterior_gallery_preview');
         });
@@ -347,18 +397,25 @@
                 const id = this.getAttribute('data-id');
                 const type = this.getAttribute('data-type');
                 const path = this.getAttribute('data-path');
+
                 fetch(`/ioka_admin/offplan/${id}/delete-image`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    body: JSON.stringify({ type, path })
-                }).then(response => response.json()).then(data => {
-                    if (data.success) {
-                        this.parentElement.remove();
-                    }
-                });
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}' // Ensure CSRF token is included
+                        },
+                        body: JSON.stringify({
+                            type,
+                            path
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            this.parentElement.remove();
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
             });
         });
 

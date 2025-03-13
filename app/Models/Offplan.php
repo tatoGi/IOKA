@@ -12,6 +12,7 @@ class Offplan extends Model
     protected $fillable = [
         'title',
         'subtitle',
+        'slug',
         'amount',
         'amount_dirhams',
         'description',
@@ -20,6 +21,7 @@ class Offplan extends Model
         'map_location',
         'near_by',
         'main_photo',
+        'banner_photo',
         'exterior_gallery',
         'interior_gallery',
         'property_type',
@@ -38,6 +40,7 @@ class Offplan extends Model
         'agent_whatsapp',
         'agent_linkedin',
         'location',
+        'developer_id',
     ];
 
     protected $casts = [

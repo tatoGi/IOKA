@@ -12,7 +12,9 @@ class OffplanService
         if ($request->hasFile('main_photo')) {
             $data['main_photo'] = $request->file('main_photo')->store('offplan_main_photos', 'public');
         }
-
+        if ($request->hasFile('banner_photo')) {
+            $data['banner_photo'] = $request->file('banner_photo')->store('offplan_banner_photos', 'public');
+        }
         if ($request->hasFile('exterior_gallery')) {
             $exteriorGallery = [];
             foreach ($request->file('exterior_gallery') as $file) {

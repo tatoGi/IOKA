@@ -68,7 +68,6 @@ class FrontendController extends Controller
 
 
         return response()->json($blog);
-
     }
 
     public function getBlog($slug): JsonResponse
@@ -84,5 +83,38 @@ class FrontendController extends Controller
 
         return response()->json($blog);
     }
+    public function getdevelopers()
+    {
+        $developers = $this->pageService->getAllDevelopers();
 
+        return response()->json($developers);
+    }
+    public function getDeveloper($slug): JsonResponse
+    {
+        $developer = $this->pageService->getDeveloperBySlug($slug);
+
+        if (! $developer) {
+            return response()->json([
+                'error' => 'Developer not found',
+            ], 404);
+        }
+
+        return response()->json($developer);
+    }
+    public function getOffplans()
+    {
+        $ofplanns = $this->pageService->getAlloffplan();
+
+        return response()->json($ofplanns);
+    }
+    public function getoffplan($slug)
+    {
+        $ofplanns = $this->pageService->getoffplanbySlug($slug);
+        if (! $ofplanns) {
+            return response()->json([
+                'error' => 'Offplan not found',
+            ], 404);
+        }
+        return response()->json($ofplanns);
+        }
 }
