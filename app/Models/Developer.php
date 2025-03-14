@@ -17,6 +17,7 @@ class Developer extends Model
         'phone',
         'whatsapp',
         'photo',
+        'logo',
         'rental_listings',
         'offplan_listings',
         'tags',
@@ -43,7 +44,7 @@ class Developer extends Model
 
     public function rentalResaleListings()
     {
-        return $this->hasMany(RentalResale::class, 'developer_id');
+        return $this->belongsToMany(RentalResale::class, 'developer_rental_resale', 'developer_id', 'rental_resale_id');
     }
 
     public function offplanListings()

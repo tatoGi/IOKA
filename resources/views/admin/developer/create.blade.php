@@ -7,6 +7,16 @@
             <form action="{{ route('admin.developer.store') }}" method="POST" enctype="multipart/form-data"
                 class="shadow p-4 rounded bg-light">
                 @csrf
+                @if ($errors->any())
+                    <div class="alert alert-danger">
+                        <ul>
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+                <!-- Existing fields for title, slug, paragraph, etc. -->
                 <div class="form-group mb-3">
                     <label for="title">Title</label>
                     <input type="text" name="title" id="title" class="form-control" required>
@@ -40,38 +50,56 @@
                     <div id="photo-container">
                         <div class="photo-input-group mb-3">
                             <input type="file" name="photo[][file]" class="form-control">
-                            <input type="text" name="photo[][alt]" class="form-control mt-2" placeholder="Alt text for this photo">
+                            <input type="text" name="photo[][alt]" class="form-control mt-2"
+                                placeholder="Alt text for this photo">
                         </div>
                     </div>
                     <button type="button" id="add-photo" class="btn btn-secondary">Add Another Photo</button>
                 </div>
                 <div class="form-group mb-3">
-                    <label for="award_title">Award Title</label>
-                    <input type="text" name="award_title" id="award_title" class="form-control">
+                    <label for="logo">Logo</label>
+                    <input type="file" name="logo" id="logo" class="form-control mt-2">
                 </div>
-                <div class="form-group mb-3">
-                    <label for="award_year">Award Year</label>
-                    <input type="text" name="award_year" id="award_year" class="form-control">
-                </div>
-                <div class="form-group mb-3">
-                    <label for="award_description">Award Description</label>
-                    <textarea name="award_description" id="award_description" class="form-control editor"></textarea>
-                </div>
-                <div class="form-group mb-3">
-                    <label for="award_photo">Award Photo</label>
-                    <input type="file" name="award_photo" id="award_photo" class="form-control">
-                </div>
+                <!-- Awards Section -->
+          <!-- Awards Section -->
+<div class="form-group mb-3">
+    <label for="awards">Awards</label>
+    <div id="awards-container">
+        <div class="award-input-group mb-3">
+            <div class="form-group">
+                <label for="award_title">Award Title</label>
+                <input type="text" name="awards[0][title]" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="award_year">Award Year</label>
+                <input type="text" name="awards[0][year]" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="award_description">Award Description</label>
+                <textarea name="awards[0][description]" class="form-control editor"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="award_photo">Award Photo</label>
+                <input type="file" name="awards[0][photo]" class="form-control">
+            </div>
+        </div>
+    </div>
+    <button type="button" id="add-award" class="btn btn-secondary">Add Another Award</button>
+</div>
+
+                <!-- Tags and Listings -->
                 <div class="mb-3">
                     <label for="tags" class="form-label">Tags</label>
                     <select class="form-control tags" id="tags" name="tags[]" multiple="multiple">
                     </select>
-                    <small class="form-text text-muted">Type to add new tags or select existing ones. Press Enter or comma to add.</small>
+                    <small class="form-text text-muted">Type to add new tags or select existing ones. Press Enter or comma
+                        to add.</small>
                 </div>
                 <div class="form-group mb-3">
                     <label for="rental_listings">Rental Listings</label>
                     <select name="rental_listings[]" id="rental_listings" class="form-control" multiple>
                         @foreach ($rentalandresaleListings as $listing)
-                            <option value="{{ $listing->type }}">{{ $listing->title }}</option>
+                            <option value="{{ $listing->id }}">{{ $listing->title }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -79,7 +107,7 @@
                     <label for="offplan_listings">Offplan Listings</label>
                     <select name="offplan_listings[]" id="offplan_listings" class="form-control" multiple>
                         @foreach ($offplanListings as $listing)
-                            <option value="{{ $listing->type }}">{{ $listing->title }}</option>
+                            <option value="{{ $listing->id }}">{{ $listing->title }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -119,15 +147,65 @@
             });
         });
         $(document).ready(function() {
-        // Add more photo inputs
-        $('#add-photo').click(function() {
-            $('#photo-container').append(`
-                <div class="photo-input-group mb-3">
-                    <input type="file" name="photo[][file]" class="form-control">
-                    <input type="text" name="photo[][alt]" class="form-control mt-2" placeholder="Alt text for this photo">
-                </div>
-            `);
+    // Add more photo inputs
+    $('#add-photo').click(function() {
+        $('#photo-container').append(`
+            <div class="photo-input-group mb-3">
+                <input type="file" name="photo[][file]" class="form-control">
+                <input type="text" name="photo[][alt]" class="form-control mt-2" placeholder="Alt text for this photo">
+            </div>
+        `);
+    });
+
+    // Add more award inputs
+    let awardIndex = 1; // Start from 1 since the first award is already present
+
+// Add more award inputs
+$('#add-award').click(function() {
+    $('#awards-container').append(`
+        <div class="award-input-group mb-3">
+            <div class="form-group">
+                <label for="award_title">Award Title</label>
+                <input type="text" name="awards[${awardIndex}][title]" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="award_year">Award Year</label>
+                <input type="text" name="awards[${awardIndex}][year]" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="award_description">Award Description</label>
+                <textarea name="awards[${awardIndex}][description]" class="form-control editor"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="award_photo">Award Photo</label>
+                <input type="file" name="awards[${awardIndex}][photo]" class="form-control">
+            </div>
+        </div>
+    `);
+
+    // Reinitialize TinyMCE for the new textarea
+    tinymce.init({
+        selector: '.editor',
+        // Add other TinyMCE configuration options here
+    });
+
+    awardIndex++; // Increment the index for the next award
+});
+
+    // Remove incomplete award fields before form submission
+    $('form').on('submit', function(e) {
+        $('#awards-container .award-input-group').each(function() {
+            const title = $(this).find('input[name*="[title]"]').val();
+            const year = $(this).find('input[name*="[year]"]').val();
+            const description = $(this).find('textarea[name*="[description]"]').val();
+            const photo = $(this).find('input[name*="[photo]"]').val();
+
+            // If either title or year is missing, remove the group
+            if (!title || !year) {
+                $(this).remove();
+            }
         });
     });
+});
     </script>
 @endsection

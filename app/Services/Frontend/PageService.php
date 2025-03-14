@@ -121,7 +121,7 @@ class PageService
 
     public function getBlogs()
     {
-        return BlogPost::with('tags')->paginate(10);
+        return BlogPost::with('tags')->orderBy('created_at', 'desc')->paginate(10);
     }
 
     /**
@@ -129,7 +129,7 @@ class PageService
      */
     public function getBlogBySlug($slug)
     {
-        $blog = BlogPost::with('tags')->where('slug', $slug)->first();
+        $blog = BlogPost::with('tags')->orderBy('created_at', 'desc')->where('slug', $slug)->first();
 
         if (! $blog) {
             return null;
@@ -172,28 +172,30 @@ class PageService
     }
     public function  getAllDevelopers()
     {
-        return Developer::paginate(10);
+        return Developer::orderBy('created_at', 'desc')->paginate(10);
     }
-    public function  getDeveloperBySlug($slug)
+    public function getDeveloperBySlug($slug)
     {
-        $developer = Developer::where('slug', $slug)->with('awards')->first();
+        // Fetch the developer with related awards, offplans, and rental_resale
+        $developer = Developer::where('slug', $slug)
+            ->with(['awards', 'offplanListings', 'rentalResaleListings'])
+            ->orderBy('created_at', 'desc')
+            ->first();
 
-        if (! $developer) {
+        if (!$developer) {
             return null;
         }
 
-        return
-           $developer
-        ;
+        return $developer;
     }
     public function getAlloffplan()
     {
-        return Offplan::paginate(10);
+        return Offplan::orderBy('created_at', 'desc')->paginate(10);
     }
     public function getOffplanBySlug($slug)
     {
         // Fetch the current offplan by slug
-        $offplan = Offplan::where('slug', $slug)->first();
+        $offplan = Offplan::where('slug', $slug)->orderBy('created_at', 'desc')->first();
 
         if (!$offplan) {
             return null;
