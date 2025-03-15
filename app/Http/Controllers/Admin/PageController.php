@@ -88,6 +88,7 @@ class PageController extends Controller
     // Update method to save the changes made to a page
     public function update(Request $request, $id)
     {
+
         // Use the repository to update the page
         $this->pageRepository->updatePage($id, $request->all());
 

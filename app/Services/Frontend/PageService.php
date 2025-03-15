@@ -93,7 +93,6 @@ class PageService
             'active' => $page->active,
             'created_at' => $page->created_at,
             'updated_at' => $page->updated_at,
-            'sections' => $page->sections->map(fn ($section) => $this->formatSection($section)),
         ];
     }
 

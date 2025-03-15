@@ -44,6 +44,7 @@
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
+
                     <div class="mb-3">
                         <label for="type_id" class="form-label">Type</label>
                         <select name="type_id" id="type_id" class="form-select @error('type_id') is-invalid @enderror">
@@ -61,9 +62,12 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="active" class="form-check-label">Active</label>
+                        <!-- Hidden input to ensure "active" is always included in the request -->
+                        <input type="hidden" name="active" value="0">
+                        <!-- Checkbox input for "active" -->
                         <input type="checkbox" name="active" id="active" value="1"
                             {{ old('active', $page->active) ? 'checked' : '' }} class="form-check-input">
+                        <label for="active" class="form-check-label">Active</label>
                         @error('active')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
