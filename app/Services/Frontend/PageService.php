@@ -7,6 +7,7 @@ use App\Models\Section;
 use App\Models\BlogPost;
 use App\Models\Developer;
 use App\Models\Offplan;
+use App\Models\RentalResale;
 
 class PageService
 {
@@ -20,7 +21,7 @@ class PageService
         }])->get();
 
         return [
-            'pages' => $pages->map(fn ($page) => $this->formatPage($page)),
+            'pages' => $pages->map(fn($page) => $this->formatPage($page)),
             'meta' => [
                 'total' => $pages->count(),
             ],
@@ -53,7 +54,7 @@ class PageService
         $sections = Section::orderBy('sort_order', 'asc')->get();
 
         return [
-            'sections' => $sections->map(fn ($section) => $this->formatSection($section)),
+            'sections' => $sections->map(fn($section) => $this->formatSection($section)),
             'meta' => [
                 'total' => $sections->count(),
             ],
@@ -109,7 +110,7 @@ class PageService
             'slug' => $section->slug,
             'description' => $section->description,
             'redirect_link' => $section->redirect_link,
-            'photo' => $section->photo ? asset('storage/'.$section->photo) : null,
+            'photo' => $section->photo ? asset('storage/' . $section->photo) : null,
             'additional_fields' => $section->additional_fields,
             'sort_order' => $section->sort_order,
             'active' => $section->active,
@@ -143,7 +144,7 @@ class PageService
 
         return [
             'blog' => $this->formatBlog($blog),
-            'related_blogs' => $relatedBlogs->map(fn ($relatedBlog) => $this->formatBlog($relatedBlog)),
+            'related_blogs' => $relatedBlogs->map(fn($relatedBlog) => $this->formatBlog($relatedBlog)),
         ];
     }
 
@@ -202,9 +203,9 @@ class PageService
 
         // Fetch the last 4 added offplans excluding the current one
         $lastAddedOffplans = Offplan::where('id', '!=', $offplan->id)
-                                    ->orderBy('created_at', 'desc')
-                                    ->take(4)
-                                    ->get();
+            ->orderBy('created_at', 'desc')
+            ->take(4)
+            ->get();
 
         // Return the current offplan along with the last added offplans
         return [
@@ -212,5 +213,19 @@ class PageService
             'lastAddedOffplans' => $lastAddedOffplans,
         ];
     }
+    public function getRentalResale()
+    {
+        return RentalResale::orderBy('created_at', 'desc')->with('amount')->paginate(10);
+    }
+    public function getRentalResaleBySlug($slug)
+    {
+        // Fetch the current rental resale by slug
+        $rentalResale = RentalResale::where('slug', $slug)->orderBy('
+            created_at', 'desc')->first();
 
+        if (!$rentalResale) {
+            return null;
+        }
+        // Fetch the last 4 added rental resales excluding the current one
+    }
 }

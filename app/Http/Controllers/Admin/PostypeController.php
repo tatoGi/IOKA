@@ -50,6 +50,7 @@ class PostypeController extends Controller
 
     public function rentalupdate(UpdateRentalResaleRequest $request, $id)
     {
+
         $this->rentalResaleService->updateRentalResale($request, $id);
 
         return redirect()->route('admin.postypes.rental.index')->with('success', 'Rental Resale Post updated successfully.');
@@ -71,6 +72,7 @@ class PostypeController extends Controller
 
     public function removeGalleryImage($id, Request $request)
     {
+        // dd($id, $request->all());
         $this->rentalResaleService->removeGalleryImage($id, $request);
 
         return response()->json(['success' => true]);

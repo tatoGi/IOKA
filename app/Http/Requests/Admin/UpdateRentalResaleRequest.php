@@ -16,6 +16,7 @@ class UpdateRentalResaleRequest extends FormRequest
         return [
             'property_type' => 'sometimes|string|max:255',
             'title' => 'sometimes|string|max:255',
+              'top' => 'nullable|boolean',
             'bathroom' => 'sometimes|integer',
             'bedroom' => 'sometimes|integer',
             'sq_ft' => 'sometimes|numeric',

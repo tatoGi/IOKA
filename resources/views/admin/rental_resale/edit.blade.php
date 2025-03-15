@@ -196,10 +196,18 @@
                 <input type="text" class="form-control" id="dld_permit_number" name="dld_permit_number" value="{{ $rentalResale->dld_permit_number }}" required>
             </div>
             <div class="mb-3">
+                <label for="top" class="form-label">Mark as Top Listing</label>
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="top" name="top" value="1" {{ $rentalResale->top ? 'checked' : '' }}>
+                    <label class="form-check-label" for="is_top">Check this box to mark the property as a top listing</label>
+                </div>
+            </div>
+            <div class="mb-3">
                 <label for="gallery" class="form-label">Gallery</label>
                 <input type="file" class="form-control" id="gallery" name="gallery_images[]" multiple>
                 <button type="button" class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#galleryModal">Manage Gallery</button>
             </div>
+
             <button type="submit" class="btn btn-success w-100">Update</button>
         </form>
     </div>

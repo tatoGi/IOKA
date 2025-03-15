@@ -14,4 +14,5 @@ Route::group(['middleware' => 'cors'], function () {
     Route::get('/developers/{slug}', [FrontendController::class, 'getDeveloper']);
     Route::get('/offplans', [FrontendController::class, 'getOffplans']);
     Route::get('/offplans/{slug}', [FrontendController::class, 'getOffplan']);
+    Route::get('/rental_resales', [FrontendController::class, 'getRentalResale']);
 });

@@ -117,4 +117,9 @@ class FrontendController extends Controller
         }
         return response()->json($ofplanns);
         }
+        public function getRentalResale()
+        {
+            $rentalResale = $this->pageService->getRentalResale();
+            return response()->json($rentalResale);
+            }
 }

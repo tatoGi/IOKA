@@ -36,6 +36,7 @@ class RentalResale extends Model
         'tags',
         'amount_id',
         'location_id',
+        'top', // Add 'top' to the fillable attributes
     ];
 
     protected $casts = [

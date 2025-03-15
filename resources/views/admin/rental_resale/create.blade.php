@@ -191,6 +191,13 @@
                 <input type="text" class="form-control" id="dld_permit_number" name="dld_permit_number" required>
             </div>
             <div class="mb-3">
+                <label for="is_top" class="form-label">Mark as Top Listing</label>
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="is_top" name="top" value="1">
+                    <label class="form-check-label" for="is_top">Check this box to mark the property as a top listing</label>
+                </div>
+            </div>
+            <div class="mb-3">
                 <label for="gallery" class="form-label">Gallery</label>
                 <button type="button" class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#galleryModal">Manage Gallery</button>
             </div>
@@ -215,6 +222,7 @@
                 </div>
             </div>
         </div>
+
     </div>
 
     <!-- Hidden element to pass uploadedImages variable -->
