@@ -15,7 +15,7 @@ class RentalResaleService
 {
     public function getRentalIndexData()
     {
-        $rentalResales = RentalResale::all();
+        $rentalResales = RentalResale::orderBy('created_at', 'desc')->paginate(10);
 
         $tags = collect();
         foreach ($rentalResales as $rentalResale) {
@@ -28,28 +28,44 @@ class RentalResaleService
     public function storeRentalResale(RentalResaleRequest $request)
     {
         $validatedData = $request->validated();
+        $validatedData['slug'] = $this->generateUniqueSlug($request->input('slug'));
 
+        // Handle QR photo upload
         if ($request->hasFile('qr_photo')) {
             $validatedData['qr_photo'] = $request->file('qr_photo')->store('qr_photos', 'public');
         }
 
+        // Handle gallery images upload
         if ($request->hasFile('gallery_images')) {
-            $galleryImages = [];
+            $galleryImages = []; // Initialize an empty array for gallery images
+
             foreach ($request->file('gallery_images') as $image) {
+                // Store each image and add its path to the galleryImages array
                 $galleryImages[] = $image->store('gallery_images', 'public');
             }
-            $validatedData['gallery_images'] = $galleryImages;
+
+            // Encode the galleryImages array as a JSON string
+            $validatedData['gallery_images'] = json_encode($galleryImages);
+        } else {
+            // If no gallery images are uploaded, set it to an empty array as a JSON string
+            $validatedData['gallery_images'] = json_encode([]);
         }
 
+        // Remove amount fields from validated data
         unset($validatedData['amount']);
         unset($validatedData['amount_dirhams']);
 
+        // Create the RentalResale record
         $rentalResale = RentalResale::create($validatedData);
+
+        // Create the related Amount record
         Amount::create([
             'rental_resale_id' => $rentalResale->id,
             'amount' => $request->amount,
             'amount_dirhams' => $request->amount_dirhams,
         ]);
+
+        return $rentalResale; // Optionally return the created record
     }
 
     public function getRentalResaleById($id)
@@ -118,7 +134,9 @@ class RentalResaleService
         $validatedData = $request->validated();
 
         $rentalResale = RentalResale::findOrFail($id);
-
+        if ($request->has('slug') && $request->input('slug') !== $rentalResale->slug) {
+            $validatedData['slug'] = $this->generateUniqueSlug($request->input('slug'));
+        }
         if ($request->hasFile('qr_photo')) {
             // Delete the old QR photo if it exists
             if ($rentalResale->qr_photo) {
@@ -143,5 +161,24 @@ class RentalResaleService
             'amount' => $request->amount,
             'amount_dirhams' => $request->amount_dirhams,
         ]);
+    }
+    private function generateUniqueSlug(string $slug): string
+    {
+        // Replace spaces with dashes
+        $slug = str_replace(' ', '-', $slug);
+
+        // Alternatively, use Laravel's helper for a cleaner slug
+        // $slug = \Illuminate\Support\Str::slug($slug);
+
+        $originalSlug = $slug;
+        $counter = 1;
+
+        // Ensure the slug is unique
+        while (RentalResale::where('slug', $slug)->exists()) {
+            $slug = "{$originalSlug}-{$counter}";
+            $counter++;
+        }
+
+        return $slug;
     }
 }

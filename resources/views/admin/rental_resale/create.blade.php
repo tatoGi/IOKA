@@ -53,6 +53,10 @@
                 <label for="title" class="form-label">Title</label>
                 <input type="text" class="form-control" id="title" name="title" required>
             </div>
+            <div class="form-group mb-3">
+                <label for="title">Slug</label>
+                <input type="text" name="slug" id="slug" class="form-control" required>
+            </div>
             <div class="container">
                 <div class="row">
                     <div class="col-md-3">
@@ -199,8 +203,14 @@
             </div>
             <div class="mb-3">
                 <label for="gallery" class="form-label">Gallery</label>
+                <input type="file" class="form-control" id="gallery" name="gallery_images[]" multiple>
                 <button type="button" class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#galleryModal">Manage Gallery</button>
             </div>
+            <div class="mb-3">
+                <label for="gallery" class="form-label">Gallery</label>
+                <button type="button" class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#galleryModal">Manage Gallery</button>
+            </div>
+
             <button type="submit" class="btn btn-success w-100">Create</button>
         </form>
     </div>
@@ -217,8 +227,6 @@
                     <div id="gallery-images">
                         <!-- Gallery images will be loaded here dynamically -->
                     </div>
-                    <input type="file" name="gallery_images[]" class="form-control mt-3" id="new-gallery-image" multiple>
-                    <button type="button" class="btn btn-primary mt-2" id="upload-new-image">Upload New Image</button>
                 </div>
             </div>
         </div>

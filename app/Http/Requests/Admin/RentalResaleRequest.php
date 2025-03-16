@@ -16,6 +16,7 @@ class RentalResaleRequest extends FormRequest
         return [
             'property_type' => 'required|string|max:255',
             'title' => 'required|string|max:255',
+            'slug' => 'required|string|max:255|unique:rental_resale,slug',
               'top' => 'nullable|boolean',
             'bathroom' => 'required|integer',
             'bedroom' => 'required|integer',

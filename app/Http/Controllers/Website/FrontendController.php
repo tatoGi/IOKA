@@ -122,4 +122,15 @@ class FrontendController extends Controller
             $rentalResale = $this->pageService->getRentalResale();
             return response()->json($rentalResale);
             }
+            public function getRentalResaleBySlug($slug)
+            {
+
+                $rentalresale = $this->pageService->getRentalResaleBySlug($slug);
+                if (! $rentalresale) {
+                    return response()->json([
+                        'error' => 'rental resale not found',
+                    ], 404);
+                }
+                return response()->json($rentalresale);
+            }
 }

@@ -46,6 +46,10 @@
                 <label for="title" class="form-label">Title</label>
                 <input type="text" class="form-control" id="title" name="title" value="{{ $rentalResale->title }}" required>
             </div>
+            <div class="form-group mb-3">
+                <label for="slug">Slug</label>
+                <input type="text" name="slug" id="slug" class="form-control" value="{{ $rentalResale->slug }}" required>
+            </div>
             <div class="container">
                 <div class="row">
                     <div class="col-md-3">
@@ -229,7 +233,6 @@
                             </div>
                         @endforeach
                     </div>
-                    <input type="file" class="form-control mt-3" id="new-gallery-image" multiple>
                     </div>
                     <script>
 

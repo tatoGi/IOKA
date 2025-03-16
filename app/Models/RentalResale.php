@@ -14,6 +14,7 @@ class RentalResale extends Model
     protected $fillable = [
         'property_type',
         'title',
+        'slug',
         'bathroom',
         'bedroom',
         'sq_ft',

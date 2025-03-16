@@ -219,13 +219,13 @@ class PageService
     }
     public function getRentalResaleBySlug($slug)
     {
-        // Fetch the current rental resale by slug
-        $rentalResale = RentalResale::where('slug', $slug)->orderBy('
-            created_at', 'desc')->first();
+        $rentalResale = RentalResale::where('slug', $slug)->with('amount')->first();
 
         if (!$rentalResale) {
             return null;
         }
+
+        return $rentalResale;
         // Fetch the last 4 added rental resales excluding the current one
     }
 }
