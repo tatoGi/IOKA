@@ -4,7 +4,6 @@ use App\Http\Controllers\Website\FrontendController;
 use Illuminate\Support\Facades\Route;
 
 Route::group(['middleware' => 'cors'], function () {
-    Route::get('/', [FrontendController::class, 'index']);
     Route::get('/pages', [FrontendController::class, 'getPages']);
     Route::get('/pages/{slug}', [FrontendController::class, 'getPage']);
     Route::get('/sections', [FrontendController::class, 'getSections']);

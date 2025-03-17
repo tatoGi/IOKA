@@ -18,13 +18,7 @@ class FrontendController extends Controller
     /**
      * Get all pages with their sections
      */
-    public function index()
-    {
-        $home = Page::where('type_id' , '1')->first();
 
-        return response()->json($home);
-
-    }
     public function getPages(): JsonResponse
     {
         return response()->json($this->pageService->getAllPages());
