@@ -209,7 +209,7 @@ class DeveloperController extends Controller
         // Update the developer
         $developer->update([
             'title' => $request->input('title'),
-            'slug' => $request->input('slug'),
+            'slug' =>  $this->generateUniqueSlug($request->input('slug')),
             'paragraph' => $request->input('paragraph'),
             'phone' => $request->input('phone'),
             'whatsapp' => $request->input('whatsapp'),
