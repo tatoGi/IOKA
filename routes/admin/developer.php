@@ -10,4 +10,6 @@ Route::group(['prefix' => 'ioka_admin/developer', 'as' => 'admin.developer.'], f
     Route::get('/edit/{id}', [DeveloperController::class, 'edit'])->name('edit');
     Route::post('/update/{id}', [DeveloperController::class, 'update'])->name('update');
     Route::delete('/delete/{id}', [DeveloperController::class, 'destroy'])->name('delete');
+    Route::post('/delete-photo', [DeveloperController::class, 'deletePhoto'])->name('delete.photo');
+    Route::post('/delete-award', [DeveloperController::class, 'deleteAward'])->name('admin.developer.delete-award');
 });

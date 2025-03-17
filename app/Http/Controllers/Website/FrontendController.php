@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Website;
 use App\Http\Controllers\Controller;
 use App\Services\Frontend\PageService;
 use Illuminate\Http\JsonResponse;
-
+use App\Models\Page;
 class FrontendController extends Controller
 {
     protected $pageService;
@@ -18,6 +18,13 @@ class FrontendController extends Controller
     /**
      * Get all pages with their sections
      */
+    public function index()
+    {
+        $home = Page::where('type_id' , '1')->first();
+
+        return response()->json($home);
+
+    }
     public function getPages(): JsonResponse
     {
         return response()->json($this->pageService->getAllPages());

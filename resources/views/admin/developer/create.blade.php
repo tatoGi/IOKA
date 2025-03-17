@@ -50,8 +50,8 @@
                     <div id="photo-container">
                         <div class="photo-input-group mb-3">
                             <input type="file" name="photo[][file]" class="form-control">
-                            <input type="text" name="photo[][alt]" class="form-control mt-2"
-                                placeholder="Alt text for this photo">
+                            <input type="text" name="photo[][alt]" class="form-control mt-2" placeholder="Alt text for this photo">
+                            <button type="button" class="btn btn-danger btn-sm mt-2 remove-photo">Remove</button>
                         </div>
                     </div>
                     <button type="button" id="add-photo" class="btn btn-secondary">Add Another Photo</button>
@@ -61,32 +61,31 @@
                     <input type="file" name="logo" id="logo" class="form-control mt-2">
                 </div>
                 <!-- Awards Section -->
-          <!-- Awards Section -->
-<div class="form-group mb-3">
-    <label for="awards">Awards</label>
-    <div id="awards-container">
-        <div class="award-input-group mb-3">
-            <div class="form-group">
-                <label for="award_title">Award Title</label>
-                <input type="text" name="awards[0][title]" class="form-control">
-            </div>
-            <div class="form-group">
-                <label for="award_year">Award Year</label>
-                <input type="text" name="awards[0][year]" class="form-control">
-            </div>
-            <div class="form-group">
-                <label for="award_description">Award Description</label>
-                <textarea name="awards[0][description]" class="form-control editor"></textarea>
-            </div>
-            <div class="form-group">
-                <label for="award_photo">Award Photo</label>
-                <input type="file" name="awards[0][photo]" class="form-control">
-            </div>
-        </div>
-    </div>
-    <button type="button" id="add-award" class="btn btn-secondary">Add Another Award</button>
-</div>
-
+                <div class="form-group mb-3">
+                    <label for="awards">Awards</label>
+                    <div id="awards-container">
+                        <div class="award-input-group mb-3">
+                            <div class="form-group">
+                                <label for="award_title">Award Title</label>
+                                <input type="text" name="awards[0][title]" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label for="award_year">Award Year</label>
+                                <input type="text" name="awards[0][year]" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label for="award_description">Award Description</label>
+                                <textarea name="awards[0][description]" class="form-control editor"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="award_photo">Award Photo</label>
+                                <input type="file" name="awards[0][photo]" class="form-control">
+                            </div>
+                            <button type="button" class="btn btn-danger btn-sm remove-award">Remove</button>
+                        </div>
+                    </div>
+                    <button type="button" id="add-award" class="btn btn-secondary">Add Another Award</button>
+                </div>
                 <!-- Tags and Listings -->
                 <div class="mb-3">
                     <label for="tags" class="form-label">Tags</label>
@@ -147,65 +146,61 @@
             });
         });
         $(document).ready(function() {
-    // Add more photo inputs
-    $('#add-photo').click(function() {
-        $('#photo-container').append(`
-            <div class="photo-input-group mb-3">
-                <input type="file" name="photo[][file]" class="form-control">
-                <input type="text" name="photo[][alt]" class="form-control mt-2" placeholder="Alt text for this photo">
-            </div>
-        `);
-    });
+            // Add more photo inputs
+            $('#add-photo').click(function() {
+                $('#photo-container').append(`
+                    <div class="photo-input-group mb-3">
+                        <input type="file" name="photo[][file]" class="form-control">
+                        <input type="text" name="photo[][alt]" class="form-control mt-2" placeholder="Alt text for this photo">
+                        <button type="button" class="btn btn-danger btn-sm mt-2 remove-photo">Remove</button>
+                    </div>
+                `);
+            });
 
-    // Add more award inputs
-    let awardIndex = 1; // Start from 1 since the first award is already present
+            // Remove photo input group
+            $(document).on('click', '.remove-photo', function() {
+                $(this).closest('.photo-input-group').remove();
+            });
 
-// Add more award inputs
-$('#add-award').click(function() {
-    $('#awards-container').append(`
-        <div class="award-input-group mb-3">
-            <div class="form-group">
-                <label for="award_title">Award Title</label>
-                <input type="text" name="awards[${awardIndex}][title]" class="form-control">
-            </div>
-            <div class="form-group">
-                <label for="award_year">Award Year</label>
-                <input type="text" name="awards[${awardIndex}][year]" class="form-control">
-            </div>
-            <div class="form-group">
-                <label for="award_description">Award Description</label>
-                <textarea name="awards[${awardIndex}][description]" class="form-control editor"></textarea>
-            </div>
-            <div class="form-group">
-                <label for="award_photo">Award Photo</label>
-                <input type="file" name="awards[${awardIndex}][photo]" class="form-control">
-            </div>
-        </div>
-    `);
+            // Add more award inputs
+            let awardIndex = 1; // Start from 1 since the first award is already present
 
-    // Reinitialize TinyMCE for the new textarea
-    tinymce.init({
-        selector: '.editor',
-        // Add other TinyMCE configuration options here
-    });
+            $('#add-award').click(function() {
+                $('#awards-container').append(`
+                    <div class="award-input-group mb-3">
+                        <div class="form-group">
+                            <label for="award_title">Award Title</label>
+                            <input type="text" name="awards[${awardIndex}][title]" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="award_year">Award Year</label>
+                            <input type="text" name="awards[${awardIndex}][year]" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="award_description">Award Description</label>
+                            <textarea name="awards[${awardIndex}][description]" class="form-control editor"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="award_photo">Award Photo</label>
+                            <input type="file" name="awards[${awardIndex}][photo]" class="form-control">
+                        </div>
+                        <button type="button" class="btn btn-danger btn-sm remove-award">Remove</button>
+                    </div>
+                `);
 
-    awardIndex++; // Increment the index for the next award
-});
+                // Reinitialize TinyMCE for the new textarea
+                tinymce.init({
+                    selector: '.editor',
+                    // Add other TinyMCE configuration options here
+                });
 
-    // Remove incomplete award fields before form submission
-    $('form').on('submit', function(e) {
-        $('#awards-container .award-input-group').each(function() {
-            const title = $(this).find('input[name*="[title]"]').val();
-            const year = $(this).find('input[name*="[year]"]').val();
-            const description = $(this).find('textarea[name*="[description]"]').val();
-            const photo = $(this).find('input[name*="[photo]"]').val();
+                awardIndex++; // Increment the index for the next award
+            });
 
-            // If either title or year is missing, remove the group
-            if (!title || !year) {
-                $(this).remove();
-            }
+            // Remove award input group
+            $(document).on('click', '.remove-award', function() {
+                $(this).closest('.award-input-group').remove();
+            });
         });
-    });
-});
     </script>
 @endsection

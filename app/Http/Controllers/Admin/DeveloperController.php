@@ -284,4 +284,54 @@ class DeveloperController extends Controller
 
         return $slug;
     }
+    public function deletePhoto(Request $request)
+    {
+        $request->validate([
+            'developer_id' => 'required|exists:developers,id', // Ensure a valid developer ID is provided
+            'photo_path' => 'required|string', // Ensure a valid photo path is provided
+        ]);
+
+        $developerId = $request->input('developer_id');
+        $photoPath = $request->input('photo_path');
+
+        // Delete the file from storage
+        if (Storage::exists('storage/' . $photoPath)) {
+            Storage::delete('storage/' . $photoPath);
+        }
+
+        // Update the database to remove the photo from the developer's data
+        $developer = Developer::findOrFail($developerId);
+        $photos = json_decode($developer->photo, true) ?? [];
+
+        // Find and remove the photo from the array
+        $photos = array_filter($photos, function($photo) use ($photoPath) {
+            return $photo['file'] !== $photoPath;
+        });
+
+        // Update the developer record
+        $developer->photo = json_encode(array_values($photos));
+        $developer->save();
+
+        return response()->json(['success' => true]);
+    }
+    public function deleteAward(Request $request)
+{
+    $request->validate([
+        'award_id' => 'required|exists:developer_awards,id', // Ensure a valid award ID is provided
+    ]);
+
+    $awardId = $request->input('award_id');
+
+    // Find and delete the award
+    $award = DeveloperAward::findOrFail($awardId);
+
+    // Delete the award photo from storage if it exists
+    if ($award->award_photo && Storage::exists('public/' . $award->award_photo)) {
+        Storage::delete('public/' . $award->award_photo);
+    }
+
+    $award->delete();
+
+    return response()->json(['success' => true]);
+}
 }
