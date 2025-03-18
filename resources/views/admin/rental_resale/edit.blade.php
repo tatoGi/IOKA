@@ -106,6 +106,7 @@
                             <div class="details-repeater">
 
                                 <div data-repeater-list="details">
+                                    @if(isset($rentalResale->details))
                                     @foreach ((array) $rentalResale->details as $index => $detail)
                                     <div data-repeater-item class="repeater-item mb-2">
                                         <input type="text" class="form-control mb-2"
@@ -119,6 +120,17 @@
                                     </button>
                                     </div>
                                     @endforeach
+                                    @else
+                                    <div data-repeater-list="details">
+                                        <div data-repeater-item class="repeater-item mb-2">
+                                            <input type="text" class="form-control mb-2" name="title" placeholder="Title" required>
+                                            <input type="text" class="form-control mb-2" name="info" placeholder="Information" required>
+                                            <button type="button" class="btn btn-danger" data-repeater-delete>
+                                                <i class="fas fa-trash-alt"></i> Remove
+                                            </button>
+                                        </div>
+                                    </div>
+                                    @endif
                                 </div>
 
                                 <button type="button" class="btn btn-primary mt-2" data-repeater-create>
@@ -135,7 +147,7 @@
                             <label for="amenities" class="form-label">Amenities</label>
                             <div class="amenities-repeater">
                                 <div data-repeater-list="amenities">
-
+                                    @if(isset($rentalResale->amenities))
                                     @foreach ($rentalResale->amenities as $index => $amenity)
                                         <div data-repeater-item class="repeater-item mb-2">
                                             <input type="text" class="form-control mb-2"
@@ -146,6 +158,16 @@
                                             </button>
                                         </div>
                                     @endforeach
+                                    @else
+                                    <div data-repeater-list="amenities">
+                                        <div data-repeater-item class="repeater-item mb-2">
+                                            <input type="text" class="form-control mb-2" name="amenity" placeholder="Amenity" required>
+                                            <button type="button" class="btn btn-danger" data-repeater-delete>
+                                                <i class="fas fa-trash-alt"></i> Remove
+                                            </button>
+                                        </div>
+                                    </div>
+                                    @endif
                                 </div>
 
 
@@ -162,6 +184,7 @@
                             <label for="addresses" class="form-label">Addresses</label>
                             <div class="addresses-repeater">
                                 <div data-repeater-list="addresses">
+                                    @if(isset($rentalResale->addresses))
                                     @foreach ($rentalResale->addresses as $index => $address)
                                     <div data-repeater-item class="repeater-item mb-2">
                                         <input type="text" class="form-control mb-2"
@@ -172,6 +195,16 @@
                                         </button>
                                     </div>
                                     @endforeach
+                                    @else
+                                    <div data-repeater-list="addresses">
+                                        <div data-repeater-item class="repeater-item mb-2">
+                                            <input type="text" class="form-control mb-2" name="address" placeholder="Address" required>
+                                            <button type="button" class="btn btn-danger" data-repeater-delete>
+                                                <i class="fas fa-trash-alt"></i> Remove
+                                            </button>
+                                        </div>
+                                    </div>
+                                    @endif
                                 </div>
                                 <button type="button" class="btn btn-primary mt-2" data-repeater-create>
                                     <i class="fas fa-plus"></i> Add Address
