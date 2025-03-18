@@ -91,49 +91,67 @@
             </div>
             <div class="container">
                 <div class="row">
+                    <!-- Details Repeater -->
                     <div class="col-md-4">
                         <div class="mb-3">
                             <label for="details" class="form-label">Details</label>
-                            <div id="details-repeater" class="repeater">
-                                <div class="repeater-item mb-2">
-                                    <input type="text" class="form-control mb-2" name="details[0][title]" placeholder="Title" required>
-                                    <input type="text" class="form-control mb-2" name="details[0][info]" placeholder="Information" required>
-                                    <button type="button" class="btn btn-danger remove-detail">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
+                            <div class="details-repeater">
+                                <div data-repeater-list="details">
+                                    <div data-repeater-item class="repeater-item mb-2">
+                                        <input type="text" class="form-control mb-2" name="title" placeholder="Title" required>
+                                        <input type="text" class="form-control mb-2" name="info" placeholder="Information" required>
+                                        <button type="button" class="btn btn-danger" data-repeater-delete>
+                                            <i class="fas fa-trash-alt"></i> Remove
+                                        </button>
+                                    </div>
                                 </div>
+                                <button type="button" class="btn btn-primary mt-2" data-repeater-create>
+                                    <i class="fas fa-plus"></i> Add Detail
+                                </button>
                             </div>
-                            <button type="button" class="btn btn-primary mt-2" id="add-detail">Add Detail</button>
                         </div>
                     </div>
+
+                    <!-- Amenities Repeater -->
                     <div class="col-md-4">
                         <div class="mb-3">
                             <label for="amenities" class="form-label">Amenities</label>
-                            <div id="amenities-repeater" class="repeater">
-                                <div class="repeater-item mb-2">
-                                    <input type="text" class="form-control mb-2" name="amenities[0]" placeholder="Amenity" required>
-                                    <button type="button" class="btn btn-danger remove-amenity">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
+                            <div class="amenities-repeater">
+                                <div data-repeater-list="amenities">
+                                    <div data-repeater-item class="repeater-item mb-2">
+                                        <input type="text" class="form-control mb-2" name="amenity" placeholder="Amenity" required>
+                                        <button type="button" class="btn btn-danger" data-repeater-delete>
+                                            <i class="fas fa-trash-alt"></i> Remove
+                                        </button>
+                                    </div>
                                 </div>
+                                <button type="button" class="btn btn-primary mt-2" data-repeater-create>
+                                    <i class="fas fa-plus"></i> Add Amenity
+                                </button>
                             </div>
-                            <button type="button" class="btn btn-primary mt-2" id="add-amenity">Add Amenity</button>
                         </div>
                     </div>
+
+                    <!-- Addresses Repeater -->
                     <div class="col-md-4">
                         <div class="mb-3">
                             <label for="addresses" class="form-label">Addresses</label>
-                            <div id="addresses-repeater" class="repeater">
-                                <div class="repeater-item mb-2">
-                                    <input type="text" class="form-control mb-2" name="addresses[0]" placeholder="Address" required>
-                                    <button type="button" class="btn btn-danger remove-address">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
+                            <div class="addresses-repeater">
+                                <div data-repeater-list="addresses">
+                                    <div data-repeater-item class="repeater-item mb-2">
+                                        <input type="text" class="form-control mb-2" name="address" placeholder="Address" required>
+                                        <button type="button" class="btn btn-danger" data-repeater-delete>
+                                            <i class="fas fa-trash-alt"></i> Remove
+                                        </button>
+                                    </div>
                                 </div>
+                                <button type="button" class="btn btn-primary mt-2" data-repeater-create>
+                                    <i class="fas fa-plus"></i> Add Address
+                                </button>
                             </div>
-                            <button type="button" class="btn btn-primary mt-2" id="add-address">Add Address</button>
                         </div>
                     </div>
+
                 </div>
             </div>
             <div class="container">
@@ -166,6 +184,30 @@
                         <div class="mb-3">
                             <label for="agent_whatsapp" class="form-label">Agent WhatsApp</label>
                             <input type="text" class="form-control" id="agent_whatsapp" name="agent_whatsapp" required>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="mb-3">
+                            <label for="agent_photo" class="form-label">Agent Photo</label>
+                            <input type="file" class="form-control" id="agent_photo" name="agent_photo" multiple>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="mb-3">
+                            <label for="languages" class="form-label">languages</label>
+                            <div class="languages-repeater">
+                                <div data-repeater-list="languages">
+                                    <div data-repeater-item class="repeater-item mb-2">
+                                        <input type="text" class="form-control mb-2" name="languages" placeholder="languages" required>
+                                        <button type="button" class="btn btn-danger" data-repeater-delete>
+                                            <i class="fas fa-trash-alt"></i> Remove
+                                        </button>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-primary mt-2" data-repeater-create>
+                                    <i class="fas fa-plus"></i> Add languages
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>

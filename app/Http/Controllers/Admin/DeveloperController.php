@@ -25,6 +25,7 @@ class DeveloperController extends Controller
     {
         $rentalandresaleListings = RentalResale::all();
         $offplanListings = Offplan::all();
+
         return view('admin.developer.create', compact('rentalandresaleListings', 'offplanListings'));
     }
 
@@ -54,12 +55,12 @@ class DeveloperController extends Controller
         if ($request->has('awards')) {
             foreach ($request->awards as $index => $award) {
                 // Only validate if both title and year are present
-                if (!empty($award['title']) && !empty($award['year'])) {
-                    $validator->sometimes("awards.$index.title", 'required|string|max:255', function ($input) use ($award) {
+                if (! empty($award['title']) && ! empty($award['year'])) {
+                    $validator->sometimes("awards.$index.title", 'required|string|max:255', function ($input) {
                         return true;
                     });
 
-                    $validator->sometimes("awards.$index.year", 'required|integer|min:1900|max:' . date('Y'), function ($input) use ($award) {
+                    $validator->sometimes("awards.$index.year", 'required|integer|min:1900|max:'.date('Y'), function ($input) {
                         return true;
                     });
                 }
@@ -112,31 +113,32 @@ class DeveloperController extends Controller
 
         // Handle awards
         $awards = [];
-    if ($request->has('awards')) {
-        foreach ($request->awards as $awardData) {
-            if (!empty($awardData['title']) && !empty($awardData['year'])) {
-                $award = new DeveloperAward([
-                    'award_title' => $awardData['title'],
-                    'award_year' => $awardData['year'],
-                    'award_description' => $awardData['description'] ?? null,
-                ]);
+        if ($request->has('awards')) {
+            foreach ($request->awards as $awardData) {
+                if (! empty($awardData['title']) && ! empty($awardData['year'])) {
+                    $award = new DeveloperAward([
+                        'award_title' => $awardData['title'],
+                        'award_year' => $awardData['year'],
+                        'award_description' => $awardData['description'] ?? null,
+                    ]);
 
-                // Upload award photo if present
-                if (isset($awardData['photo'])) {
-                    $awardPhotoPath = $awardData['photo']->store('award_photos', 'public');
-                    $award->award_photo = $awardPhotoPath;
+                    // Upload award photo if present
+                    if (isset($awardData['photo'])) {
+                        $awardPhotoPath = $awardData['photo']->store('award_photos', 'public');
+                        $award->award_photo = $awardPhotoPath;
+                    }
+
+                    $awards[] = $award;
                 }
-
-                $awards[] = $award;
             }
         }
-    }
 
-    // Save awards using sync
-    $developer->awards()->saveMany($awards);
+        // Save awards using sync
+        $developer->awards()->saveMany($awards);
 
         return redirect()->route('admin.developer.list')->with('success', 'Developer created successfully!');
     }
+
     // Show the form for editing the specified developer
     public function edit($id)
     {
@@ -160,7 +162,6 @@ class DeveloperController extends Controller
         ));
     }
 
-
     // Update the specified developer in storage
     public function update(Request $request, $id)
     {
@@ -169,7 +170,7 @@ class DeveloperController extends Controller
         // Validate the request
         $request->validate([
             'title' => 'required|string|max:255',
-            'slug' => 'required|string|max:255|unique:developers,slug,' . $developer->id,
+            'slug' => 'required|string|max:255|unique:developers,slug,'.$developer->id,
             'paragraph' => 'required|string',
             'phone' => 'required|string|max:20',
             'whatsapp' => 'required|string|max:20',
@@ -184,7 +185,7 @@ class DeveloperController extends Controller
             'offplan_listings.*' => 'exists:offplans,id',
             'awards' => 'nullable|array',
             'awards.*.title' => 'required|string|max:255',
-            'awards.*.year' => 'required|integer|min:1900|max:' . date('Y'),
+            'awards.*.year' => 'required|integer|min:1900|max:'.date('Y'),
             'awards.*.description' => 'nullable|string',
             'awards.*.photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
@@ -209,7 +210,7 @@ class DeveloperController extends Controller
         // Update the developer
         $developer->update([
             'title' => $request->input('title'),
-            'slug' =>  $this->generateUniqueSlug($request->input('slug')),
+            'slug' => $this->generateUniqueSlug($request->input('slug')),
             'paragraph' => $request->input('paragraph'),
             'phone' => $request->input('phone'),
             'whatsapp' => $request->input('whatsapp'),
@@ -237,7 +238,7 @@ class DeveloperController extends Controller
 
             // Add new awards
             foreach ($request->awards as $awardData) {
-                if (!empty($awardData['title']) && !empty($awardData['year'])) {
+                if (! empty($awardData['title']) && ! empty($awardData['year'])) {
                     $award = new DeveloperAward([
                         'award_title' => $awardData['title'],
                         'award_year' => $awardData['year'],
@@ -257,6 +258,7 @@ class DeveloperController extends Controller
 
         return redirect()->route('admin.developer.list')->with('success', 'Developer updated successfully!');
     }
+
     // Remove the specified developer from storage
     public function destroy($id)
     {
@@ -265,6 +267,7 @@ class DeveloperController extends Controller
 
         return redirect()->route('admin.developer.list');
     }
+
     private function generateUniqueSlug(string $slug): string
     {
         // Replace spaces with dashes
@@ -284,6 +287,7 @@ class DeveloperController extends Controller
 
         return $slug;
     }
+
     public function deletePhoto(Request $request)
     {
         $request->validate([
@@ -295,8 +299,8 @@ class DeveloperController extends Controller
         $photoPath = $request->input('photo_path');
 
         // Delete the file from storage
-        if (Storage::exists('storage/' . $photoPath)) {
-            Storage::delete('storage/' . $photoPath);
+        if (Storage::exists('storage/'.$photoPath)) {
+            Storage::delete('storage/'.$photoPath);
         }
 
         // Update the database to remove the photo from the developer's data
@@ -304,7 +308,7 @@ class DeveloperController extends Controller
         $photos = json_decode($developer->photo, true) ?? [];
 
         // Find and remove the photo from the array
-        $photos = array_filter($photos, function($photo) use ($photoPath) {
+        $photos = array_filter($photos, function ($photo) use ($photoPath) {
             return $photo['file'] !== $photoPath;
         });
 
@@ -314,24 +318,25 @@ class DeveloperController extends Controller
 
         return response()->json(['success' => true]);
     }
+
     public function deleteAward(Request $request)
-{
-    $request->validate([
-        'award_id' => 'required|exists:developer_awards,id', // Ensure a valid award ID is provided
-    ]);
+    {
+        $request->validate([
+            'award_id' => 'required|exists:developer_awards,id', // Ensure a valid award ID is provided
+        ]);
 
-    $awardId = $request->input('award_id');
+        $awardId = $request->input('award_id');
 
-    // Find and delete the award
-    $award = DeveloperAward::findOrFail($awardId);
+        // Find and delete the award
+        $award = DeveloperAward::findOrFail($awardId);
 
-    // Delete the award photo from storage if it exists
-    if ($award->award_photo && Storage::exists('public/' . $award->award_photo)) {
-        Storage::delete('public/' . $award->award_photo);
+        // Delete the award photo from storage if it exists
+        if ($award->award_photo && Storage::exists('public/'.$award->award_photo)) {
+            Storage::delete('public/'.$award->award_photo);
+        }
+
+        $award->delete();
+
+        return response()->json(['success' => true]);
     }
-
-    $award->delete();
-
-    return response()->json(['success' => true]);
-}
 }

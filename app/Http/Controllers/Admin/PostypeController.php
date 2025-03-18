@@ -5,11 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\RentalResaleRequest;
 use App\Http\Requests\Admin\UpdateRentalResaleRequest;
+use App\Models\Location;
 use App\Services\RentalResaleService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use App\Models\Location;
-use Illuminate\Support\Facades\View;
 
 class PostypeController extends Controller
 {
@@ -30,6 +28,7 @@ class PostypeController extends Controller
     public function rentalcreate()
     {
         $locations = Location::all();
+
         return view('admin.rental_resale.create', compact('locations'));
     }
 
@@ -91,4 +90,5 @@ class PostypeController extends Controller
 
         return response()->json($result);
     }
+
 }

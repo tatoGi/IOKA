@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('rental_resale', function (Blueprint $table) {
-            if (!Schema::hasColumn('rental_resale', 'slug')) {
-                $table->string('slug')->after('title');
+            if (!Schema::hasColumn('rental_resale', 'agent_photo')) {
+                $table->string('agent_photo')->nullable()->after('agent_whatsapp');
             }
         });
     }
@@ -24,8 +24,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('rental_resale', function (Blueprint $table) {
-            if (Schema::hasColumn('rental_resale', 'slug')) {
-                $table->dropColumn('slug');
+            if (Schema::hasColumn('rental_resale', 'agent_photo')) {
+                $table->dropColumn('agent_photo');
             }
         });
     }

@@ -27,6 +27,7 @@ class RentalResale extends Model
         'agent_languages',
         'agent_call',
         'agent_whatsapp',
+        'agent_photo',
         'location_link',
         'qr_photo',
         'reference',
@@ -38,6 +39,8 @@ class RentalResale extends Model
         'amount_id',
         'location_id',
         'top', // Add 'top' to the fillable attributes
+        'languages',
+
     ];
 
     protected $casts = [
@@ -46,14 +49,16 @@ class RentalResale extends Model
         'addresses' => 'array',
         'gallery_images' => 'array',
         'tags' => 'array',
+        'languages' => 'array', // Ensuring JSON is handled properly
     ];
 
     public function amount()
     {
         return $this->hasOne(Amount::class);
     }
+
     public function developer()
-{
-    return $this->belongsTo(Developer::class, 'developer_id');
-}
+    {
+        return $this->belongsTo(Developer::class, 'developer_id');
+    }
 }

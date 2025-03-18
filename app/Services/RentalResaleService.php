@@ -9,7 +9,6 @@ use App\Models\Page;
 use App\Models\RentalResale;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use App\Models\Location;
 
 class RentalResaleService
 {
@@ -34,7 +33,9 @@ class RentalResaleService
         if ($request->hasFile('qr_photo')) {
             $validatedData['qr_photo'] = $request->file('qr_photo')->store('qr_photos', 'public');
         }
-
+        if ($request->hasFile('agent_photo')) {
+            $validatedData['agent_photo'] = $request->file('agent_photo')->store('agent_photo', 'public');
+        }
         // Handle gallery images upload
         if ($request->hasFile('gallery_images')) {
             $galleryImages = []; // Initialize an empty array for gallery images
@@ -122,7 +123,7 @@ class RentalResaleService
             return [
                 'success' => true,
                 'image_url' => $imageUrl,
-                'image_id' => uniqid() // Replace with actual image ID if available
+                'image_id' => uniqid(), // Replace with actual image ID if available
             ];
         }
 
@@ -144,6 +145,13 @@ class RentalResaleService
             }
             $validatedData['qr_photo'] = $request->file('qr_photo')->store('qr_photos', 'public');
         }
+        if ($request->hasFile('agent_photo')) {
+            // Delete the old QR photo if it exists
+            if ($rentalResale->agent_photo) {
+                Storage::delete($rentalResale->agent_photo);
+            }
+            $validatedData['agent_photo'] = $request->file('agent_photo')->store('agent_photo', 'public');
+        }
 
         if ($request->hasFile('gallery_images')) {
             $galleryImages = is_array($rentalResale->gallery_images) ? $rentalResale->gallery_images : json_decode($rentalResale->gallery_images, true);
@@ -162,6 +170,7 @@ class RentalResaleService
             'amount_dirhams' => $request->amount_dirhams,
         ]);
     }
+
     private function generateUniqueSlug(string $slug): string
     {
         // Replace spaces with dashes

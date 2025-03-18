@@ -2,12 +2,12 @@
 
 namespace App\Services\Frontend;
 
-use App\Models\Page;
-use App\Models\Section;
 use App\Models\BlogPost;
 use App\Models\Developer;
 use App\Models\Offplan;
+use App\Models\Page;
 use App\Models\RentalResale;
+use App\Models\Section;
 
 class PageService
 {
@@ -21,7 +21,7 @@ class PageService
         }])->get();
 
         return [
-            'pages' => $pages->map(fn($page) => $this->formatPage($page)),
+            'pages' => $pages->map(fn ($page) => $this->formatPage($page)),
             'meta' => [
                 'total' => $pages->count(),
             ],
@@ -54,7 +54,7 @@ class PageService
         $sections = Section::orderBy('sort_order', 'asc')->get();
 
         return [
-            'sections' => $sections->map(fn($section) => $this->formatSection($section)),
+            'sections' => $sections->map(fn ($section) => $this->formatSection($section)),
             'meta' => [
                 'total' => $sections->count(),
             ],
@@ -110,7 +110,7 @@ class PageService
             'slug' => $section->slug,
             'description' => $section->description,
             'redirect_link' => $section->redirect_link,
-            'photo' => $section->photo ? asset('storage/' . $section->photo) : null,
+            'photo' => $section->photo ? asset('storage/'.$section->photo) : null,
             'additional_fields' => $section->additional_fields,
             'sort_order' => $section->sort_order,
             'active' => $section->active,
@@ -144,7 +144,7 @@ class PageService
 
         return [
             'blog' => $this->formatBlog($blog),
-            'related_blogs' => $relatedBlogs->map(fn($relatedBlog) => $this->formatBlog($relatedBlog)),
+            'related_blogs' => $relatedBlogs->map(fn ($relatedBlog) => $this->formatBlog($relatedBlog)),
         ];
     }
 
@@ -170,10 +170,12 @@ class PageService
             'updated_at' => $blog->updated_at,
         ];
     }
-    public function  getAllDevelopers()
+
+    public function getAllDevelopers()
     {
         return Developer::orderBy('created_at', 'desc')->paginate(10);
     }
+
     public function getDeveloperBySlug($slug)
     {
         // Fetch the developer with related awards, offplans, and rental_resale
@@ -182,22 +184,24 @@ class PageService
             ->orderBy('created_at', 'desc')
             ->first();
 
-        if (!$developer) {
+        if (! $developer) {
             return null;
         }
 
         return $developer;
     }
+
     public function getAlloffplan()
     {
         return Offplan::orderBy('created_at', 'desc')->paginate(10);
     }
+
     public function getOffplanBySlug($slug)
     {
         // Fetch the current offplan by slug
         $offplan = Offplan::where('slug', $slug)->orderBy('created_at', 'desc')->first();
 
-        if (!$offplan) {
+        if (! $offplan) {
             return null;
         }
 
@@ -213,15 +217,17 @@ class PageService
             'lastAddedOffplans' => $lastAddedOffplans,
         ];
     }
+
     public function getRentalResale()
     {
         return RentalResale::orderBy('created_at', 'desc')->with('amount')->paginate(10);
     }
+
     public function getRentalResaleBySlug($slug)
     {
         $rentalResale = RentalResale::where('slug', $slug)->with('amount')->first();
 
-        if (!$rentalResale) {
+        if (! $rentalResale) {
             return null;
         }
 

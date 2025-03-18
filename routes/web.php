@@ -2,7 +2,6 @@
 
 use App\Http\Controllers\Admin\OffplanController;
 use App\Http\Controllers\Admin\PartnerController;
-use App\Http\Controllers\Admin\SectionController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -18,7 +17,6 @@ Route::middleware('admin_auth')->group(function () {
     include_once 'admin/developer.php';
     Route::resource('ioka_admin/partners', PartnerController::class)->names('admin.partners');
     Route::delete('/admin/partners/{partner}/delete-image', [PartnerController::class, 'deleteImage']);
-
 
     Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('offplan', OffplanController::class);

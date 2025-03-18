@@ -17,7 +17,7 @@ class RentalResaleRequest extends FormRequest
             'property_type' => 'required|string|max:255',
             'title' => 'required|string|max:255',
             'slug' => 'required|string|max:255|unique:rental_resale,slug',
-              'top' => 'nullable|boolean',
+            'top' => 'nullable|boolean',
             'bathroom' => 'required|integer',
             'bedroom' => 'required|integer',
             'sq_ft' => 'required|numeric',
@@ -39,6 +39,8 @@ class RentalResaleRequest extends FormRequest
             'amount_dirhams' => 'required|numeric',
             'gallery_images' => 'required|array',
             'tags' => 'required|array',
+            'languages' => 'required|array',
+            'agent_photo' => 'required|image',
 
         ];
     }

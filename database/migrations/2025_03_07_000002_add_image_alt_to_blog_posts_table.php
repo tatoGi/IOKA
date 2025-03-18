@@ -15,7 +15,7 @@ class AddImageAltToBlogPostsTable extends Migration
     {
         Schema::table('blog_posts', function (Blueprint $table) {
             // Ensure the 'image' column exists before adding 'image_alt'
-            if (!Schema::hasColumn('blog_posts', 'image')) {
+            if (! Schema::hasColumn('blog_posts', 'image')) {
                 $table->string('image')->nullable()->after('body');
             }
             $table->string('image_alt')->nullable()->after('image');

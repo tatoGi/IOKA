@@ -3,9 +3,10 @@
 namespace App\Http\Controllers\Website;
 
 use App\Http\Controllers\Controller;
+use App\Models\Page;
 use App\Services\Frontend\PageService;
 use Illuminate\Http\JsonResponse;
-use App\Models\Page;
+
 class FrontendController extends Controller
 {
     protected $pageService;
@@ -18,7 +19,6 @@ class FrontendController extends Controller
     /**
      * Get all pages with their sections
      */
-
     public function getPages(): JsonResponse
     {
         return response()->json($this->pageService->getAllPages());
@@ -63,10 +63,10 @@ class FrontendController extends Controller
 
         return response()->json($section);
     }
+
     public function getblogs()
     {
         $blog = $this->pageService->getBlogs();
-
 
         return response()->json($blog);
     }
@@ -84,12 +84,14 @@ class FrontendController extends Controller
 
         return response()->json($blog);
     }
+
     public function getdevelopers()
     {
         $developers = $this->pageService->getAllDevelopers();
 
         return response()->json($developers);
     }
+
     public function getDeveloper($slug): JsonResponse
     {
         $developer = $this->pageService->getDeveloperBySlug($slug);
@@ -102,12 +104,14 @@ class FrontendController extends Controller
 
         return response()->json($developer);
     }
+
     public function getOffplans()
     {
         $ofplanns = $this->pageService->getAlloffplan();
 
         return response()->json($ofplanns);
     }
+
     public function getoffplan($slug)
     {
         $ofplanns = $this->pageService->getoffplanbySlug($slug);
@@ -116,22 +120,27 @@ class FrontendController extends Controller
                 'error' => 'Offplan not found',
             ], 404);
         }
-        return response()->json($ofplanns);
-        }
-        public function getRentalResale()
-        {
-            $rentalResale = $this->pageService->getRentalResale();
-            return response()->json($rentalResale);
-            }
-            public function getRentalResaleBySlug($slug)
-            {
 
-                $rentalresale = $this->pageService->getRentalResaleBySlug($slug);
-                if (! $rentalresale) {
-                    return response()->json([
-                        'error' => 'rental resale not found',
-                    ], 404);
-                }
-                return response()->json($rentalresale);
-            }
+        return response()->json($ofplanns);
+    }
+
+    public function getRentalResale()
+    {
+        $rentalResale = $this->pageService->getRentalResale();
+
+        return response()->json($rentalResale);
+    }
+
+    public function getRentalResaleBySlug($slug)
+    {
+
+        $rentalresale = $this->pageService->getRentalResaleBySlug($slug);
+        if (! $rentalresale) {
+            return response()->json([
+                'error' => 'rental resale not found',
+            ], 404);
+        }
+
+        return response()->json($rentalresale);
+    }
 }

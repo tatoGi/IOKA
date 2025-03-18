@@ -39,6 +39,7 @@ class OffplanController extends Controller
 
         return redirect()->route('admin.offplan.index')->with('success', 'Offplan created successfully.');
     }
+
     private function generateUniqueSlug(string $slug): string
     {
         // Replace spaces with dashes
@@ -58,6 +59,7 @@ class OffplanController extends Controller
 
         return $slug;
     }
+
     public function edit($id)
     {
         $offplan = Offplan::findOrFail($id);
@@ -138,8 +140,10 @@ class OffplanController extends Controller
 
         if ($type && $path && Storage::disk('public')->exists($path)) {
             Storage::disk('public')->delete($path);
+
             return response()->json(['success' => 'Image deleted successfully.']);
         }
+
         return response()->json(['error' => 'Image not found.'], 404);
     }
 }

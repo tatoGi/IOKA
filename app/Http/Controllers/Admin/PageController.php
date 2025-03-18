@@ -86,26 +86,25 @@ class PageController extends Controller
     }
 
     // Update method to save the changes made to a page
-   // Update method to save the changes made to a page
-public function update(Request $request, $id)
-{
-    // Get the existing page
-    $page = $this->pageRepository->findPageById($id);
+    // Update method to save the changes made to a page
+    public function update(Request $request, $id)
+    {
+        // Get the existing page
+        $page = $this->pageRepository->findPageById($id);
 
-    // Prepare the update data
-    $data = $request->all();
+        // Prepare the update data
+        $data = $request->all();
 
-    // Check if the slug is being updated
-    if ($data['slug'] && $data['slug'] !== $page->slug) {
-        $data['slug'] = $this->generateUniqueSlug($request['slug']);
+        // Check if the slug is being updated
+        if ($data['slug'] && $data['slug'] !== $page->slug) {
+            $data['slug'] = $this->generateUniqueSlug($request['slug']);
+        }
+
+        // Use the repository to update the page
+        $this->pageRepository->updatePage($id, $data);
+
+        return redirect()->route('menu.index')->with('success', 'Page updated successfully!');
     }
-
-    // Use the repository to update the page
-    $this->pageRepository->updatePage($id, $data);
-
-    return redirect()->route('menu.index')->with('success', 'Page updated successfully!');
-}
-
 
     // Rearrange pages method
     public function arrange(Request $request)

@@ -80,7 +80,7 @@ class BlogPostController extends Controller
             'title' => 'required|string|max:255',
             'subtitle' => 'nullable|string|max:255',
             'body' => 'required',
-            'slug' => 'required|string|max:255|unique:blog_posts,slug,' . $blogPost->id,
+            'slug' => 'required|string|max:255|unique:blog_posts,slug,'.$blogPost->id,
             'date' => 'required|date',
             'show_on_main_page' => 'boolean',
             'tags' => 'array',
@@ -132,7 +132,7 @@ class BlogPostController extends Controller
             $blogPost->update(['banner_image' => null, 'banner_image_alt' => null]);
         }
 
-        return response()->json(['success' => true, 'message' => ucfirst(str_replace('_', ' ', $type)) . ' removed successfully.']);
+        return response()->json(['success' => true, 'message' => ucfirst(str_replace('_', ' ', $type)).' removed successfully.']);
     }
 
     public function destroy(BlogPost $blogPost)
@@ -149,6 +149,7 @@ class BlogPostController extends Controller
 
         return redirect()->route('blogposts.index')->with('success', 'Blog post deleted successfully.');
     }
+
     private function generateUniqueSlug(string $slug): string
     {
         // Replace spaces with dashes

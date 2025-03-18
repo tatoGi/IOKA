@@ -2,11 +2,11 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use App\Models\RentalResale;
 use App\Models\Amount;
-use Illuminate\Support\Facades\Storage;
+use App\Models\RentalResale;
 use Faker\Factory as Faker;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Storage;
 
 class RentalResaleSeeder extends Seeder
 {
@@ -21,13 +21,13 @@ class RentalResaleSeeder extends Seeder
         for ($i = 0; $i < 10; $i++) {
             // Generate fake QR photo
             $qrPhoto = $faker->image(storage_path('app/public/qr_photos'), 200, 200, 'business', false);
-            $qrPhotoPath = 'qr_photos/' . $qrPhoto;
+            $qrPhotoPath = 'qr_photos/'.$qrPhoto;
 
             // Generate fake gallery images
             $galleryImages = [];
             for ($j = 0; $j < 3; $j++) { // Generate 3 gallery images per record
                 $galleryImage = $faker->image(storage_path('app/public/gallery_images'), 800, 600, 'city', false);
-                $galleryImages[] = 'gallery_images/' . $galleryImage;
+                $galleryImages[] = 'gallery_images/'.$galleryImage;
             }
 
             // Create RentalResale record

@@ -19,7 +19,7 @@ class BlogPost extends Model
         'image',
         'image_alt',
         'banner_image',
-        'banner_image_alt'
+        'banner_image_alt',
     ];
 
     /**
