@@ -18,7 +18,7 @@
                 </div>
             @endif
             <div class="mb-3">
-                <label for="tags" class="form-label">Tags</label>
+                <label for="tags" class="form-label">Tags <span class="text-danger">*</span></label>
                 <select class="form-control select2" id="tags" name="tags[]" multiple required>
                     <option value="6" {{ in_array(6, (array) $rentalResale->tags) ? 'selected' : '' }}>Resale</option>
                     <option value="5" {{ in_array(5, (array) $rentalResale->tags) ? 'selected' : '' }}>Rental</option>
@@ -35,7 +35,7 @@
                     value="{{ $rentalResale->amount->amount_dirhams }}" readonly>
             </div>
             <div class="mb-3">
-                <label for="property_type" class="form-label">Property Type</label>
+                <label for="property_type" class="form-label">Property Type<span class="text-danger">*</span></label>
                 <select class="form-control select2" id="property_type" name="property_type" required>
                     <option value="Villa" {{ $rentalResale->property_type == 'Villa' ? 'selected' : '' }}>Villa</option>
                     <option value="Townhouse" {{ $rentalResale->property_type == 'Townhouse' ? 'selected' : '' }}>Townhouse
@@ -50,12 +50,12 @@
                 </select>
             </div>
             <div class="mb-3">
-                <label for="title" class="form-label">Title</label>
+                <label for="title" class="form-label">Title<span class="text-danger">*</span></label>
                 <input type="text" class="form-control" id="title" name="title" value="{{ $rentalResale->title }}"
                     required>
             </div>
             <div class="form-group mb-3">
-                <label for="slug">Slug</label>
+                <label for="slug">Slug<span class="text-danger">*</span></label>
                 <input type="text" name="slug" id="slug" class="form-control" value="{{ $rentalResale->slug }}"
                     required>
             </div>
@@ -63,28 +63,28 @@
                 <div class="row">
                     <div class="col-md-3">
                         <div class="mb-3">
-                            <label for="bathroom" class="form-label">Bathroom</label>
+                            <label for="bathroom" class="form-label">Bathroom<span class="text-danger">*</span></label>
                             <input type="number" class="form-control" id="bathroom" name="bathroom"
                                 value="{{ $rentalResale->bathroom }}" required>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="mb-3">
-                            <label for="bedroom" class="form-label">Bedroom</label>
+                            <label for="bedroom" class="form-label">Bedroom<span class="text-danger">*</span></label>
                             <input type="number" class="form-control" id="bedroom" name="bedroom"
                                 value="{{ $rentalResale->bedroom }}" required>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="mb-3">
-                            <label for="sq_ft" class="form-label">SQ Ft</label>
+                            <label for="sq_ft" class="form-label">SQ Ft<span class="text-danger">*</span></label>
                             <input type="number" step="0.1" class="form-control" id="sq_ft" name="sq_ft"
                                 value="{{ $rentalResale->sq_ft }}" required>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="mb-3">
-                            <label for="garage" class="form-label">Garage</label>
+                            <label for="garage" class="form-label">Garage<span class="text-danger">*</span></label>
                             <input type="number" class="form-control" id="garage" name="garage"
                                 value="{{ $rentalResale->garage }}" required>
                         </div>
@@ -92,7 +92,7 @@
                 </div>
             </div>
             <div class="mb-3">
-                <label for="description" class="form-label">Description</label>
+                <label for="description" class="form-label">Description<span class="text-danger">*</span></label>
                 <textarea class="form-control editor" id="description" name="description" required>{{ $rentalResale->description }}</textarea>
             </div>
 
@@ -101,7 +101,7 @@
                     <!-- Details Repeater -->
                     <div class="col-md-4">
                         <div class="mb-3">
-                            <label for="details" class="form-label">Details</label>
+                            <label for="details" class="form-label">Details<span class="text-danger">*</span></label>
 
                             <div class="details-repeater">
 
@@ -144,7 +144,7 @@
                     <!-- Amenities Repeater -->
                     <div class="col-md-4">
                         <div class="mb-3">
-                            <label for="amenities" class="form-label">Amenities</label>
+                            <label for="amenities" class="form-label">Amenities<span class="text-danger">*</span></label>
                             <div class="amenities-repeater">
                                 <div data-repeater-list="amenities">
                                     @if(isset($rentalResale->amenities))
@@ -181,7 +181,7 @@
                     <!-- Addresses Repeater -->
                     <div class="col-md-4">
                         <div class="mb-3">
-                            <label for="addresses" class="form-label">Addresses</label>
+                            <label for="addresses" class="form-label">Addresses<span class="text-danger">*</span></label>
                             <div class="addresses-repeater">
                                 <div data-repeater-list="addresses">
                                     @if(isset($rentalResale->addresses))
@@ -219,35 +219,35 @@
                 <div class="row">
                     <div class="col-md-2">
                         <div class="mb-3">
-                            <label for="agent_title" class="form-label">Agent Title</label>
+                            <label for="agent_title" class="form-label">Agent Title<span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="agent_title" name="agent_title"
                                 value="{{ $rentalResale->agent_title }}" required>
                         </div>
                     </div>
                     <div class="col-md-2">
                         <div class="mb-3">
-                            <label for="agent_status" class="form-label">Agent Status</label>
+                            <label for="agent_status" class="form-label">Agent Status<span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="agent_status" name="agent_status"
                                 value="{{ $rentalResale->agent_status }}" required>
                         </div>
                     </div>
                     <div class="col-md-2">
                         <div class="mb-3">
-                            <label for="agent_languages" class="form-label">Agent Languages</label>
+                            <label for="agent_languages" class="form-label">Agent Languages<span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="agent_languages" name="agent_languages"
                                 value="{{ $rentalResale->agent_languages }}" required>
                         </div>
                     </div>
                     <div class="col-md-2">
                         <div class="mb-3">
-                            <label for="agent_call" class="form-label">Agent Call</label>
+                            <label for="agent_call" class="form-label">Agent Call<span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="agent_call" name="agent_call"
                                 value="{{ $rentalResale->agent_call }}" required>
                         </div>
                     </div>
                     <div class="col-md-2">
                         <div class="mb-3">
-                            <label for="agent_whatsapp" class="form-label">Agent WhatsApp</label>
+                            <label for="agent_whatsapp" class="form-label">Agent WhatsApp<span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="agent_whatsapp" name="agent_whatsapp"
                                 value="{{ $rentalResale->agent_whatsapp }}" required>
                         </div>
@@ -303,12 +303,12 @@
                 </div>
             </div>
             <div class="mb-3">
-                <label for="location_link" class="form-label">Location Link</label>
+                <label for="location_link" class="form-label">Location Link<span class="text-danger">*</span></label>
                 <input type="text" class="form-control" id="location_link" name="location_link"
                     value="{{ $rentalResale->location_link }}" required>
             </div>
             <div class="mb-3">
-                <label for="location_id" class="form-label">Location</label>
+                <label for="location_id" class="form-label">Location<span class="text-danger">*</span></label>
                 <select class="form-control select2" id="location_id" name="location_id" required>
                     @foreach ($locations as $location)
                         <option value="{{ $location->id }}"
@@ -318,7 +318,7 @@
                 </select>
             </div>
             <div class="mb-3">
-                <label for="qr_photo" class="form-label">QR Photo</label>
+                <label for="qr_photo" class="form-label">QR Photo<span class="text-danger">*</span></label>
                 @if ($rentalResale->qr_photo)
                     <div class="mb-2">
                         <img src="{{ asset('storage/' . $rentalResale->qr_photo) }}" alt="QR Photo"
@@ -329,17 +329,17 @@
                 <input type="file" class="form-control" id="qr_photo" name="qr_photo">
             </div>
             <div class="mb-3">
-                <label for="reference" class="form-label">Reference</label>
+                <label for="reference" class="form-label">Reference<span class="text-danger">*</span></label>
                 <input type="text" class="form-control" id="reference" name="reference"
                     value="{{ $rentalResale->reference }}" required>
             </div>
             <div class="mb-3">
-                <label for="dld_permit_number" class="form-label">DLD Permit Number</label>
+                <label for="dld_permit_number" class="form-label">DLD Permit Number<span class="text-danger">*</span></label>
                 <input type="text" class="form-control" id="dld_permit_number" name="dld_permit_number"
                     value="{{ $rentalResale->dld_permit_number }}" required>
             </div>
             <div class="mb-3">
-                <label for="top" class="form-label">Mark as Top Listing</label>
+                <label for="top" class="form-label">Mark as Top Listing<span class="text-danger">*</span></label>
                 <div class="form-check">
                     <input type="checkbox" class="form-check-input" id="top" name="top" value="1"
                         {{ $rentalResale->top ? 'checked' : '' }}>
