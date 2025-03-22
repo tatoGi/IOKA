@@ -18,31 +18,31 @@
                 @endif
                 <!-- Existing fields for title, slug, paragraph, etc. -->
                 <div class="form-group mb-3">
-                    <label for="title">Title</label>
+                    <label for="title">Title <span class="text-danger">*</span></label>
                     <input type="text" name="title" id="title" class="form-control" value="{{ $developer->title }}"
                         required>
                 </div>
                 <div class="form-group mb-3">
-                    <label for="slug">Slug</label>
+                    <label for="slug">Slug <span class="text-danger">*</span></label>
                     <input type="text" name="slug" id="slug" class="form-control" value="{{ $developer->slug }}"
                         required>
                 </div>
                 <div class="form-group mb-3">
-                    <label for="paragraph">Paragraph</label>
+                    <label for="paragraph">Paragraph <span class="text-danger">*</span></label>
                     <textarea name="paragraph" id="paragraph" class="form-control editor" required>{{ $developer->paragraph }}</textarea>
                 </div>
                 <div class="container mb-3">
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label for="phone">Phone</label>
+                                <label for="phone">Phone <span class="text-danger">*</span> </label>
                                 <input type="text" name="phone" id="phone" class="form-control"
                                     value="{{ $developer->phone }}" required>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label for="whatsapp">WhatsApp</label>
+                                <label for="whatsapp">WhatsApp <span class="text-danger">*</span></label>
                                 <input type="text" name="whatsapp" id="whatsapp" class="form-control"
                                     value="{{ $developer->whatsapp }}" required>
                             </div>
@@ -160,8 +160,27 @@
 @section('scripts')
     <script>
         $(document).ready(function() {
-            $('#rental_listings, #offplan_listings, .tags').select2();
-        });
+    $('#rental_listings, #offplan_listings, .tags').select2({
+        tags: true,
+        tokenSeparators: [','],
+        placeholder: 'Type or select tags',
+        allowClear: true,
+        theme: 'default',
+        width: '100%',
+        minimumInputLength: 1,
+        createTag: function(params) {
+            if (params.term.trim() === '') {
+                return null;
+            }
+            return {
+                id: params.term,
+                text: params.term,
+                newTag: true
+            };
+        }
+    });
+});
+
         $(document).ready(function() {
             $('#add-photo').click(function() {
                 $('#photo-container').append(`
