@@ -75,8 +75,15 @@
                     <div class="col-md-12">
                         <div class="mb-3">
                             <label for="amenities" class="form-label">Amenities</label>
-                            <textarea class="form-control editor" id="amenities" name="amenities"></textarea>
+                            <div id="amenities_repeater">
+                                <div class="amenities_item">
+                                    <input type="text" class="form-control mb-2" name="amenities[0]" placeholder="amenities">
+                                    <button type="button" class="btn btn-danger btn-sm remove-amenities">Remove</button>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-secondary" id="add_amenities">Add More</button>
                         </div>
+
                     </div>
                 </div>
                 <div class="row">
@@ -330,7 +337,17 @@
             `;
             repeater.appendChild(newItem);
         });
-
+        document.getElementById('add_amenities').addEventListener('click', function() {
+            var repeater = document.getElementById('amenities_repeater');
+            var index = repeater.children.length;
+            var newItem = document.createElement('div');
+            newItem.classList.add('amenities_item');
+            newItem.innerHTML = `
+                <input type="text" class="form-control mb-2" name="amenities[${index}]" placeholder="amenities">
+                <button type="button" class="btn btn-danger btn-sm remove-amenities">Remove</button>
+            `;
+            repeater.appendChild(newItem);
+        });
         document.getElementById('add_near_by').addEventListener('click', function() {
             var repeater = document.getElementById('near_by_repeater');
             var index = repeater.children.length;
@@ -351,6 +368,10 @@
             if (event.target.classList.contains('remove-near-by')) {
                 event.target.parentElement.remove();
             }
+            if (event.target.classList.contains('remove-amenities')) {
+                event.target.parentElement.remove();
+            }
         });
+
     </script>
 @endsection

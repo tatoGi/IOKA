@@ -54,7 +54,7 @@
                 <label for="description">Description</label>
                 <textarea class="form-control editor" id="description" name="description" required>{{ $offplan->description }}</textarea>
             </div>
-            <div class="form-group">
+            <div class="form-group mt-2">
                 <label for="features">Features</label>
                 <div id="features_repeater">
                     @foreach (json_decode($offplan->features, true) as $index => $feature)
@@ -67,9 +67,18 @@
                 </div>
                 <button type="button" class="btn btn-secondary" id="add_feature">Add More</button>
             </div>
-            <div class="form-group">
+            <div class="form-group mt-2">
                 <label for="amenities">Amenities</label>
-                <textarea class="form-control editor" id="amenities" name="amenities">{{ $offplan->amenities }}</textarea>
+                <div id="amenities_repeater">
+                    @foreach (json_decode($offplan->amenities, true) as $index => $amenity)
+                        <div class="amenities_item">
+                            <input type="text" class="form-control mb-2" name="amenities[{{ $index }}]"
+                                value="{{ $amenity }}" placeholder="amenities">
+                            <button type="button" class="btn btn-danger btn-sm remove-amenities">Remove</button>
+                        </div>
+                    @endforeach
+                </div>
+                <button type="button" class="btn btn-secondary" id="add_amenities">Add More</button>
             </div>
             <div class="form-group">
                 <label for="map_location">Map Location</label>
@@ -378,7 +387,17 @@
         `;
             repeater.appendChild(newItem);
         });
-
+        document.getElementById('add_amenities').addEventListener('click', function() {
+            var repeater = document.getElementById('features_amenities');
+            var index = repeater.children.length;
+            var newItem = document.createElement('div');
+            newItem.classList.add('amenities_item');
+            newItem.innerHTML = `
+            <input type="text" class="form-control mb-2" name="amenities[${index}]" placeholder="amenities">
+            <button type="button" class="btn btn-danger btn-sm remove-amenities">Remove</button>
+        `;
+            repeater.appendChild(newItem);
+        });
         document.getElementById('add_near_by').addEventListener('click', function() {
             var repeater = document.getElementById('near_by_repeater');
             var index = repeater.children.length;
@@ -424,7 +443,11 @@
                 this.parentElement.remove();
             });
         });
-
+        document.querySelectorAll('.remove-amenities').forEach(button => {
+            button.addEventListener('click', function() {
+                this.parentElement.remove();
+            });
+        });
         document.querySelectorAll('.remove-near-by').forEach(button => {
             button.addEventListener('click', function() {
                 this.parentElement.remove();
