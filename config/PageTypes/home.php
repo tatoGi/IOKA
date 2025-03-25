@@ -350,6 +350,11 @@ return [
         'section_five' => [
             'label' => 'Section Five - Our Team',
             'fields' => [
+                'title' => [
+                    'type' => 'text',
+                    'label' => 'Main Title',
+                    'required' => true,
+                ],
                 'team_members' => [
                     'type' => 'repeater',
                     'label' => 'Team Members',
@@ -381,9 +386,9 @@ return [
                         ],
                     ],
                 ],
-                'image_or_like_this' => [
-                    'type' => 'image_or_like_this',
-                    'label' => 'Image or Like This',
+                'Redirect_Link' => [
+                    'type' => 'text',
+                    'label' => 'Redirect Link',
                     'required' => true,
                 ],
             ],
@@ -464,5 +469,55 @@ return [
 
             ],
         ],
-    ],
+        'section_seven' => [
+            'label' => 'Recent Articles',
+            'fields' => [
+                'title' => [
+                    'type' => 'text',
+                    'label' => 'Section Title',
+                    'default' => 'Recent Articles',
+                    'required' => true,
+                ],
+                'subtitle' => [
+                    'type' => 'text',
+                    'label' => 'Section Subtitle',
+                    'required' => true,
+                ],
+                'redirect_link' => [
+                    'type' => 'text',
+                    'label' => 'Redirect Link',
+                    'required' => true,
+                ],
+                'Recent_Articles' => [
+                    'type' => 'repeater',
+                    'label' => 'Recent Articles',
+                    'min_items' => 1,
+                    'max_items' => 4,
+                    'fields' => [
+                        'Tips&Tricks' => [
+                            'type' => 'text',
+                            'label' => 'Tips & Tricks',
+                            'required' => true,
+                        ],
+                        'title' => [
+                            'type' => 'text',
+                            'label' => 'Title',
+                            'required' => true,
+                        ],
+                        'image' => [
+                            'type' => 'image',
+                            'label' => 'Image',
+                            'required' => true,
+                        ],
+                        'read_more' => [
+                            'type' => 'text',
+                            'label' => 'Read More',
+                            'required' => true,
+                        ],
+                    ]
+
+                    ]
+                ]
+            ]
+        ]
 ];

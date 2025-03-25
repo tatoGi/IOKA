@@ -24,7 +24,8 @@
                     <input type="text" class="form-control @error($fieldKey) is-invalid @enderror" id="{{ $fieldKey }}"
                         name="fields[{{ $fieldKey }}]"
                         value="{{ old("fields.$fieldKey", $additionalFields[$fieldKey] ?? ($field['default'] ?? '')) }}"
-                        {{ isset($field['required']) && $field['required'] ? 'required' : '' }}>
+                        {{ isset($field['required']) && $field['required'] ? 'required' : '' }}
+                        placeholder="{{ $field['placeholder'] ?? '' }}">
                 @break
 
                 @case('textarea')
@@ -81,6 +82,13 @@
                                                 <div class="mb-3">
                                                     <label class="form-label">{{ $repeaterField['label'] }}</label>
                                                     @switch($repeaterField['type'])
+                                                        @case('text')
+                                                            <input type="text" class="form-control"
+                                                                name="fields[{{ $fieldKey }}][{{ $index }}][{{ $repeaterFieldKey }}]"
+                                                                value="{{ getSafeValue($item[$repeaterFieldKey] ?? '') }}"
+                                                                {{ isset($repeaterField['required']) && $repeaterField['required'] ? 'required' : '' }}
+                                                                placeholder="{{ $repeaterField['placeholder'] ?? '' }}">
+                                                        @break
                                                         @case('image')
                                                             @if (isset($item[$repeaterFieldKey]))
                                                                 <div class="mb-2">
@@ -123,6 +131,12 @@
                                         <div class="mb-3">
                                             <label class="form-label">{{ $repeaterField['label'] }}</label>
                                             @switch($repeaterField['type'])
+                                                @case('text')
+                                                    <input type="text" class="form-control"
+                                                        name="fields[{{ $fieldKey }}][__INDEX__][{{ $repeaterFieldKey }}]"
+                                                        {{ isset($repeaterField['required']) && $repeaterField['required'] ? 'required' : '' }}
+                                                        placeholder="{{ $repeaterField['placeholder'] ?? '' }}">
+                                                @break
                                                 @case('image')
                                                     <input type="file" class="form-control"
                                                         name="fields[{{ $fieldKey }}][__INDEX__][{{ $repeaterFieldKey }}]"
@@ -225,6 +239,13 @@
                                                                                     <label
                                                                                         class="form-label">{{ $repeaterField['label'] }}</label>
                                                                                     @switch($repeaterField['type'])
+                                                                                        @case('text')
+                                                                                            <input type="text" class="form-control"
+                                                                                                name="fields[{{ $fieldKey }}][{{ $tabKey }}][{{ $tabFieldKey }}][{{ $index }}][{{ $repeaterFieldKey }}]"
+                                                                                                value="{{ getSafeValue($item[$repeaterFieldKey] ?? '') }}"
+                                                                                                {{ isset($repeaterField['required']) && $repeaterField['required'] ? 'required' : '' }}
+                                                                                                placeholder="{{ $repeaterField['placeholder'] ?? '' }}">
+                                                                                        @break
                                                                                         @case('image')
                                                                                             @if (isset($item[$repeaterFieldKey]))
                                                                                                 <div class="mb-2">
@@ -271,6 +292,12 @@
                                                                             <label
                                                                                 class="form-label">{{ $repeaterField['label'] }}</label>
                                                                             @switch($repeaterField['type'])
+                                                                                @case('text')
+                                                                                    <input type="text" class="form-control"
+                                                                                        name="fields[{{ $fieldKey }}][{{ $tabKey }}][{{ $tabFieldKey }}][__INDEX__][{{ $repeaterFieldKey }}]"
+                                                                                        {{ isset($repeaterField['required']) && $repeaterField['required'] ? 'required' : '' }}
+                                                                                        placeholder="{{ $repeaterField['placeholder'] ?? '' }}">
+                                                                                @break
                                                                                 @case('image')
                                                                                     <input type="file" class="form-control"
                                                                                         name="fields[{{ $fieldKey }}][{{ $tabKey }}][{{ $tabFieldKey }}][__INDEX__][{{ $repeaterFieldKey }}]"
