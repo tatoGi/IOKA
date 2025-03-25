@@ -61,4 +61,9 @@ class RentalResale extends Model
     {
         return $this->belongsTo(Developer::class, 'developer_id');
     }
+
+    public function location()
+    {
+        return $this->belongsTo(Location::class, 'location_id');
+    }
 }

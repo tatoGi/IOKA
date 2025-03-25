@@ -6,6 +6,7 @@ use App\Models\BlogPost;
 use App\Models\Developer;
 use App\Models\Offplan;
 use App\Models\Page;
+use App\Models\Partner;
 use App\Models\RentalResale;
 use App\Models\Section;
 
@@ -233,5 +234,9 @@ class PageService
 
         return $rentalResale;
         // Fetch the last 4 added rental resales excluding the current one
+    }
+    public function partners()
+    {
+        return Partner::orderBy('created_at', 'desc')->get();
     }
 }

@@ -143,4 +143,10 @@ class FrontendController extends Controller
 
         return response()->json($rentalresale);
     }
+    public function getPartners()
+    {
+        $partners = $this->pageService->Partners();
+
+        return response()->json($partners);
+    }
 }
