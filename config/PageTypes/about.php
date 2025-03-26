@@ -13,6 +13,48 @@ return [
                     'label' => 'Title',
                     'required' => true,
                 ],
+                'your_agency' => [
+                    'type' => 'text',
+                    'label' => 'Your Agency',
+                    'required' => true,
+                ],
+                'your_agency_description' => [
+                    'type' => 'textarea',
+                    'label' => 'Your Agency Description',
+                    'required' => true,
+                ],
+                'testimonials' => [
+                    'type' => 'repeater',
+                    'label' => 'Testimonials',
+                    'max_items' => 3,
+                    'fields' => [
+                        'name' => [
+                            'type' => 'text',
+                            'label' => 'Name',
+                            'required' => true,
+                        ],
+                        'position' => [
+                            'type' => 'text',
+                            'label' => 'Position',
+                            'required' => true,
+                        ],
+                        'description' => [
+                            'type' => 'textarea',
+                            'label' => 'Description',
+                            'required' => true,
+                        ],
+                        'quote' => [
+                            'type' => 'textarea',
+                            'label' => 'Quote',
+                            'required' => true,
+                        ],
+                        'image' => [
+                            'type' => 'image',
+                            'label' => 'Image',
+                            'required' => true,
+                        ],
+                    ],
+                ],
                 'number_boxes' => [
                     'type' => 'repeater',
                     'label' => 'Number Boxes',

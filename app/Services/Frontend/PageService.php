@@ -239,4 +239,12 @@ class PageService
     {
         return Partner::orderBy('created_at', 'desc')->get();
     }
+    public function aboutpage($id)
+    {
+        return Section::where('page_id', $id)->first();
+    }
+    public function getContactData($id)
+    {
+        return Section::where('page_id', $id)->first();
+    }
 }

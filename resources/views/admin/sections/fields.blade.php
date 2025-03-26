@@ -66,7 +66,6 @@
                 @break
 
                 @case('repeater')
-                    {{-- {{ dd($field) }} --}}
                     <div class="repeater-container" data-field="{{ $fieldKey }}">
                         <div class="repeater-items">
                             @if (isset($additionalFields[$fieldKey]) && is_array($additionalFields[$fieldKey]))
@@ -89,12 +88,23 @@
                                                                 {{ isset($repeaterField['required']) && $repeaterField['required'] ? 'required' : '' }}
                                                                 placeholder="{{ $repeaterField['placeholder'] ?? '' }}">
                                                         @break
+
+                                                        @case('textarea')
+                                                            <textarea class="editor form-control"
+                                                                name="fields[{{ $fieldKey }}][{{ $index }}][{{ $repeaterFieldKey }}]"
+                                                                {{ isset($repeaterField['required']) && $repeaterField['required'] ? 'required' : '' }}
+                                                                placeholder="{{ $repeaterField['placeholder'] ?? '' }}">{{ getSafeValue($item[$repeaterFieldKey] ?? '') }}</textarea>
+                                                        @break
+
                                                         @case('image')
                                                             @if (isset($item[$repeaterFieldKey]))
                                                                 <div class="mb-2">
                                                                     <img src="{{ Storage::url($item[$repeaterFieldKey]) }}"
                                                                         alt="Current Image" class="img-thumbnail"
                                                                         style="max-height: 200px;">
+                                                                    <button type="button" class="btn btn-danger btn-sm delete-image" data-field="{{ $repeaterFieldKey }}" data-index="{{ $index }}">
+                                                                        Delete Image
+                                                                    </button>
                                                                 </div>
                                                                 <input type="hidden"
                                                                     name="old_{{ $repeaterFieldKey }}_{{ $index }}"
@@ -137,6 +147,13 @@
                                                         {{ isset($repeaterField['required']) && $repeaterField['required'] ? 'required' : '' }}
                                                         placeholder="{{ $repeaterField['placeholder'] ?? '' }}">
                                                 @break
+
+                                                @case('textarea')
+                                                    <textarea class="editor form-control" name="fields[{{ $fieldKey }}][__INDEX__][{{ $repeaterFieldKey }}]"
+                                                        {{ isset($repeaterField['required']) && $repeaterField['required'] ? 'required' : '' }}
+                                                        placeholder="{{ $repeaterField['placeholder'] ?? '' }}"></textarea>
+                                                @break
+
                                                 @case('image')
                                                     <input type="file" class="form-control"
                                                         name="fields[{{ $fieldKey }}][__INDEX__][{{ $repeaterFieldKey }}]"
@@ -246,6 +263,13 @@
                                                                                                 {{ isset($repeaterField['required']) && $repeaterField['required'] ? 'required' : '' }}
                                                                                                 placeholder="{{ $repeaterField['placeholder'] ?? '' }}">
                                                                                         @break
+
+                                                                                        @case('textarea')
+                                                                                            <textarea class="editor form-control" name="fields[{{ $fieldKey }}][__INDEX__][{{ $repeaterFieldKey }}]"
+                                                                                                {{ isset($repeaterField['required']) && $repeaterField['required'] ? 'required' : '' }}
+                                                                                                placeholder="{{ $repeaterField['placeholder'] ?? '' }}"></textarea>
+                                                                                        @break
+
                                                                                         @case('image')
                                                                                             @if (isset($item[$repeaterFieldKey]))
                                                                                                 <div class="mb-2">
@@ -253,6 +277,9 @@
                                                                                                         alt="Current Image"
                                                                                                         class="img-thumbnail"
                                                                                                         style="max-height: 200px;">
+                                                                                                    <button type="button" class="btn btn-danger btn-sm delete-image" data-field="{{ $repeaterFieldKey }}" data-index="{{ $index }}">
+                                                                                                        Delete Image
+                                                                                                    </button>
                                                                                                 </div>
                                                                                                 <input type="hidden"
                                                                                                     name="old_{{ $repeaterFieldKey }}_{{ $index }}"
@@ -298,6 +325,7 @@
                                                                                         {{ isset($repeaterField['required']) && $repeaterField['required'] ? 'required' : '' }}
                                                                                         placeholder="{{ $repeaterField['placeholder'] ?? '' }}">
                                                                                 @break
+
                                                                                 @case('image')
                                                                                     <input type="file" class="form-control"
                                                                                         name="fields[{{ $fieldKey }}][{{ $tabKey }}][{{ $tabFieldKey }}][__INDEX__][{{ $repeaterFieldKey }}]"
@@ -366,6 +394,11 @@
             button.removeEventListener('click', handleRemoveRepeaterItem);
             button.addEventListener('click', handleRemoveRepeaterItem);
         });
+
+        document.querySelectorAll('.delete-image').forEach(button => {
+            button.removeEventListener('click', handleDeleteImage);
+            button.addEventListener('click', handleDeleteImage);
+        });
     }
 
     function handleAddRepeaterItem() {
@@ -387,6 +420,43 @@
         this.closest('.repeater-item').remove();
     }
 
+    function handleDeleteImage() {
+        const fieldKey = this.getAttribute('data-field');
+        const index = this.getAttribute('data-index');
+        const pageId = '{{ $pageId }}'; // Use pageId from the blade template
+        const sectionKey = '{{ $sectionKey }}'; // Use sectionKey as section ID
+        const url = `{{ route('admin.sections.delete_image', ['pageId' => '__PAGE_ID__', 'sectionKey' => '__SECTION_KEY__']) }}`
+            .replace('__PAGE_ID__', pageId)
+            .replace('__SECTION_KEY__', sectionKey);
+
+        fetch(url, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ field_key: fieldKey, index: index })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                const hiddenInput = document.querySelector(`input[name="old_${fieldKey}_${index}"]`);
+                if (hiddenInput) {
+                    hiddenInput.value = '';
+                }
+                this.closest('.mb-2').remove();
+            }
+        })
+        .catch(error => {
+            console.error('There was a problem with the fetch operation:', error);
+        });
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
         initializeRepeaterHandlers();
         initializeDeleteImageHandlers();
@@ -396,44 +466,5 @@
         document.querySelectorAll('.delete-image').forEach(button => {
             button.addEventListener('click', handleDeleteImage);
         });
-    }
-
-    function handleDeleteImage() {
-        const fieldKey = this.getAttribute('data-field');
-        const pageId = '{{ $pageId }}'; // Use pageId from the blade template
-        const sectionKey = '{{ $sectionKey }}'; // Use sectionKey as section ID
-        const url =
-            `{{ route('admin.sections.delete_image', ['pageId' => '__PAGE_ID__', 'sectionKey' => '__SECTION_KEY__']) }}`
-            .replace('__PAGE_ID__', pageId)
-            .replace('__SECTION_KEY__', sectionKey);
-
-        fetch(url, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify({
-                    field_key: fieldKey
-                })
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.success) {
-                    const hiddenInput = document.querySelector(`input[name="old_${fieldKey}"]`);
-                    if (hiddenInput) {
-                        hiddenInput.value = '';
-                    }
-                    this.closest('.mb-2').remove();
-                }
-            })
-            .catch(error => {
-                console.error('There was a problem with the fetch operation:', error);
-            });
     }
 </script>

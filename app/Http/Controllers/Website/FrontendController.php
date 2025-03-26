@@ -149,4 +149,20 @@ class FrontendController extends Controller
 
         return response()->json($partners);
     }
+    public function getabout($id)
+    {
+        $about = $this->pageService->aboutpage($id);
+
+        return response()->json([
+            'about' => $about,
+        ]);
+    }
+    public function getContact($id)
+    {
+        $contact = $this->pageService->getContactData($id);
+
+        return response()->json([
+            'contact' => $contact,
+        ]);
+    }
 }

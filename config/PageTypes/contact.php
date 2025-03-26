@@ -18,6 +18,11 @@ return [
                     'label' => 'Title',
                     'required' => true,
                 ],
+                'description' => [
+                    'type' => 'textarea',
+                    'label' => 'Description',
+                    'required' => true,
+                ],
                 'phone_numbers' => [
                     'type' => 'repeater',
                     'label' => 'Phone Numbers',
