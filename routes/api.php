@@ -19,4 +19,5 @@ Route::group(['middleware' => 'cors'], function () {
     Route::get('/partners', [FrontendController::class, 'getPartners']);
     Route::get('/about/{id}', [FrontendController::class, 'getabout']);
     Route::get('/contact/{id}', [FrontendController::class, 'getContact']);
+    Route::post('/contact/submissions', [FrontendController::class, 'Contactstore']);
 });

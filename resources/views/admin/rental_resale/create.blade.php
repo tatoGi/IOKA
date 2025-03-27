@@ -53,6 +53,10 @@
                 <label for="title" class="form-label">Title<span class="text-danger">*</span></label>
                 <input type="text" class="form-control" id="title" name="title" required>
             </div>
+            <div class="mb-3">
+                <label for="subtitle" class="form-label">Subtitle<span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="subtitle" name="subtitle" required>
+            </div>
             <div class="form-group mb-3">
                 <label for="title">Slug<span class="text-danger">*</span></label>
                 <input type="text" name="slug" id="slug" class="form-control" required>

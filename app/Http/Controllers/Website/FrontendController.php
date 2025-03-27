@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Page;
 use App\Services\Frontend\PageService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Http\Request;
 
 class FrontendController extends Controller
 {
@@ -164,5 +166,22 @@ class FrontendController extends Controller
         return response()->json([
             'contact' => $contact,
         ]);
+    }
+    public function Contactstore(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'message' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        // Process the data (e.g., save to database, send email, etc.)
+        // $contact = Contact::create($request->all());
+
+        return response()->json(['message' => 'Contact form submitted successfully'], 200);
     }
 }

@@ -132,6 +132,7 @@ class RentalResaleService
 
     public function updateRentalResale(UpdateRentalResaleRequest $request, $id)
     {
+
         $validatedData = $request->validated();
 
         $rentalResale = RentalResale::findOrFail($id);

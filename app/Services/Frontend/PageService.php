@@ -122,7 +122,7 @@ class PageService
 
     public function getBlogs()
     {
-        return BlogPost::with('tags')->orderBy('created_at', 'desc')->paginate(10);
+        return BlogPost::with('tags')->orderBy('created_at', 'asc')->paginate(10);
     }
 
     /**
@@ -194,7 +194,11 @@ class PageService
 
     public function getAlloffplan()
     {
-        return Offplan::orderBy('created_at', 'desc')->paginate(10);
+
+        $offplans = Offplan::orderBy('created_at', 'desc')->paginate(10);
+
+
+        return $offplans;
     }
 
     public function getOffplanBySlug($slug)

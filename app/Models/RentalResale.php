@@ -40,7 +40,7 @@ class RentalResale extends Model
         'location_id',
         'top', // Add 'top' to the fillable attributes
         'languages',
-
+        'subtitle',
     ];
 
     protected $casts = [

@@ -41,6 +41,8 @@ class Offplan extends Model
         'agent_linkedin',
         'location',
         'developer_id',
+        'created_at',
+        'updated_at',
     ];
 
     protected $casts = [

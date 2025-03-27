@@ -54,6 +54,11 @@
                 <input type="text" class="form-control" id="title" name="title" value="{{ $rentalResale->title }}"
                     required>
             </div>
+            <div class="mb-3">
+                <label for="subtitle" class="form-label">Subtitle<span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="subtitle" name="subtitle" value="{{ $rentalResale->subtitle }}"
+                    required>
+            </div>
             <div class="form-group mb-3">
                 <label for="slug">Slug<span class="text-danger">*</span></label>
                 <input type="text" name="slug" id="slug" class="form-control" value="{{ $rentalResale->slug }}"
