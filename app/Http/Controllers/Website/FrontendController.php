@@ -8,15 +8,19 @@ use App\Services\Frontend\PageService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
-
+use App\Services\Frontend\FilterService;
+use App\Models\ContactSubmission;
 class FrontendController extends Controller
 {
     protected $pageService;
+    protected $filterService;
 
-    public function __construct(PageService $pageService)
+    public function __construct(PageService $pageService, FilterService $filterService)
     {
         $this->pageService = $pageService;
+        $this->filterService = $filterService;
     }
+
 
     /**
      * Get all pages with their sections
@@ -167,21 +171,44 @@ class FrontendController extends Controller
             'contact' => $contact,
         ]);
     }
-    public function Contactstore(Request $request)
+    public function submission(Request $request)
     {
-        $validator = Validator::make($request->all(), [
+        dd($request->all());
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255',
+            'phone' => 'required|string|max:20',
+            'country' => 'required|string|max:100',
             'message' => 'required|string',
         ]);
 
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
+        $submission = ContactSubmission::create($validated);
+
+        return response()->json([
+            'message' => 'Contact form submitted successfully!',
+            'data' => $submission
+        ], 201);
+    }
+
+    public function search(Request $request): JsonResponse
+    {
+
+        $query = $request->input('query');
+
+        if (!$query) {
+            return response()->json(['error' => 'Search query is required'], 400);
         }
 
-        // Process the data (e.g., save to database, send email, etc.)
-        // $contact = Contact::create($request->all());
+        $results = $this->pageService->search($query);
 
-        return response()->json(['message' => 'Contact form submitted successfully'], 200);
+        return response()->json($results);
+    }
+    public function filter_offplan(Request $request)
+    {
+
+        $filters = $request->all(); // Retrieve filters from the request
+        $offplan = $this->filterService->filterOffplans($filters);
+
+        return response()->json($offplan);
     }
 }

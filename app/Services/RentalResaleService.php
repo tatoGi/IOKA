@@ -9,6 +9,7 @@ use App\Models\Page;
 use App\Models\RentalResale;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 
 class RentalResaleService
 {
@@ -33,41 +34,53 @@ class RentalResaleService
         if ($request->hasFile('qr_photo')) {
             $validatedData['qr_photo'] = $request->file('qr_photo')->store('qr_photos', 'public');
         }
+
+        // Handle agent photo upload
         if ($request->hasFile('agent_photo')) {
             $validatedData['agent_photo'] = $request->file('agent_photo')->store('agent_photo', 'public');
         }
+
         // Handle gallery images upload
         if ($request->hasFile('gallery_images')) {
-            $galleryImages = []; // Initialize an empty array for gallery images
+            $galleryImages = [];
 
             foreach ($request->file('gallery_images') as $image) {
-                // Store each image and add its path to the galleryImages array
                 $galleryImages[] = $image->store('gallery_images', 'public');
             }
 
-            // Encode the galleryImages array as a JSON string
             $validatedData['gallery_images'] = json_encode($galleryImages);
         } else {
-            // If no gallery images are uploaded, set it to an empty array as a JSON string
             $validatedData['gallery_images'] = json_encode([]);
         }
 
-        // Remove amount fields from validated data
+        // Get and remove location IDs from the validated data
+        $locationIds = $validatedData['location_id'] ?? [];
+        unset($validatedData['location_id']);
+
+        // Remove amount fields for now (they go into a separate table)
         unset($validatedData['amount']);
         unset($validatedData['amount_dirhams']);
 
-        // Create the RentalResale record
-        $rentalResale = RentalResale::create($validatedData);
+        return DB::transaction(function () use ($validatedData, $locationIds, $request) {
+            // Create the RentalResale record
+            $rentalResale = RentalResale::create($validatedData);
 
-        // Create the related Amount record
-        Amount::create([
-            'rental_resale_id' => $rentalResale->id,
-            'amount' => $request->amount,
-            'amount_dirhams' => $request->amount_dirhams,
-        ]);
+            // Attach locations if available
+            if (!empty($locationIds)) {
+                $rentalResale->locations()->attach($locationIds);
+            }
 
-        return $rentalResale; // Optionally return the created record
+            // Create the related Amount record
+            Amount::create([
+                'rental_resale_id' => $rentalResale->id,
+                'amount' => $request->amount,
+                'amount_dirhams' => $request->amount_dirhams,
+            ]);
+
+            return $rentalResale;
+        });
     }
+
 
     public function getRentalResaleById($id)
     {
@@ -132,44 +145,62 @@ class RentalResaleService
 
     public function updateRentalResale(UpdateRentalResaleRequest $request, $id)
     {
-
         $validatedData = $request->validated();
-
         $rentalResale = RentalResale::findOrFail($id);
+
+        // Handle slug update
         if ($request->has('slug') && $request->input('slug') !== $rentalResale->slug) {
             $validatedData['slug'] = $this->generateUniqueSlug($request->input('slug'));
         }
+
+        // Handle QR photo update
         if ($request->hasFile('qr_photo')) {
-            // Delete the old QR photo if it exists
             if ($rentalResale->qr_photo) {
                 Storage::delete($rentalResale->qr_photo);
             }
             $validatedData['qr_photo'] = $request->file('qr_photo')->store('qr_photos', 'public');
         }
+
+        // Handle agent photo update
         if ($request->hasFile('agent_photo')) {
-            // Delete the old QR photo if it exists
             if ($rentalResale->agent_photo) {
                 Storage::delete($rentalResale->agent_photo);
             }
             $validatedData['agent_photo'] = $request->file('agent_photo')->store('agent_photo', 'public');
         }
 
+        // Handle gallery images update
         if ($request->hasFile('gallery_images')) {
-            $galleryImages = is_array($rentalResale->gallery_images) ? $rentalResale->gallery_images : json_decode($rentalResale->gallery_images, true);
+            $galleryImages = $rentalResale->gallery_images ?? [];
             foreach ($request->file('gallery_images') as $image) {
                 $galleryImages[] = $image->store('gallery_images', 'public');
             }
-            $validatedData['gallery_images'] = json_encode($galleryImages);
+            $validatedData['gallery_images'] = $galleryImages;
         }
 
+        // Remove amount fields
         unset($validatedData['amount']);
         unset($validatedData['amount_dirhams']);
 
-        $rentalResale->update($validatedData);
-        $rentalResale->amount->update([
-            'amount' => $request->amount,
-            'amount_dirhams' => $request->amount_dirhams,
-        ]);
+        // Store location IDs
+        $locationIds = $request->input('location_id', []);
+        unset($validatedData['location_id']);
+
+        return DB::transaction(function () use ($rentalResale, $validatedData, $locationIds, $request) {
+            // Update the RentalResale record
+            $rentalResale->update($validatedData);
+
+            // Sync locations (add new, remove old)
+            $rentalResale->locations()->sync($locationIds);
+
+            // Update the related Amount record
+            $rentalResale->amount->update([
+                'amount' => $request->amount,
+                'amount_dirhams' => $request->amount_dirhams,
+            ]);
+
+            return $rentalResale;
+        });
     }
 
     private function generateUniqueSlug(string $slug): string

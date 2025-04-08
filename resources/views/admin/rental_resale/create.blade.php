@@ -220,14 +220,17 @@
                 <label for="location_link" class="form-label">Location Link<span class="text-danger">*</span></label>
                 <input type="text" class="form-control" id="location_link" name="location_link" required>
             </div>
-            <div class="mb-3">
-                <label for="location_id" class="form-label">Location<span class="text-danger">*</span></label>
-                <select class="form-control select2" id="location_id" name="location_id" required>
-                    @foreach($locations as $location)
-                        <option value="{{ $location->id }}">{{ $location->title }}</option>
-                    @endforeach
-                </select>
+            <div class="row">
+                <div class="mb-3">
+                    <label for="location_id" class="form-label">Location<span class="text-danger">*</span></label>
+                    <select class="form-control select2" id="location_id" name="location_id[]" required multiple>
+                        @foreach($locations as $location)
+                            <option value="{{ $location->id }}">{{ $location->title }}</option>
+                        @endforeach
+                    </select>
+                </div>
             </div>
+
             <div class="mb-3">
                 <label for="qr_photo" class="form-label">QR Photo<span class="text-danger">*</span></label>
                 <input type="file" class="form-control" id="qr_photo" name="qr_photo" required>

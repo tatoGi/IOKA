@@ -62,8 +62,8 @@ class RentalResale extends Model
         return $this->belongsTo(Developer::class, 'developer_id');
     }
 
-    public function location()
+    public function locations()
     {
-        return $this->belongsTo(Location::class, 'location_id');
+        return $this->belongsToMany(Location::class, 'rental_resale_location');
     }
 }

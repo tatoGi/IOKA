@@ -42,7 +42,8 @@ class RentalResaleRequest extends FormRequest
             'tags' => 'required|array',
             'languages' => 'required|array',
             'agent_photo' => 'required|image',
-
+            'location_id' => 'nullable|array',
+            'location_id.*' => 'exists:locations,id',
         ];
     }
 }

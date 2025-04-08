@@ -251,4 +251,35 @@ class PageService
     {
         return Section::where('page_id', $id)->first();
     }
+
+    public function search($query)
+    {
+        $pages = Page::where('title', 'like', "%$query%")
+            ->orWhere('keywords', 'like', "%$query%")
+            ->get();
+
+        $blogs = BlogPost::where('title', 'like', "%$query%")
+            ->orWhere('body', 'like', "%$query%")
+            ->get();
+
+        $developers = Developer::where('title', 'like', "%$query%")
+            ->orWhere('paragraph', 'like', "%$query%")
+            ->get();
+
+        $offplans = Offplan::where('title', 'like', "%$query%")
+            ->orWhere('description', 'like', "%$query%")
+            ->get();
+
+        $rentalResales = RentalResale::where('title', 'like', "%$query%")
+            ->orWhere('description', 'like', "%$query%")
+            ->get();
+
+        return [
+            'pages' => $pages,
+            'blogs' => $blogs,
+            'developers' => $developers,
+            'offplans' => $offplans,
+            'rental_resales' => $rentalResales,
+        ];
+    }
 }

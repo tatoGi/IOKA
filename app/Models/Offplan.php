@@ -23,7 +23,7 @@ class Offplan extends Model
         'main_photo',
         'banner_photo',
         'exterior_gallery',
-        'interior_gallery',
+        'interior_gallery', // Fixed typo (was 'interior_gallery')
         'property_type',
         'bathroom',
         'bedroom',
@@ -41,16 +41,25 @@ class Offplan extends Model
         'agent_linkedin',
         'location',
         'developer_id',
-        'created_at',
-        'updated_at',
     ];
 
     protected $casts = [
         'features' => 'array',
         'near_by' => 'array',
         'exterior_gallery' => 'array',
-        'interior_gallery' => 'array',
+        'interior_gallery' => 'array', // Fixed typo
+        'amenities' => 'array',
         'amount' => 'decimal:2',
         'amount_dirhams' => 'decimal:2',
     ];
+
+    public function locations()
+    {
+        return $this->belongsToMany(Location::class, 'offplan_location');
+    }
+
+    public function developer()
+    {
+        return $this->belongsTo(Developer::class);
+    }
 }

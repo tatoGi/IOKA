@@ -314,10 +314,11 @@
             </div>
             <div class="mb-3">
                 <label for="location_id" class="form-label">Location<span class="text-danger">*</span></label>
-                <select class="form-control select2" id="location_id" name="location_id" required>
-                    @foreach ($locations as $location)
+                <select name="location_id[]" id="location_id" class="form-control select2" multiple="multiple">
+                    @foreach($locations as $location)
                         <option value="{{ $location->id }}"
-                            {{ $rentalResale->location_id == $location->id ? 'selected' : '' }}>{{ $location->title }}
+                            {{ in_array($location->id, $selectedLocations) ? 'selected' : '' }}>
+                            {{ $location->title }}
                         </option>
                     @endforeach
                 </select>

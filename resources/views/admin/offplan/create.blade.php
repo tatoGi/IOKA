@@ -262,13 +262,17 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-12">
-                        <div class="mb-3">
-                            <label for="location" class="form-label">Location</label>
-                            <input type="text" class="form-control" id="location" name="location">
-                        </div>
+                    <div class="mb-3">
+                        <label for="location_id" class="form-label">Location<span class="text-danger">*</span></label>
+                        <select class="form-control select2" id="location_id" name="location_id[]" required multiple>
+                            @foreach($locations as $location)
+                                <option value="{{ $location->id }}">{{ $location->title }}</option>
+                            @endforeach
+                        </select>
                     </div>
                 </div>
+
+
                 <button type="submit" class="btn btn-success w-100">Submit</button>
             </div>
         </form>

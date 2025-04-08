@@ -1,10 +1,10 @@
 @extends('admin.layouts.app')
 
 @section('content')
-<div class="container">
+<div class="container-fluid">
     <h1>Offplan Properties</h1>
     <a href="{{ route('admin.offplan.offplan.create') }}" class="btn btn-success mb-3">Create New Offplan</a>
-    <table class="table">
+    <table class="table table-bordered table-striped align-middle">
         <thead>
             <tr>
                 <th>Title</th>
@@ -22,8 +22,8 @@
                 <td>{{ $offplan->title }}</td>
                 <td>{{ $offplan->subtitle }}</td>
                 <td>{{ $offplan->amount }}</td>
-                <td>{{ $offplan->amount_dirham }}</td>
-                <td>{!! Str::limit($offplan->description, 100) !!}...</td> <!-- Limit description to 100 chars -->
+                <td>{{ $offplan->amount_dirhams }}</td>
+                <td>{!! Str::limit($offplan->description, 50) !!}...</td> <!-- Limit description to 100 chars -->
                 <td>
                     <a href="{{ route('admin.offplan.edit', $offplan->id) }}" class="btn btn-primary">Edit</a>
                     <form action="{{ route('admin.offplan.destroy', $offplan->id) }}" method="POST" style="display:inline-block;">

@@ -57,20 +57,21 @@
             <div class="form-group mt-2">
                 <label for="features">Features</label>
                 <div id="features_repeater">
-                    @foreach (json_decode($offplan->features, true) as $index => $feature)
-                        <div class="features_item">
-                            <input type="text" class="form-control mb-2" name="features[{{ $index }}]"
-                                value="{{ $feature }}" placeholder="Feature">
-                            <button type="button" class="btn btn-danger btn-sm remove-feature">Remove</button>
-                        </div>
-                    @endforeach
+                    {{-- {{ dd($offplan) }} --}}
+                    @foreach ((is_array($offplan->features) ? $offplan->features : json_decode($offplan->features, true)) as $index => $feature)
+                    <div class="features_item">
+                        <input type="text" class="form-control mb-2" name="features[{{ $index }}]"
+                               value="{{ $feature }}" placeholder="Feature">
+                        <button type="button" class="btn btn-danger btn-sm remove-feature">Remove</button>
+                    </div>
+                @endforeach
                 </div>
                 <button type="button" class="btn btn-secondary" id="add_feature">Add More</button>
             </div>
             <div class="form-group mt-2">
                 <label for="amenities">Amenities</label>
                 <div id="amenities_repeater">
-                    @foreach (json_decode($offplan->amenities, true) as $index => $amenity)
+                    @foreach ((is_array($offplan->amenities) ? $offplan->amenities : json_decode($offplan->amenities, true)) as $index => $amenity)
                         <div class="amenities_item">
                             <input type="text" class="form-control mb-2" name="amenities[{{ $index }}]"
                                 value="{{ $amenity }}" placeholder="amenities">
@@ -88,7 +89,7 @@
             <div class="form-group">
                 <label for="near_by">Near By</label>
                 <div id="near_by_repeater">
-                    @foreach (json_decode($offplan->near_by, true) as $index => $nearBy)
+                    @foreach ((is_array($offplan->near_by) ? $offplan->near_by : json_decode($offplan->near_by, true)) as $index => $nearBy)
                         <div class="near_by_item">
                             <input type="text" class="form-control mb-2" name="near_by[{{ $index }}][title]"
                                 value="{{ $nearBy['title'] }}" placeholder="Title">
@@ -143,8 +144,8 @@
                             <input type="file" class="form-control" id="exterior_gallery" name="exterior_gallery[]"
                                 multiple accept="image/*">
                                 <div id="exterior_gallery_preview" class="uploaded-files">
-                                    @if(!empty($offplan->exterior_gallery) && json_decode($offplan->exterior_gallery, true))
-                                        @foreach (json_decode($offplan->exterior_gallery, true) as $photo)
+                                    @if(!empty($offplan->exterior_gallery))
+                                        @foreach ($offplan->exterior_gallery as $photo)
                                             <div class="uploaded-file">
                                                 <img src="{{ asset('storage/' . $photo) }}" alt="Exterior Photo"
                                                     class="img-thumbnail" style="max-width: 100px;">
@@ -167,8 +168,8 @@
                             <input type="file" class="form-control" id="interior_gallery" name="interior_gallery[]"
                                 multiple accept="image/*">
                                 <div id="interior_gallery_preview" class="uploaded-files">
-                                    @if(!empty($offplan->interior_gallery) && json_decode($offplan->interior_gallery, true))
-                                        @foreach (json_decode($offplan->interior_gallery, true) as $photo)
+                                    @if(!empty($offplan->interior_gallery))
+                                        @foreach ($offplan->interior_gallery as $photo)
                                             <div class="uploaded-file">
                                                 <img src="{{ asset('storage/' . $photo) }}" alt="Interior Photo"
                                                     class="img-thumbnail" style="max-width: 100px;">
@@ -181,6 +182,7 @@
                                         <p>No interior gallery photos available.</p>
                                     @endif
                                 </div>
+
 
                         </div>
                     </div>
@@ -325,10 +327,19 @@
                     @endif
                 </div>
             </div>
-            <div class="form-group mt-3">
-                <label for="location">Location</label>
-                <input type="text" class="form-control" id="location" name="location"
-                    value="{{ $offplan->location }}">
+            <div class="form-group">
+                <label for="location_id">Locations</label>
+                <select name="location_id[]" id="location_id" class="form-control select2" multiple="multiple">
+                    @foreach($locations as $location)
+                        <option value="{{ $location->id }}"
+                            {{ in_array($location->id, $selectedLocations) ? 'selected' : '' }}>
+                            {{ $location->title }}
+                        </option>
+                    @endforeach
+                </select>
+                @error('location_id')
+                    <span class="text-danger">{{ $message }}</span>
+                @enderror
             </div>
             <button type="submit" class="btn btn-primary mt-3">Update</button>
         </form>

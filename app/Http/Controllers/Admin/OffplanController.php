@@ -8,6 +8,7 @@ use App\Models\Offplan;
 use App\Services\OffplanService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use App\Models\Location;
 
 class OffplanController extends Controller
 {
@@ -20,25 +21,36 @@ class OffplanController extends Controller
 
     public function index()
     {
-        $offplans = Offplan::paginate(10);
+        $offplans = Offplan::orderBy('created_at', 'desc')->paginate(10);
 
         return view('admin.offplan.index', compact('offplans'));
     }
 
     public function create()
     {
-        return view('admin.offplan.create');
+        $locations = Location::all();
+        return view('admin.offplan.create', compact('locations'));
     }
 
     public function store(StoreOffplanRequest $request)
-    {
+{
+    try {
         $data = $request->validated();
         $data['slug'] = $this->generateUniqueSlug($data['slug']);
-        $this->offplanService->handleFileUploads($request, $data);
-        $this->offplanService->createOffplan($data);
 
-        return redirect()->route('admin.offplan.index')->with('success', 'Offplan created successfully.');
+        $this->offplanService->handleFileUploads($request, $data);
+        $offplan = $this->offplanService->createOffplan($data);
+
+        return redirect()
+            ->route('admin.offplan.index')
+            ->with('success', 'Offplan created successfully.');
+
+    } catch (\Exception $e) {
+        return back()
+            ->withInput()
+            ->with('error', 'Failed to create offplan: ' . $e->getMessage());
     }
+}
 
     private function generateUniqueSlug(string $slug): string
     {
@@ -60,12 +72,13 @@ class OffplanController extends Controller
         return $slug;
     }
 
-    public function edit($id)
-    {
-        $offplan = Offplan::findOrFail($id);
+   public function edit(Offplan $offplan)
+{
+    $locations = Location::all(); // Get all available locations
+    $selectedLocations = $offplan->locations->pluck('id')->toArray();
 
-        return view('admin.offplan.edit', compact('offplan'));
-    }
+    return view('admin.offplan.edit', compact('offplan', 'locations', 'selectedLocations'));
+}
 
     public function update(StoreOffplanRequest $request, $id)
     {

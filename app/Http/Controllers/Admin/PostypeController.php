@@ -42,9 +42,10 @@ class PostypeController extends Controller
     public function rentaledit($id)
     {
         $rentalResale = $this->rentalResaleService->getRentalResaleById($id);
-        $locations = Location::all();
+        $locations = Location::all(); // Get all available locations
+        $selectedLocations = $rentalResale->locations->pluck('id')->toArray();
 
-        return view('admin.rental_resale.edit', compact('rentalResale', 'locations'));
+        return view('admin.rental_resale.edit', compact('rentalResale', 'selectedLocations', 'locations'));
     }
 
     public function rentalupdate(UpdateRentalResaleRequest $request, $id)

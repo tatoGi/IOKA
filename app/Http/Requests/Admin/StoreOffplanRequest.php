@@ -47,6 +47,7 @@ class StoreOffplanRequest extends FormRequest
             'agent_whatsapp' => 'nullable|string|max:20',
             'agent_linkedin' => 'nullable|string|max:255',
             'location' => 'nullable|string|max:255',
+            'location_id' => 'required|exists:locations,id',
         ];
     }
 
