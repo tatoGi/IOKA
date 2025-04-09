@@ -27,4 +27,33 @@ Route::middleware('admin_auth')->group(function () {
     });
 });
 include_once 'admin/login.php';
+
 include_once 'api.php';
+
+// Add this new route for clearing caches (consider protecting it in production)
+Route::get('/clear-cache', function() {
+    Artisan::call('optimize:clear');
+    return 'Cache cleared successfully!';
+})->name('clear.cache');
+Route::get('/create-storage-link', function() {
+    try {
+        // Remove existing link if it exists
+        if (file_exists(public_path('storage'))) {
+            unlink(public_path('storage'));
+        }
+
+        Artisan::call('storage:link');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Storage link created successfully!',
+            'output' => Artisan::output()
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Error creating storage link',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+})->name('create.storage.link');

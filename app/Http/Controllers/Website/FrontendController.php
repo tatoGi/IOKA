@@ -171,15 +171,16 @@ class FrontendController extends Controller
             'contact' => $contact,
         ]);
     }
-    public function submission(Request $request)
+    public static  function submission(Request $request)
     {
-        dd($request->all());
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255',
             'phone' => 'required|string|max:20',
             'country' => 'required|string|max:100',
             'message' => 'required|string',
+            'page_title' => 'nullable|string|max:255', // Add this line
         ]);
 
         $submission = ContactSubmission::create($validated);
@@ -210,5 +211,10 @@ class FrontendController extends Controller
         $offplan = $this->filterService->filterOffplans($filters);
 
         return response()->json($offplan);
+    }
+    public function getLocations()
+    {
+        $locations = $this->pageService->getLocations();
+        return response()->json($locations);
     }
 }

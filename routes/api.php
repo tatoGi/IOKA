@@ -3,6 +3,7 @@
 use App\Http\Controllers\Website\FrontendController;
 use Illuminate\Support\Facades\Route;
 
+
     Route::get('/pages', [FrontendController::class, 'getPages']);
     Route::get('/pages/{slug}', [FrontendController::class, 'getPage']);
     Route::get('/sections', [FrontendController::class, 'getSections']);
@@ -18,12 +19,9 @@ use Illuminate\Support\Facades\Route;
     Route::get('/partners', [FrontendController::class, 'getPartners']);
     Route::get('/about/{id}', [FrontendController::class, 'getabout']);
     Route::get('/contact/{id}', [FrontendController::class, 'getContact']);
-    Route::post('/contact/submissions', [FrontendController::class, 'submission']);
+    Route::post('/contact/submissions', [FrontendController::class, 'submission'])->withoutMiddleware(['csrf']);
     Route::get('/search', [FrontendController::class, 'search']);
     Route::get('/offplans/filter', [FrontendController::class, 'filter_offplan']);
-    Route::get('/get-csrf-token', function() {
-        return response()->json([
-            'csrf_token' => csrf_token()
-        ]);
-    });
+    Route::get('/search_for_homes', [FrontendController::class, 'search_for_homes']);
+    Route::get('/locations', [FrontendController::class, 'getLocations']);
 

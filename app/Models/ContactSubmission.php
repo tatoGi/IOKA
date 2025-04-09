@@ -14,6 +14,7 @@ class ContactSubmission extends Model
         'email',
         'phone',
         'country',
-        'message'
+        'message',
+        'page_title'
     ];
 }

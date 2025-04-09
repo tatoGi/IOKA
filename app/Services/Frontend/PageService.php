@@ -9,6 +9,7 @@ use App\Models\Page;
 use App\Models\Partner;
 use App\Models\RentalResale;
 use App\Models\Section;
+use App\Models\Location;
 
 class PageService
 {
@@ -281,5 +282,9 @@ class PageService
             'offplans' => $offplans,
             'rental_resales' => $rentalResales,
         ];
+    }
+    public function getLocations()
+    {
+        return Location::all();
     }
 }

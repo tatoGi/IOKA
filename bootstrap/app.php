@@ -13,7 +13,9 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
             'admin_auth' => \App\Http\Middleware\AdminAuth::class,
+            'csrf' => \Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class,
         ]);
+
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
