@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Website\FrontendController;
+use App\Http\Controllers\Website\PropertySearchController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -24,4 +25,5 @@ use Illuminate\Support\Facades\Route;
     Route::get('/offplans/filter', [FrontendController::class, 'filter_offplan']);
     Route::get('/search_for_homes', [FrontendController::class, 'search_for_homes']);
     Route::get('/locations', [FrontendController::class, 'getLocations']);
+    Route::get('/properties/Search', [PropertySearchController::class, 'search']);
 

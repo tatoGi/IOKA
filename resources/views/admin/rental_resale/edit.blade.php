@@ -26,12 +26,12 @@
             </div>
             <div class="mb-3">
                 <label for="amount" class="form-label">Amount (in dollars)</label>
-                <input type="number" step="0.01" class="form-control" id="amount" name="amount"
+                <input type="number" step="0.01" class="form-control amount" id="amount" name="amount"
                     value="{{ $rentalResale->amount->amount }}" required>
             </div>
             <div class="mb-3">
                 <label for="amount_dirhams" class="form-label">Amount (in Dirhams)</label>
-                <input type="number" step="0.01" class="form-control" id="amount_dirhams" name="amount_dirhams"
+                <input type="number" step="0.01" class="form-control amount_dirhams" id="amount_dirhams" name="amount_dirhams"
                     value="{{ $rentalResale->amount->amount_dirhams }}" readonly>
             </div>
             <div class="mb-3">
