@@ -212,6 +212,7 @@ class FrontendController extends Controller
 
         return response()->json($offplan);
     }
+    // for github //
     public function getLocations()
     {
         $locations = $this->pageService->getLocations();
