@@ -13,6 +13,21 @@ class PropertySearchController extends Controller
 {
     public function search(Request $request)
     {
+        // Validate request parameters
+        $request->validate([
+            'type' => 'sometimes|string',
+            'location' => 'sometimes|numeric',
+            'locations.*' => 'numeric', // validate each location is numeric
+            'sizeMin' => 'sometimes|numeric',
+            'sizeMax' => 'sometimes|numeric',
+            'priceMin' => 'sometimes|numeric',
+            'priceMax' => 'sometimes|numeric',
+            'bathMin' => 'sometimes|integer',
+            'bathMax' => 'sometimes|integer',
+            'currency' => 'sometimes|in:AED,USD',
+            'page' => 'sometimes|integer|min:1'
+        ]);
+
         // Handle comma-separated types or single type
         $types = $request->input('type', 'OFFPLAN');
         $types = is_array($types) ? $types : explode(',', $types);
@@ -21,70 +36,86 @@ class PropertySearchController extends Controller
         $types = array_unique(array_map('strtoupper', $types));
 
         $response = [
-            'OFFPLAN' => null,
-            'RENTAL' => null,
-            'RESALE' => null,
+            'OFFPLAN' => [],
+            'RENTAL' => [],
+            'RESALE' => [],
             'developers' => [],
-            'all' => []
+            'all' => [],
+            'message' => ''
         ];
 
         $allResults = collect();
         $developerIds = collect();
 
+        // Get location from either singular or plural parameter
+        $location = $request->filled('location')
+                  ? $request->location
+                  : ($request->filled('locations') ? $request->locations : null);
+
+        // Offplan search
         if (in_array('OFFPLAN', $types)) {
-            $offplanQuery = $this->buildOffplanQuery($request);
+            $offplanQuery = $this->buildOffplanQuery($request, $location);
             $offplanResults = $offplanQuery->get();
-            $response['OFFPLAN'] = $offplanResults;
-            $allResults = $allResults->merge($offplanResults);
 
-            // Get developers who have offplan properties matching the filters
-            $offplanDeveloperIds = DB::table('developer_offplan')
-                ->whereIn('offplan_id', $offplanResults->pluck('id'))
-                ->pluck('developer_id')
-                ->unique();
+            if ($offplanResults->isNotEmpty()) {
+                $response['OFFPLAN'] = $offplanResults;
+                $allResults = $allResults->merge($offplanResults);
 
-            $developerIds = $developerIds->merge($offplanDeveloperIds);
+                // Get developers who have matching offplan properties
+                $offplanDeveloperIds = DB::table('developer_offplan')
+                    ->whereIn('offplan_id', $offplanResults->pluck('id'))
+                    ->pluck('developer_id')
+                    ->unique();
+                $developerIds = $developerIds->merge($offplanDeveloperIds);
+            }
         }
 
+        // Rental search
         if (in_array('RENTAL', $types)) {
-            $rentalQuery = $this->buildRentalResaleQuery($request, 'rental');
+            $rentalQuery = $this->buildRentalResaleQuery($request, 'rental', $location);
             $rentalResults = $rentalQuery->get();
-            $response['RENTAL'] = $rentalResults;
-            $allResults = $allResults->merge($rentalResults);
 
-            // Get developers who have rental properties matching the filters
-            $rentalDeveloperIds = DB::table('developer_rental_resale')
-                ->whereIn('rental_resale_id', $rentalResults->pluck('id'))
-                ->pluck('developer_id')
-                ->unique();
-            $developerIds = $developerIds->merge($rentalDeveloperIds);
-            $developer = Developer::whereIn('id', $developerIds)->first();
+            if ($rentalResults->isNotEmpty()) {
+                $response['RENTAL'] = $rentalResults;
+                $allResults = $allResults->merge($rentalResults);
+
+                // Get developers who have matching rental properties
+                $rentalDeveloperIds = DB::table('developer_rental_resale')
+                    ->whereIn('rental_resale_id', $rentalResults->pluck('id'))
+                    ->pluck('developer_id')
+                    ->unique();
+                $developerIds = $developerIds->merge($rentalDeveloperIds);
+            }
         }
 
+        // Resale search
         if (in_array('RESALE', $types)) {
-            $resaleQuery = $this->buildRentalResaleQuery($request, 'resale');
+            $resaleQuery = $this->buildRentalResaleQuery($request, 'resale', $location);
             $resaleResults = $resaleQuery->get();
-            $response['RESALE'] = $resaleResults;
-            $allResults = $allResults->merge($resaleResults);
 
-            // Get developers who have resale properties matching the filters
-            $resaleDeveloperIds = DB::table('developer_rental_resale')
-                ->whereIn('rental_resale_id', $resaleResults->pluck('id'))
-                ->pluck('developer_id')
-                ->unique();
-            $developerIds = $developerIds->merge($resaleDeveloperIds);
-            $developer = Developer::whereIn('id', $developerIds)->first();
+            if ($resaleResults->isNotEmpty()) {
+                $response['RESALE'] = $resaleResults;
+                $allResults = $allResults->merge($resaleResults);
+
+                // Get developers who have matching resale properties
+                $resaleDeveloperIds = DB::table('developer_rental_resale')
+                    ->whereIn('rental_resale_id', $resaleResults->pluck('id'))
+                    ->pluck('developer_id')
+                    ->unique();
+                $developerIds = $developerIds->merge($resaleDeveloperIds);
+            }
         }
 
         // Get unique developers with their relationships
         if ($developerIds->isNotEmpty()) {
             $response['developers'] = Developer::with([
-                'offplanListings' => function($query) use ($types) {
+                'offplanListings' => function($query) use ($types, $request, $location) {
                     if (in_array('OFFPLAN', $types)) {
-                        $query->with('locations');
+                        $this->applyOffplanFilters($query, $request, $location)
+                            ->with('locations');
                     }
                 },
-                'rentalResaleListings' => function($query) use ($types) {
+                'rentalResaleListings' => function($query) use ($types, $request, $location) {
                     $query->where(function($q) use ($types) {
                         if (in_array('RENTAL', $types)) {
                             $q->orWhereJsonContains('tags', '5');
@@ -92,9 +123,17 @@ class PropertySearchController extends Controller
                         if (in_array('RESALE', $types)) {
                             $q->orWhereJsonContains('tags', '6');
                         }
-                    })->with('locations', 'amount');
+                    });
+                    $this->applyRentalResaleFilters($query, $request, $location)
+                        ->with('locations', 'amount');
                 }
             ])->whereIn('id', $developerIds->unique())->get();
+        }
+
+        // Return empty response if no results
+        if ($allResults->isEmpty()) {
+            $response['message'] = 'No properties found matching your criteria';
+            return response()->json(['data' => $response]);
         }
 
         // Paginate combined results
@@ -109,28 +148,34 @@ class PropertySearchController extends Controller
         );
 
         $response['all'] = $paginatedResults;
-
         return response()->json(['data' => $response]);
     }
 
-    private function buildOffplanQuery(Request $request)
+    private function buildOffplanQuery(Request $request, $location = null)
     {
-        $query = Offplan::query();
+        return $this->applyOffplanFilters(Offplan::query(), $request, $location)
+            ->with(['locations', 'developer']);
+    }
 
-        // Location filter (optional)
-        if ($request->filled('location')) {
-            $location = trim($request->location);
-            $query->where(function($q) use ($location) {
-                $q->where('location', 'like', $location . '%')
-                  ->orWhere('location', 'like', '%' . $location . '%')
-                  ->orWhereHas('locations', function($q) use ($location) {
-                      $q->where('title', 'like', $location . '%')
-                        ->orWhere('title', 'like', '%' . $location . '%');
-                  });
+    private function buildRentalResaleQuery(Request $request, $type, $location = null)
+    {
+        $query = RentalResale::query()
+            ->whereJsonContains('tags', $type === 'rental' ? '5' : '6');
+
+        return $this->applyRentalResaleFilters($query, $request, $location)
+            ->with(['locations', 'developer', 'amount']);
+    }
+
+    private function applyOffplanFilters($query, Request $request, $location = null)
+    {
+        // Location filter
+        if ($location) {
+            $query->whereHas('locations', function($q) use ($location) {
+                $q->where('locations.id', $location);
             });
         }
 
-        // Size filter (optional)
+        // Size filter
         if ($request->filled('sizeMin')) {
             $query->where('sq_ft', '>=', (float)$request->sizeMin);
         }
@@ -138,7 +183,7 @@ class PropertySearchController extends Controller
             $query->where('sq_ft', '<=', (float)$request->sizeMax);
         }
 
-        // Price filter (optional)
+        // Price filter
         $currency = $request->input('currency', 'USD');
         if ($currency === 'AED') {
             if ($request->filled('priceMin')) {
@@ -156,7 +201,7 @@ class PropertySearchController extends Controller
             }
         }
 
-        // Bedrooms filter (optional)
+        // Bedrooms filter
         if ($request->filled('bathMin')) {
             $query->where('bedroom', '>=', (int)$request->bathMin);
         }
@@ -164,26 +209,19 @@ class PropertySearchController extends Controller
             $query->where('bedroom', '<=', (int)$request->bathMax);
         }
 
-        return $query->with(['locations', 'developer']);
+        return $query;
     }
 
-    private function buildRentalResaleQuery(Request $request, $type)
+    private function applyRentalResaleFilters($query, Request $request, $location = null)
     {
-        $query = RentalResale::query();
-
-        // Always filter by type
-        $query->whereJsonContains('tags', $type === 'rental' ? '5' : '6');
-
-        // Location filter (optional)
-        if ($request->filled('location')) {
-            $location = trim($request->location);
+        // Location filter
+        if ($location) {
             $query->whereHas('locations', function($q) use ($location) {
-                $q->where('title', 'like', $location . '%')
-                  ->orWhere('title', 'like', '%' . $location . '%');
+                $q->where('locations.id', $location);
             });
         }
 
-        // Size filter (optional)
+        // Size filter
         if ($request->filled('sizeMin')) {
             $query->where('sq_ft', '>=', (float)$request->sizeMin);
         }
@@ -191,7 +229,7 @@ class PropertySearchController extends Controller
             $query->where('sq_ft', '<=', (float)$request->sizeMax);
         }
 
-        // Price filter (optional)
+        // Price filter
         $currency = $request->input('currency', 'USD');
         if ($currency === 'AED') {
             if ($request->filled('priceMin')) {
@@ -217,7 +255,7 @@ class PropertySearchController extends Controller
             }
         }
 
-        // Bedrooms filter (optional)
+        // Bedrooms filter
         if ($request->filled('bathMin')) {
             $query->where('bedroom', '>=', (int)$request->bathMin);
         }
@@ -225,6 +263,6 @@ class PropertySearchController extends Controller
             $query->where('bedroom', '<=', (int)$request->bathMax);
         }
 
-        return $query->with(['locations', 'developer', 'amount']);
+        return $query;
     }
 }
