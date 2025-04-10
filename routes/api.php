@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Website\FrontendController;
 use App\Http\Controllers\Website\PropertySearchController;
+use App\Http\Controllers\Website\SubscriptionController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -22,8 +23,11 @@ use Illuminate\Support\Facades\Route;
     Route::get('/contact/{id}', [FrontendController::class, 'getContact']);
     Route::post('/contact/submissions', [FrontendController::class, 'submission'])->withoutMiddleware(['csrf']);
     Route::get('/search', [FrontendController::class, 'search']);
-    Route::get('/offplans/filter', [FrontendController::class, 'filter_offplan']);
+    Route::get('/offplans_filter', [FrontendController::class, 'filter_offplan']);
     Route::get('/search_for_homes', [FrontendController::class, 'search_for_homes']);
     Route::get('/locations', [FrontendController::class, 'getLocations']);
     Route::get('/properties/Search', [PropertySearchController::class, 'search']);
+    Route::post('/subscribe', [SubscriptionController::class, 'subscribe'])->withoutMiddleware(['csrf']);
+    Route::get('/subscribe/verify/{token}', [SubscriptionController::class, 'verify']);
+    Route::get('/settings', [FrontendController::class, 'getSettings']);
 

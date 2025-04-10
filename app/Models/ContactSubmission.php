@@ -15,6 +15,7 @@ class ContactSubmission extends Model
         'phone',
         'country',
         'message',
-        'page_title'
+        'page_title',
+        'page_url'  // Added this line
     ];
 }

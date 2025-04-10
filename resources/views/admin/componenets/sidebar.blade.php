@@ -101,28 +101,40 @@
                 <span class="mx-2">Messages</span>
             </li>
         </a>
+        <a href="{{ url('ioka_admin/subscribe') }}" style="text-decoration: none;">
+            <li class="nav-link {{ request()->is('ioka_admin/subscribe*') ? 'active' : '' }}">
+                <i class='bx bx-message-rounded-dots bx-tada bx-rotate-90 bx-spin'></i>
+                <span class="mx-2">Subscribe</span>
+            </li>
+        </a>
         <a href="{{ url('ioka_admin/postypes/rental_resale') }}" style="text-decoration: none;">
-            <li class="nav-link ">
+            <li class="nav-link  {{ request()->is('ioka_admin/postypes/rental_resale*') ? 'active' : '' }}">
                 <i class='bx bx-menu'></i>
                 <span class="mx-2">Rental Resale</span>
             </li>
         </a>
         <a href="{{ url('ioka_admin/offplan/offplan') }}" style="text-decoration: none;">
-            <li class="nav-link ">
+            <li class="nav-link   {{ request()->is('ioka_admin/offplan/offplan*') ? 'active' : '' }}">
                 <i class='bx bx-menu'></i>
                 <span class="mx-2">Offplan</span>
             </li>
         </a>
         <a href="{{ url('ioka_admin/developer/list') }}" style="text-decoration: none;">
-            <li class="nav-link ">
+            <li class="nav-link   {{ request()->is('ioka_admin/developer/list*') ? 'active' : '' }}">
                 <i class='bx bx-menu'></i>
                 <span class="mx-2">Developer</span>
             </li>
         </a>
         <a href="{{ url('/ioka_admin/locations') }}" style="text-decoration: none;">
-            <li class="nav-link ">
+            <li class="nav-link  {{ request()->is('ioka_admin/locations*') ? 'active' : '' }}">
                 <i class='bx bx-location-plus bx-tada'></i>
                 <span class="mx-2">locations</span>
+            </li>
+        </a>
+        <a href="{{ url('/ioka_admin/settings') }}" style="text-decoration: none;">
+            <li class="nav-link  {{ request()->is('ioka_admin/settings*') ? 'active' : '' }}">
+                <i class='bx bx-cog bx-tada bx-rotate-90' ></i>
+                <span class="mx-2">Settings</span>
             </li>
         </a>
     </ul>

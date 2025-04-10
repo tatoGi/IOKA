@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use App\Services\Frontend\FilterService;
 use App\Models\ContactSubmission;
+use App\Models\Setting;
 class FrontendController extends Controller
 {
     protected $pageService;
@@ -181,6 +182,7 @@ class FrontendController extends Controller
             'country' => 'required|string|max:100',
             'message' => 'required|string',
             'page_title' => 'nullable|string|max:255', // Add this line
+            'page_url' => 'nullable|string|max:255', // Add this line
         ]);
 
         $submission = ContactSubmission::create($validated);
@@ -217,5 +219,10 @@ class FrontendController extends Controller
     {
         $locations = $this->pageService->getLocations();
         return response()->json($locations);
+    }
+    public function getSettings()
+    {
+        $settings = Setting::all()->groupBy('group');
+        return response()->json($settings);
     }
 }
