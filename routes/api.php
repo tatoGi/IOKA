@@ -30,4 +30,5 @@ use Illuminate\Support\Facades\Route;
     Route::post('/subscribe', [SubscriptionController::class, 'subscribe'])->withoutMiddleware(['csrf']);
     Route::get('/subscribe/verify/{token}', [SubscriptionController::class, 'verify']);
     Route::get('/settings', [FrontendController::class, 'getSettings']);
+    Route::get('/developers_search', [FrontendController::class, 'searchDeveloper']);
 

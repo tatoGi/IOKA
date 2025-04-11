@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use App\Services\Frontend\FilterService;
 use App\Models\ContactSubmission;
+use App\Models\Developer;
 use App\Models\Setting;
 class FrontendController extends Controller
 {
@@ -224,5 +225,34 @@ class FrontendController extends Controller
     {
         $settings = Setting::all()->groupBy('group');
         return response()->json($settings);
+    }
+    public function searchDeveloper(Request $request)
+    {
+        // Validate the search term
+        $request->validate([
+            'search' => 'required|string|min:3|max:255',
+            'per_page' => 'sometimes|integer|min:1|max:100',
+        ]);
+
+        // Get search term from request
+        $searchTerm = $request->input('search');
+        $perPage = $request->input('per_page', 10); // Default to 10 items per page
+
+        // Perform the search with relationships
+        $developers = Developer::with(['awards', 'rentalResaleListings', 'offplanListings'])
+            ->search($searchTerm)
+            ->paginate($perPage);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Search results',
+            'data' => $developers,
+            'meta' => [
+                'total' => $developers->total(),
+                'current_page' => $developers->currentPage(),
+                'per_page' => $developers->perPage(),
+                'last_page' => $developers->lastPage(),
+            ]
+        ]);
     }
 }
