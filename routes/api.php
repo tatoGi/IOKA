@@ -31,4 +31,5 @@ use Illuminate\Support\Facades\Route;
     Route::get('/subscribe/verify/{token}', [SubscriptionController::class, 'verify']);
     Route::get('/settings', [FrontendController::class, 'getSettings']);
     Route::get('/developers_search', [FrontendController::class, 'searchDeveloper']);
+    Route::get('/rental/related', [FrontendController::class, 'getRelatedRental']);
 

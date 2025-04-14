@@ -53,7 +53,14 @@
                     {{ $message->page_title }}
                 </div>
             </div>
-
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <strong>Page Link:</strong>
+                </div>
+                <div class="col-md-8">
+                    {{ $message->page_url }}
+                </div>
+            </div>
             <div class="row mb-3">
                 <div class="col-md-4">
                     <strong>Date:</strong>
