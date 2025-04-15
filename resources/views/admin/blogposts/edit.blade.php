@@ -116,6 +116,7 @@
 
                     <div class="mb-3">
                         <div class="form-check">
+                            <input type="hidden" name="show_on_main_page" value="0">
                             <input type="checkbox" class="form-check-input" id="show_on_main_page" name="show_on_main_page"
                                 value="1"
                                 {{ old('show_on_main_page', $blogPost->show_on_main_page) ? 'checked' : '' }}>

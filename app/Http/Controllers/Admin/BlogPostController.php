@@ -82,7 +82,7 @@ class BlogPostController extends Controller
             'body' => 'required',
             'slug' => 'required|string|max:255|unique:blog_posts,slug,'.$blogPost->id,
             'date' => 'required|date',
-            'show_on_main_page' => 'boolean',
+            'show_on_main_page' => 'sometimes|boolean',
             'tags' => 'array',
             'image' => 'nullable|image|max:2048',
             'banner_image' => 'nullable|image|max:2048',

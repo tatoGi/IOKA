@@ -21,7 +21,10 @@ class BlogPost extends Model
         'banner_image',
         'banner_image_alt',
     ];
-
+    protected $casts = [
+        'show_on_main_page' => 'boolean',
+        // your other casts
+    ];
     /**
      * Define the many-to-many relationship with Tag.
      */
