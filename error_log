@@ -1,1 +1,2 @@
 [10-Apr-2025 20:38:15 UTC] PHP Fatal error:  Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.2.0". You are running 8.1.32. in /home/ioka/test.ioka.ae/vendor/composer/platform_check.php on line 24
+[10-Apr-2025 21:43:26 UTC] PHP Fatal error:  Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.2.0". You are running 8.1.32. in /home/ioka/test.ioka.ae/vendor/composer/platform_check.php on line 24
