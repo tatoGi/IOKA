@@ -16,9 +16,9 @@ class PropertySearchController extends Controller
         // Validate request parameters
         $request->validate([
             'type' => 'sometimes|string',
-            'location' => 'sometimes|string', // Change from numeric to string
-            'sizeMin' => 'sometimes|numeric',
-            'sizeMax' => 'sometimes|numeric',
+            'location' => 'sometimes|string',
+            'sq_ft_min' => 'sometimes|numeric',
+            'sq_ft_max' => 'sometimes|numeric',
             'priceMin' => 'sometimes|numeric',
             'priceMax' => 'sometimes|numeric',
             'bathMin' => 'sometimes|integer',
@@ -26,7 +26,6 @@ class PropertySearchController extends Controller
             'currency' => 'sometimes|in:AED,USD',
             'page' => 'sometimes|integer|min:1'
         ]);
-
         // Handle comma-separated types or single type
         $types = $request->input('type', 'OFFPLAN');
         $types = is_array($types) ? $types : explode(',', $types);
