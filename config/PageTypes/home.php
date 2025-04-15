@@ -313,40 +313,53 @@ return [
                 ],
             ],
         ],
-        'section_four' => [
-            'label' => 'Section Four - Popular Areas',
+       'section_four' => [
+    'label' => 'Section Four - Popular Areas',
+    'fields' => [
+        'title' => [
+            'type' => 'text',
+            'label' => 'Main Title',
+            'required' => true,
+        ],
+        'Add_Popular_Areas' => [
+            'type' => 'repeater',
+            'label' => 'Add Popular Areas',
+            'min_items' => 1,
+            'max_items' => 4,
             'fields' => [
                 'title' => [
-                        'type' => 'text',
-                        'label' => 'Main Title',
-                        'required' => true,
-                    ],
-                'Add_Popular_Areas' => [
-                    'type' => 'repeater',
-                    'label' => 'Add Popular Areas',
-                    'min_items' => 1,
-                    'max_items' => 4,
-                    'fields' => [
-                    'title' => [
-                        'type' => 'text',
-                        'label' => 'Title',
-                        'required' => true,
-                    ],
-                    'redirect_link' => [
-                        'type' => 'text',
-                        'label' => 'Redirect Link',
-                        'required' => true,
-                    ],
-                    'image' => [
-                        'type' => 'image',
-                        'label' => 'Image',
-                        'required' => true,
-                    ],
-                ]
+                    'type' => 'text',
+                    'label' => 'Title',
+                    'required' => true,
                 ],
-
-            ],
+                'redirect_link' => [
+                    'type' => 'text',
+                    'label' => 'Redirect Link',
+                    'required' => true,
+                ],
+                'image' => [
+                    'type' => 'image',
+                    'label' => 'Image',
+                    'required' => true,
+                ],
+                'property_types' => [
+                    'type' => 'select',
+                    'label' => 'Property Types',
+                    'required' => true,
+                    'multiple' => true,
+                    'options' => [
+                        'offplan' => 'Offplan',
+                        'rental' => 'Rental',
+                        'resale' => 'Resale'
+                    ],
+                    'attributes' => [
+                        'placeholder' => 'Select property types...'
+                    ]
+                ]
+            ]
         ],
+    ],
+],
         'section_five' => [
             'label' => 'Section Five - Our Team',
             'fields' => [
@@ -469,55 +482,6 @@ return [
 
             ],
         ],
-        'section_seven' => [
-            'label' => 'Recent Articles',
-            'fields' => [
-                'title' => [
-                    'type' => 'text',
-                    'label' => 'Section Title',
-                    'default' => 'Recent Articles',
-                    'required' => true,
-                ],
-                'subtitle' => [
-                    'type' => 'text',
-                    'label' => 'Section Subtitle',
-                    'required' => true,
-                ],
-                'redirect_link' => [
-                    'type' => 'text',
-                    'label' => 'Redirect Link',
-                    'required' => true,
-                ],
-                'Recent_Articles' => [
-                    'type' => 'repeater',
-                    'label' => 'Recent Articles',
-                    'min_items' => 1,
-                    'max_items' => 4,
-                    'fields' => [
-                        'Tips&Tricks' => [
-                            'type' => 'text',
-                            'label' => 'Tips & Tricks',
-                            'required' => true,
-                        ],
-                        'title' => [
-                            'type' => 'text',
-                            'label' => 'Title',
-                            'required' => true,
-                        ],
-                        'image' => [
-                            'type' => 'image',
-                            'label' => 'Image',
-                            'required' => true,
-                        ],
-                        'read_more' => [
-                            'type' => 'text',
-                            'label' => 'Read More',
-                            'required' => true,
-                        ],
-                    ]
 
-                    ]
-                ]
-            ]
         ]
 ];

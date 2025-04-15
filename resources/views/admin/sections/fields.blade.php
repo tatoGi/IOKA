@@ -114,7 +114,30 @@
                                                                 name="fields[{{ $fieldKey }}][{{ $index }}][{{ $repeaterFieldKey }}]"
                                                                 accept="image/*">
                                                         @break
-
+                                                        @case('select')
+                                                        <select class="form-control select2"
+                                                                name="fields[{{ $fieldKey }}][{{ $index }}][{{ $repeaterFieldKey }}]{{ isset($repeaterField['multiple']) && $repeaterField['multiple'] ? '[]' : '' }}"
+                                                                {{ isset($repeaterField['required']) && $repeaterField['required'] ? 'required' : '' }}
+                                                                {{ isset($repeaterField['multiple']) && $repeaterField['multiple'] ? 'multiple' : '' }}
+                                                                data-placeholder="{{ $repeaterField['placeholder'] ?? (isset($repeaterField['multiple']) ? 'Select options...' : 'Select an option...') }}">
+                                                            @if(isset($repeaterField['placeholder']))
+                                                                <option value=""></option>
+                                                            @endif
+                                                            @foreach($repeaterField['options'] as $value => $label)
+                                                                @if(isset($repeaterField['multiple']) && $repeaterField['multiple'])
+                                                                    <option value="{{ $value }}"
+                                                                        {{ isset($item[$repeaterFieldKey]) && is_array($item[$repeaterFieldKey]) && in_array($value, $item[$repeaterFieldKey]) ? 'selected' : '' }}>
+                                                                        {{ $label }}
+                                                                    </option>
+                                                                @else
+                                                                    <option value="{{ $value }}"
+                                                                        {{ (isset($item[$repeaterFieldKey]) && $item[$repeaterFieldKey] == $value) || (isset($repeaterField['default']) && $repeaterField['default'] == $value) ? 'selected' : '' }}>
+                                                                        {{ $label }}
+                                                                    </option>
+                                                                @endif
+                                                            @endforeach
+                                                        </select>
+                                                    @break
                                                         @default
                                                             <input type="{{ $repeaterField['type'] }}" class="form-control"
                                                                 name="fields[{{ $fieldKey }}][{{ $index }}][{{ $repeaterFieldKey }}]"
@@ -383,6 +406,18 @@
 @endif
 
 <script>
+    function initializeSelect2() {
+        $('select').each(function() {
+            const $select = $(this);
+            const isMultiple = $select.attr('multiple') !== undefined;
+
+            $select.select2({
+                placeholder: isMultiple ? "Select options..." : "Select an option...",
+                allowClear: true,
+                width: '100%'
+            });
+        });
+    }
     // Initialize repeater functionality
     function initializeRepeaterHandlers() {
         document.querySelectorAll('.add-repeater-item').forEach(button => {
