@@ -21,12 +21,14 @@
                     <th>Country</th>
                     <th>Message</th>
                     <th>Page</th>
+                    <th>Page Link</th>
                     <th>Date</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach($messages as $message)
+
                 <tr>
                     <td>{{ $message->id }}</td>
                     <td>{{ $message->name }}</td>
@@ -35,6 +37,7 @@
                     <td>{{ $message->country }}</td>
                     <td>{{ Str::limit($message->message, 50) }}</td>
                     <td>{{ $message->page_title }}</td>
+                    <td><a href="{{ $message->page_url }}">{{ $message->page_url }} </a>   </td>
                     <td>{{ $message->created_at->format('d/m/Y H:i') }}</td>
                     <td>
                         <a href="{{ route('admin.messages.show', $message->id) }}"

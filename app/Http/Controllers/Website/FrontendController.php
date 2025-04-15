@@ -11,7 +11,9 @@ use Illuminate\Http\Request;
 use App\Services\Frontend\FilterService;
 use App\Models\ContactSubmission;
 use App\Models\Developer;
+use App\Models\RentalResale;
 use App\Models\Setting;
+use Illuminate\Support\Facades\DB;
 class FrontendController extends Controller
 {
     protected $pageService;
@@ -255,4 +257,30 @@ class FrontendController extends Controller
             ]
         ]);
     }
+    public function getRelatedRental()
+    {
+        // First group rentals by their location combinations
+    $locationGroups = DB::table('rental_resale_location')
+    ->select('rental_resale_id', DB::raw('GROUP_CONCAT(location_id ORDER BY location_id) as location_ids'))
+    ->groupBy('rental_resale_id')
+    ->get()
+    ->groupBy('location_ids');
+
+// Filter only groups with duplicates
+$duplicateGroups = $locationGroups->filter(fn($group) => $group->count() > 1);
+
+// Get full rental data for duplicates
+$result = collect();
+foreach ($duplicateGroups as $group) {
+    $result = $result->merge(
+        RentalResale::with('locations')
+            ->whereIn('id', $group->pluck('rental_resale_id'))
+            ->with('amount')
+            ->get()
+    );
+}
+
+return $result;
+    }
+
 }

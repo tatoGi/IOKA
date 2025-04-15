@@ -255,10 +255,6 @@ class PageService
 
     public function search($query)
     {
-        $pages = Page::where('title', 'like', "%$query%")
-            ->orWhere('keywords', 'like', "%$query%")
-            ->get();
-
         $blogs = BlogPost::where('title', 'like', "%$query%")
             ->orWhere('body', 'like', "%$query%")
             ->get();
@@ -276,7 +272,6 @@ class PageService
             ->get();
 
         return [
-            'pages' => $pages,
             'blogs' => $blogs,
             'developers' => $developers,
             'offplans' => $offplans,
