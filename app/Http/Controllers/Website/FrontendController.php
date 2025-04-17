@@ -11,6 +11,8 @@ use Illuminate\Http\Request;
 use App\Services\Frontend\FilterService;
 use App\Models\ContactSubmission;
 use App\Models\Developer;
+use App\Models\Faq;
+use App\Models\PolicyPage;
 use App\Models\RentalResale;
 use App\Models\Setting;
 use Illuminate\Support\Facades\DB;
@@ -288,5 +290,27 @@ foreach ($duplicateGroups as $group) {
 
 return $result;
     }
+    public function policy()
+    {
+        {
+            $policies = PolicyPage::whereIn('type', [
+                'privacy_policy', 'cookie_policy', 'terms_agreement'
+            ])->get()->keyBy('type');
+
+            return response()->json([
+                'privacy_policy'   => $policies['privacy_policy']->content ?? null,
+                'cookie_policy'    => $policies['cookie_policy']->content ?? null,
+                'terms_agreement'  => $policies['terms_agreement']->content ?? null,
+            ]);
+        }
+    }
+    public function getFAQ()
+    {
+        $faqs = Faq::all();
+        return response()->json([
+            'faqs' => $faqs,
+            ]);
+            }
+
 
 }

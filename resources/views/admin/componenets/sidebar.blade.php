@@ -89,6 +89,18 @@
                 </div>
             @endif
         @endforeach
+        <a href="{{ url('ioka_admin/policy-pages') }}" style="text-decoration: none;">
+            <li class="nav-link {{ request()->is('ioka_admin/policy-pages*') ? 'active' : '' }}">
+                <i class='bx bx-slideshow {{ request()->is('ioka_admin/policy-pages*') ? 'bx-flashing' : 'bx-tada' }}'></i>
+                <span class="mx-2">Policies</span>
+            </li>
+        </a>
+        <a href="{{ url('ioka_admin/faqs') }}" style="text-decoration: none;">
+            <li class="nav-link {{ request()->is('ioka_admin/faqs*') ? 'active' : '' }}">
+                <i class='bx bx-slideshow {{ request()->is('ioka_admin/faqs*') ? 'bx-flashing' : 'bx-tada' }}'></i>
+                <span class="mx-2">FAQ</span>
+            </li>
+        </a>
         <a href="{{ url('ioka_admin/partners') }}" style="text-decoration: none;">
             <li class="nav-link {{ request()->is('ioka_admin/partners*') ? 'active' : '' }}">
                 <i class='bx bx-slideshow {{ request()->is('ioka_admin/partners*') ? 'bx-flashing' : 'bx-tada' }}'></i>

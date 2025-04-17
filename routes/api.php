@@ -33,4 +33,6 @@ use Illuminate\Support\Facades\Route;
     Route::get('/settings', [FrontendController::class, 'getSettings']);
     Route::get('/developers_search', [FrontendController::class, 'searchDeveloper']);
     Route::get('/rental/related', [FrontendController::class, 'getRelatedRental']);
+    Route::get('/policies', [FrontendController::class, 'policy']);
+    Route::get('/faqs', [FrontendController::class, 'getFAQ']);
 
