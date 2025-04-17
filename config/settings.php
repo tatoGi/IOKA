@@ -1,15 +1,19 @@
 <?php return array (
-  'footer' => 
+  'footer' =>
   array (
     'description' => 'Specializes in providing high-class tours for those in need',
-    'contact' => 
+    'contact' =>
     array (
       'address' => '101 E 129th St. East Fujairah IN 45721, UAE',
       'phone' => '+1-11-111-11-11',
       'email' => 'contact@example.com',
       'working_hours' => 'Mon-Fri: 9AM - 6PM',
     ),
-    'newsletter' => 
+    array (
+        'logo' => 'footer-logo.png', // default footer logo
+        // ... rest of your existing footer config ...
+      ),
+    'newsletter' =>
     array (
       'title' => 'Newsletter',
       'description' => 'Your Weekly/Monthly Dose of Knowledge and Inspiration',
@@ -17,26 +21,30 @@
       'button_text' => 'Subscribe',
     ),
     'copyright' => '©2024 Copyright Protected. All Rights Reserved.',
-    'legal_links' => 
+    'legal_links' =>
     array (
-      0 => 
+      0 =>
       array (
         'title' => 'Terms of Service',
         'url' => '/terms',
       ),
-      1 => 
+      1 =>
       array (
         'title' => 'Privacy Policy',
         'url' => '/privacy',
       ),
-      2 => 
+      2 =>
       array (
         'title' => 'Cookie Policy',
         'url' => '/cookies',
       ),
     ),
   ),
-  'social' => 
+  'header' =>
+  array (
+    'logo' => 'logo.png', // default logo
+  ),
+  'social' =>
   array (
     'facebook' => 'https://www.facebook.com/',
     'twitter' => 'https://www.facebook.com/',

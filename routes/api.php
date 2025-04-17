@@ -24,6 +24,7 @@ use Illuminate\Support\Facades\Route;
     Route::post('/contact/submissions', [FrontendController::class, 'submission'])->withoutMiddleware(['csrf']);
     Route::get('/search', [FrontendController::class, 'search']);
     Route::get('/offplans_filter', [FrontendController::class, 'filter_offplan']);
+    Route::get('/rental_filter', [FrontendController::class, 'filter_rentals']);
     Route::get('/search_for_homes', [FrontendController::class, 'search_for_homes']);
     Route::get('/locations', [FrontendController::class, 'getLocations']);
     Route::get('/properties/Search', [PropertySearchController::class, 'search']);

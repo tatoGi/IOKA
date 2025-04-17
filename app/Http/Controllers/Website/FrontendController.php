@@ -217,6 +217,12 @@ class FrontendController extends Controller
 
         return response()->json($offplan);
     }
+    public function filter_rentals(Request $request)
+    {
+        $filters = $request->all(); // Retrieve filters from the request
+        $rentals = $this->filterService->filterRentals($filters);
+        return response()->json($rentals);
+        }
     // for github //
     public function getLocations()
     {

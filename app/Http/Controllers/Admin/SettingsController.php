@@ -20,6 +20,7 @@ class SettingsController extends Controller
 
         // Merge config with database settings
         $settings = [
+            'header' => $this->mergeSettings($configSettings['header'] ?? [], $dbSettings->get('header', collect())),
             'footer' => $this->mergeSettings($configSettings['footer'], $dbSettings->get('footer', collect())),
             'social' => $this->mergeSettings($configSettings['social'], $dbSettings->get('social', collect()))
         ];
@@ -63,8 +64,16 @@ class SettingsController extends Controller
 
     public function update(Request $request)
     {
-        $validated = $this->validateSettings($request);
 
+        $validated = $this->validateSettings($request);
+        if ($request->hasFile('header.logo')) {
+            $validated['header']['logo'] = $this->uploadLogo($request->file('header.logo'), 'header');
+        }
+
+        if ($request->hasFile('footer.logo')) {
+            $validated['footer']['logo'] = $this->uploadLogo($request->file('footer.logo'), 'footer');
+        }
+        $this->updateConfigFile($validated);
         // Update config file
         $this->updateConfigFile($validated);
 
@@ -74,10 +83,25 @@ class SettingsController extends Controller
         return back()->with('success', 'Settings updated successfully!');
     }
 
+    protected function uploadLogo($file, $type)
+    {
+        $filename = $type . '-logo-' . time() . '.' . $file->getClientOriginalExtension();
+
+        // Store in public/logos directory
+        $path = $file->storeAs('logos', $filename);
+
+        // Return path without 'public/' for web access
+        return 'storage/logos/' . $filename;
+    }
+
     protected function updateConfigFile($validated)
     {
         $content = '<?php return ' . var_export([
+            'header' => [
+                'logo' => $validated['header']['logo'] ?? config('settings.header.logo'),
+            ],
             'footer' => [
+                'logo' => $validated['footer']['logo'] ?? config('settings.footer.logo'),
                 'description' => $validated['footer']['description'],
                 'contact' => $validated['footer']['contact'],
                 'newsletter' => $validated['footer']['newsletter'],
@@ -129,6 +153,8 @@ class SettingsController extends Controller
     protected function validateSettings(Request $request)
     {
         return $request->validate([
+            'header.logo' => 'sometimes|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'footer.logo' => 'sometimes|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'footer.description' => 'required|string',
             'footer.copyright' => 'required|string',
             'footer.contact.address' => 'required|string',
