@@ -7,6 +7,7 @@ use App\Models\Setting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 
 class SettingsController extends Controller
 {
@@ -64,8 +65,26 @@ class SettingsController extends Controller
 
     public function update(Request $request)
     {
-
         $validated = $this->validateSettings($request);
+
+        // Convert legal links URLs to slugs
+        if (isset($validated['footer']['legal_links'])) {
+            foreach ($validated['footer']['legal_links'] as &$link) {
+                if (isset($link['url'])) {
+                    $link['url'] = Str::slug($link['url']);
+                }
+            }
+        }
+
+        // Handle meta images upload
+        if ($request->hasFile('meta.og_image')) {
+            $validated['meta']['og_image'] = $this->uploadMetaImage($request->file('meta.og_image'), 'og');
+        }
+
+        if ($request->hasFile('meta.twitter_image')) {
+            $validated['meta']['twitter_image'] = $this->uploadMetaImage($request->file('meta.twitter_image'), 'twitter');
+        }
+
         if ($request->hasFile('header.logo')) {
             $validated['header']['logo'] = $this->uploadLogo($request->file('header.logo'), 'header');
         }
@@ -73,11 +92,8 @@ class SettingsController extends Controller
         if ($request->hasFile('footer.logo')) {
             $validated['footer']['logo'] = $this->uploadLogo($request->file('footer.logo'), 'footer');
         }
-        $this->updateConfigFile($validated);
-        // Update config file
-        $this->updateConfigFile($validated);
 
-        // Update database settings
+        $this->updateConfigFile($validated);
         $this->updateDatabaseSettings($validated);
 
         return back()->with('success', 'Settings updated successfully!');
@@ -94,11 +110,30 @@ class SettingsController extends Controller
         return 'storage/logos/' . $filename;
     }
 
+    protected function uploadMetaImage($file, $type)
+    {
+        $filename = 'meta-' . $type . '-' . time() . '.' . $file->getClientOriginalExtension();
+        $path = $file->storeAs('meta', $filename);
+        return 'storage/meta/' . $filename;
+    }
+
     protected function updateConfigFile($validated)
     {
         $content = '<?php return ' . var_export([
             'header' => [
                 'logo' => $validated['header']['logo'] ?? config('settings.header.logo'),
+            ],
+            'meta' => [
+                'title' => $validated['meta']['title'],
+                'description' => $validated['meta']['description'],
+                'keywords' => $validated['meta']['keywords'],
+                'og_title' => $validated['meta']['og_title'],
+                'og_description' => $validated['meta']['og_description'],
+                'og_image' => $validated['meta']['og_image'] ?? config('settings.meta.og_image'),
+                'twitter_card' => $validated['meta']['twitter_card'],
+                'twitter_title' => $validated['meta']['twitter_title'],
+                'twitter_description' => $validated['meta']['twitter_description'],
+                'twitter_image' => $validated['meta']['twitter_image'] ?? config('settings.meta.twitter_image'),
             ],
             'footer' => [
                 'logo' => $validated['footer']['logo'] ?? config('settings.footer.logo'),
@@ -116,12 +151,19 @@ class SettingsController extends Controller
 
     protected function updateDatabaseSettings($validated)
     {
+        // Update meta settings
+        foreach ($validated['meta'] as $key => $value) {
+            Setting::updateOrCreate(
+                ['group' => 'meta', 'key' => $key],
+                ['value' => $value]
+            );
+        }
+
         // Update footer settings
         foreach ($validated['footer'] as $key => $value) {
             if (is_array($value)) {
                 foreach ($value as $subKey => $subValue) {
                     if (is_array($subValue)) {
-                        // Handle nested arrays (like legal_links)
                         Setting::updateOrCreate(
                             ['group' => 'footer', 'key' => $key],
                             ['value' => $subValue]
@@ -154,6 +196,16 @@ class SettingsController extends Controller
     {
         return $request->validate([
             'header.logo' => 'sometimes|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'meta.title' => 'required|string|max:60',
+            'meta.description' => 'required|string|max:160',
+            'meta.keywords' => 'required|string|max:255',
+            'meta.og_title' => 'required|string|max:60',
+            'meta.og_description' => 'required|string|max:160',
+            'meta.og_image' => 'sometimes|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'meta.twitter_card' => 'required|in:summary,summary_large_image',
+            'meta.twitter_title' => 'required|string|max:60',
+            'meta.twitter_description' => 'required|string|max:160',
+            'meta.twitter_image' => 'sometimes|image|mimes:jpeg,png,jpg,gif|max:2048',
             'footer.logo' => 'sometimes|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'footer.description' => 'required|string',
             'footer.copyright' => 'required|string',
@@ -166,11 +218,19 @@ class SettingsController extends Controller
             'footer.newsletter.placeholder' => 'required|string',
             'footer.newsletter.button_text' => 'required|string',
             'footer.legal_links.*.title' => 'sometimes|string',
-            'footer.legal_links.*.url' => 'sometimes|string',
+            'footer.legal_links.*.url' => 'sometimes|string|regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/',
             'social.facebook' => 'required|url',
             'social.twitter' => 'required|url',
             'social.instagram' => 'required|url',
             'social.youtube' => 'required|url',
+        ], [
+            'footer.legal_links.*.url.regex' => 'The URL must be a valid slug (e.g., terms-of-service)',
+            'meta.title.max' => 'Meta title should not exceed 60 characters',
+            'meta.description.max' => 'Meta description should not exceed 160 characters',
+            'meta.og_title.max' => 'OG title should not exceed 60 characters',
+            'meta.og_description.max' => 'OG description should not exceed 160 characters',
+            'meta.twitter_title.max' => 'Twitter title should not exceed 60 characters',
+            'meta.twitter_description.max' => 'Twitter description should not exceed 160 characters',
         ]);
     }
 }

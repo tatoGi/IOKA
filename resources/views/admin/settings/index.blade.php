@@ -4,13 +4,23 @@
 <div class="container">
     <h1>System Settings</h1>
 
-    <form method="POST" action="{{ route('admin.settings.update') }}">
+    <form method="POST" action="{{ route('admin.settings.update') }}" enctype="multipart/form-data">
         @csrf
         @method('PUT')
 
         <ul class="nav nav-tabs mb-4">
             <li class="nav-item">
-                <a class="nav-link active" data-bs-toggle="tab" href="#footer">
+                <a class="nav-link active" data-bs-toggle="tab" href="#header">
+                    Header
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#meta">
+                    Meta Tags
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#footer">
                     Footer
                 </a>
             </li>
@@ -22,8 +32,125 @@
         </ul>
 
         <div class="tab-content">
+            <!-- Header Tab -->
+            <div class="tab-pane fade show active" id="header">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="mb-4">
+                            <h5 class="mb-3">Logo Settings</h5>
+                            <div class="mb-3">
+                                <label class="form-label">Header Logo</label>
+                                <div class="mb-2">
+                                    @if(isset($settings['header']['logo']))
+                                        <img src="{{ asset($settings['header']['logo']) }}" alt="Current Logo" class="img-thumbnail" style="max-height: 100px">
+                                    @endif
+                                </div>
+                                <input type="file" class="form-control" name="header[logo]" accept="image/*">
+                                <small class="text-muted">Recommended size: 200x60px. Supported formats: JPEG, PNG, JPG, GIF, SVG</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Meta Tags Tab -->
+            <div class="tab-pane fade" id="meta">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="mb-4">
+                            <h5 class="mb-3">Global Meta Tags</h5>
+                            <div class="mb-3">
+                                <label class="form-label">Meta Title</label>
+                                <input type="text" class="form-control"
+                                       name="meta[title]"
+                                       value="{{ old('meta.title', $settings['meta']['title'] ?? '') }}"
+                                       placeholder="Default page title">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Meta Description</label>
+                                <textarea class="form-control"
+                                          name="meta[description]"
+                                          rows="3"
+                                          placeholder="Default meta description">{{ old('meta.description', $settings['meta']['description'] ?? '') }}</textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Meta Keywords</label>
+                                <input type="text" class="form-control"
+                                       name="meta[keywords]"
+                                       value="{{ old('meta.keywords', $settings['meta']['keywords'] ?? '') }}"
+                                       placeholder="keyword1, keyword2, keyword3">
+                                <small class="text-muted">Separate keywords with commas</small>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <h5 class="mb-3">Open Graph Tags</h5>
+                            <div class="mb-3">
+                                <label class="form-label">OG Title</label>
+                                <input type="text" class="form-control"
+                                       name="meta[og_title]"
+                                       value="{{ old('meta.og_title', $settings['meta']['og_title'] ?? '') }}"
+                                       placeholder="Open Graph title">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">OG Description</label>
+                                <textarea class="form-control"
+                                          name="meta[og_description]"
+                                          rows="3"
+                                          placeholder="Open Graph description">{{ old('meta.og_description', $settings['meta']['og_description'] ?? '') }}</textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">OG Image</label>
+                                <div class="mb-2">
+                                    @if(isset($settings['meta']['og_image']))
+                                        <img src="{{ asset($settings['meta']['og_image']) }}" alt="OG Image" class="img-thumbnail" style="max-height: 100px">
+                                    @endif
+                                </div>
+                                <input type="file" class="form-control" name="meta[og_image]" accept="image/*">
+                                <small class="text-muted">Recommended size: 1200x630px</small>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <h5 class="mb-3">Twitter Card Tags</h5>
+                            <div class="mb-3">
+                                <label class="form-label">Twitter Card Type</label>
+                                <select class="form-control" name="meta[twitter_card]">
+                                    <option value="summary" {{ (old('meta.twitter_card', $settings['meta']['twitter_card'] ?? '') == 'summary') ? 'selected' : '' }}>Summary</option>
+                                    <option value="summary_large_image" {{ (old('meta.twitter_card', $settings['meta']['twitter_card'] ?? '') == 'summary_large_image') ? 'selected' : '' }}>Summary Large Image</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Twitter Title</label>
+                                <input type="text" class="form-control"
+                                       name="meta[twitter_title]"
+                                       value="{{ old('meta.twitter_title', $settings['meta']['twitter_title'] ?? '') }}"
+                                       placeholder="Twitter card title">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Twitter Description</label>
+                                <textarea class="form-control"
+                                          name="meta[twitter_description]"
+                                          rows="3"
+                                          placeholder="Twitter card description">{{ old('meta.twitter_description', $settings['meta']['twitter_description'] ?? '') }}</textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Twitter Image</label>
+                                <div class="mb-2">
+                                    @if(isset($settings['meta']['twitter_image']))
+                                        <img src="{{ asset($settings['meta']['twitter_image']) }}" alt="Twitter Image" class="img-thumbnail" style="max-height: 100px">
+                                    @endif
+                                </div>
+                                <input type="file" class="form-control" name="meta[twitter_image]" accept="image/*">
+                                <small class="text-muted">Recommended size: 1200x600px</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Footer Tab -->
-            <div class="tab-pane fade show active" id="footer">
+            <div class="tab-pane fade" id="footer">
                 <div class="card">
                     <div class="card-body">
                         <!-- General Footer Settings -->
@@ -102,7 +229,9 @@
                                             <label>URL</label>
                                             <input type="text" class="form-control"
                                                    name="footer[legal_links][{{ $index }}][url]"
-                                                   value="{{ old("footer.legal_links.$index.url", $link['url'] ?? '') }}">
+                                                   value="{{ old("footer.legal_links.$index.url", $link['url'] ?? '') }}"
+                                                   placeholder="terms-of-service">
+                                            <small class="text-muted">Enter URL as slug (e.g., terms-of-service)</small>
                                         </div>
                                     </div>
                                 </div>
