@@ -66,6 +66,7 @@
                 @break
 
                 @case('repeater')
+
                     <div class="repeater-container" data-field="{{ $fieldKey }}">
                         <div class="repeater-items">
                             @if (isset($additionalFields[$fieldKey]) && is_array($additionalFields[$fieldKey]))
@@ -124,17 +125,7 @@
                                                                 <option value=""></option>
                                                             @endif
                                                             @foreach($repeaterField['options'] as $value => $label)
-                                                                @if(isset($repeaterField['multiple']) && $repeaterField['multiple'])
-                                                                    <option value="{{ $value }}"
-                                                                        {{ isset($item[$repeaterFieldKey]) && is_array($item[$repeaterFieldKey]) && in_array($value, $item[$repeaterFieldKey]) ? 'selected' : '' }}>
-                                                                        {{ $label }}
-                                                                    </option>
-                                                                @else
-                                                                    <option value="{{ $value }}"
-                                                                        {{ (isset($item[$repeaterFieldKey]) && $item[$repeaterFieldKey] == $value) || (isset($repeaterField['default']) && $repeaterField['default'] == $value) ? 'selected' : '' }}>
-                                                                        {{ $label }}
-                                                                    </option>
-                                                                @endif
+                                                                <option value="{{ $value }}">{{ $label }}</option>
                                                             @endforeach
                                                         </select>
                                                     @break
@@ -181,6 +172,21 @@
                                                     <input type="file" class="form-control"
                                                         name="fields[{{ $fieldKey }}][__INDEX__][{{ $repeaterFieldKey }}]"
                                                         accept="image/*">
+                                                @break
+
+                                                @case('select')
+                                                    <select class="form-control select2"
+                                                            name="fields[{{ $fieldKey }}][__INDEX__][{{ $repeaterFieldKey }}]{{ isset($repeaterField['multiple']) && $repeaterField['multiple'] ? '[]' : '' }}"
+                                                            {{ isset($repeaterField['required']) && $repeaterField['required'] ? 'required' : '' }}
+                                                            {{ isset($repeaterField['multiple']) && $repeaterField['multiple'] ? 'multiple' : '' }}
+                                                            data-placeholder="{{ $repeaterField['placeholder'] ?? (isset($repeaterField['multiple']) ? 'Select options...' : 'Select an option...') }}">
+                                                        @if(isset($repeaterField['placeholder']))
+                                                            <option value=""></option>
+                                                        @endif
+                                                        @foreach($repeaterField['options'] as $value => $label)
+                                                            <option value="{{ $value }}">{{ $label }}</option>
+                                                        @endforeach
+                                                    </select>
                                                 @break
 
                                                 @default
@@ -261,6 +267,7 @@
                                                 @break
 
                                                 @case('repeater')
+
                                                     <div class="repeater-container" data-field="{{ $tabFieldKey }}">
                                                         <div class="repeater-items">
                                                             @if (isset($additionalFields[$fieldKey][$tabKey][$tabFieldKey]) &&
@@ -313,6 +320,21 @@
                                                                                                 accept="image/*">
                                                                                         @break
 
+                                                                                        @case('select')
+                                                                                            <select class="form-control select2"
+                                                                                                    name="fields[{{ $fieldKey }}][{{ $tabKey }}][{{ $tabFieldKey }}][{{ $index }}][{{ $repeaterFieldKey }}]{{ isset($repeaterField['multiple']) && $repeaterField['multiple'] ? '[]' : '' }}"
+                                                                                                    {{ isset($repeaterField['required']) && $repeaterField['required'] ? 'required' : '' }}
+                                                                                                    {{ isset($repeaterField['multiple']) && $repeaterField['multiple'] ? 'multiple' : '' }}
+                                                                                                    data-placeholder="{{ $repeaterField['placeholder'] ?? (isset($repeaterField['multiple']) ? 'Select options...' : 'Select an option...') }}">
+                                                                                                @if(isset($repeaterField['placeholder']))
+                                                                                                    <option value=""></option>
+                                                                                                @endif
+                                                                                                @foreach($repeaterField['options'] as $value => $label)
+                                                                                                    <option value="{{ $value }}">{{ $label }}</option>
+                                                                                                @endforeach
+                                                                                            </select>
+                                                                                        @break
+
                                                                                         @default
                                                                                             <input type="{{ $repeaterField['type'] }}"
                                                                                                 class="form-control"
@@ -355,6 +377,21 @@
                                                                                         accept="image/*">
                                                                                 @break
 
+                                                                                @case('select')
+                                                                                    <select class="form-control select2"
+                                                                                            name="fields[{{ $fieldKey }}][{{ $tabKey }}][{{ $tabFieldKey }}][__INDEX__][{{ $repeaterFieldKey }}]{{ isset($repeaterField['multiple']) && $repeaterField['multiple'] ? '[]' : '' }}"
+                                                                                            {{ isset($repeaterField['required']) && $repeaterField['required'] ? 'required' : '' }}
+                                                                                            {{ isset($repeaterField['multiple']) && $repeaterField['multiple'] ? 'multiple' : '' }}
+                                                                                            data-placeholder="{{ $repeaterField['placeholder'] ?? (isset($repeaterField['multiple']) ? 'Select options...' : 'Select an option...') }}">
+                                                                                        @if(isset($repeaterField['placeholder']))
+                                                                                            <option value=""></option>
+                                                                                        @endif
+                                                                                        @foreach($repeaterField['options'] as $value => $label)
+                                                                                            <option value="{{ $value }}">{{ $label }}</option>
+                                                                                        @endforeach
+                                                                                    </select>
+                                                                                @break
+
                                                                                 @default
                                                                                     <input type="{{ $repeaterField['type'] }}"
                                                                                         class="form-control"
@@ -387,6 +424,37 @@
                     </div>
                 @break
 
+                @case('select')
+                    @if(isset($field['multiple']) && $field['multiple'])
+                        <select class="form-control select2-tagging"
+                                name="fields[{{ $fieldKey }}][]"
+                                multiple
+                                {{ isset($field['required']) && $field['required'] ? 'required' : '' }}
+                                data-placeholder="{{ $field['placeholder'] ?? 'Enter keywords...' }}">
+                            @if(isset($additionalFields[$fieldKey]) && is_array($additionalFields[$fieldKey]))
+                                @foreach($additionalFields[$fieldKey] as $value)
+                                    <option value="{{ $value }}" selected>{{ $value }}</option>
+                                @endforeach
+                            @endif
+                        </select>
+                    @else
+                        <select class="form-control select2"
+                                name="fields[{{ $fieldKey }}]"
+                                {{ isset($field['required']) && $field['required'] ? 'required' : '' }}
+                                data-placeholder="{{ $field['placeholder'] ?? 'Select an option...' }}">
+                            @if(isset($field['placeholder']))
+                                <option value=""></option>
+                            @endif
+                            @foreach($field['options'] as $value => $label)
+                                <option value="{{ $value }}"
+                                    {{ (isset($additionalFields[$fieldKey]) && $additionalFields[$fieldKey] == $value) || (isset($field['default']) && $field['default'] == $value) ? 'selected' : '' }}>
+                                    {{ $label }}
+                                </option>
+                            @endforeach
+                        </select>
+                    @endif
+                @break
+
                 @default
                     <input type="text" class="form-control @error($fieldKey) is-invalid @enderror"
                         id="{{ $fieldKey }}" name="fields[{{ $fieldKey }}]"
@@ -406,18 +474,48 @@
 @endif
 
 <script>
+    // Initialize select2 when the page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeSelect2();
+        initializeRepeaterHandlers();
+    });
+
     function initializeSelect2() {
         $('select').each(function() {
-            const $select = $(this);
-            const isMultiple = $select.attr('multiple') !== undefined;
+            if (!$(this).hasClass('select2-hidden-accessible')) {
+                const $select = $(this);
+                const isMultiple = $select.attr('multiple') !== undefined;
 
-            $select.select2({
-                placeholder: isMultiple ? "Select options..." : "Select an option...",
-                allowClear: true,
-                width: '100%'
-            });
+                $select.select2({
+                    placeholder: isMultiple ? "Select options..." : "Select an option...",
+                    allowClear: true,
+                    width: '100%'
+                });
+            }
         });
     }
+
+    // Initialize select2 when new repeater items are added
+    function handleAddRepeaterItem() {
+        const container = this.closest('.repeater-container');
+        const itemsContainer = container.querySelector('.repeater-items');
+        const template = container.querySelector('.repeater-template');
+        const index = itemsContainer.querySelectorAll('.repeater-item').length;
+
+        const templateContent = template.content.cloneNode(true);
+        templateContent.querySelectorAll('[name*="__INDEX__"]').forEach(input => {
+            input.name = input.name.replace('__INDEX__', index);
+        });
+
+        itemsContainer.appendChild(templateContent);
+        initializeRepeaterHandlers();
+
+        // Reinitialize select2 after adding new repeater item
+        setTimeout(() => {
+            initializeSelect2();
+        }, 100);
+    }
+
     // Initialize repeater functionality
     function initializeRepeaterHandlers() {
         document.querySelectorAll('.add-repeater-item').forEach(button => {
@@ -434,21 +532,6 @@
             button.removeEventListener('click', handleDeleteImage);
             button.addEventListener('click', handleDeleteImage);
         });
-    }
-
-    function handleAddRepeaterItem() {
-        const container = this.closest('.repeater-container');
-        const itemsContainer = container.querySelector('.repeater-items');
-        const template = container.querySelector('.repeater-template');
-        const index = itemsContainer.querySelectorAll('.repeater-item').length;
-
-        const templateContent = template.content.cloneNode(true);
-        templateContent.querySelectorAll('[name*="__INDEX__"]').forEach(input => {
-            input.name = input.name.replace('__INDEX__', index);
-        });
-
-        itemsContainer.appendChild(templateContent);
-        initializeRepeaterHandlers();
     }
 
     function handleRemoveRepeaterItem() {
@@ -492,14 +575,8 @@
         });
     }
 
-    document.addEventListener('DOMContentLoaded', function() {
-        initializeRepeaterHandlers();
-        initializeDeleteImageHandlers();
+    // Initialize select2 when the form is loaded
+    $(document).ready(function() {
+        initializeSelect2();
     });
-
-    function initializeDeleteImageHandlers() {
-        document.querySelectorAll('.delete-image').forEach(button => {
-            button.addEventListener('click', handleDeleteImage);
-        });
-    }
 </script>

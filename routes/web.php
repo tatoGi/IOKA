@@ -2,8 +2,9 @@
 
 use App\Http\Controllers\Admin\OffplanController;
 use App\Http\Controllers\Admin\PartnerController;
+use App\Http\Controllers\Admin\SettingsController;
 use Illuminate\Support\Facades\Route;
-
+use Illuminate\Support\Facades\Artisan;
 Route::get('/', function () {
     return redirect()->route('admin.dashboard');
 });
