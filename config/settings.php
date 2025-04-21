@@ -5,7 +5,7 @@
   ),
   'footer' => 
   array (
-    'logo' => NULL,
+    'logo' => 'logo.png',
     'description' => 'Specializes in providing high-class tours for those in need',
     'contact' => 
     array (
