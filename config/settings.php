@@ -18,8 +18,11 @@
   ),
   'footer' => 
   array (
+
     'logo' => 'logo.png',
     'description' => 'Specializes in providing high-class tours for those in need',
+    'logo' => NULL,
+    'description' => '<p>Specializes in providing high-class tours for those in need</p>',
     'contact' => 
     array (
       'address' => '101 E 129th St. East Fujairah IN 45721, UAE',
