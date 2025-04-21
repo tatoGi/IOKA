@@ -323,7 +323,7 @@ return [
         ],
         'Add_Popular_Areas' => [
             'type' => 'repeater',
-            'label' => 'Add Popular Areas',
+            'label' => 'Popular Areas',
             'min_items' => 1,
             'max_items' => 4,
             'fields' => [
@@ -347,6 +347,7 @@ return [
                     'label' => 'Property Types',
                     'required' => true,
                     'multiple' => true,
+                    'class' => 'select2',
                     'options' => [
                         'offplan' => 'Offplan',
                         'rental' => 'Rental',

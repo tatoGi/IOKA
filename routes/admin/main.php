@@ -5,7 +5,7 @@ use App\Http\Controllers\Admin\FaqController;
 use App\Http\Controllers\Admin\LocationController;
 use App\Http\Controllers\Admin\PolicyPageController;
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\Admin\SettingsController;
 Route::get('/ioka_admin', [AdminController::class, 'index'])->name('admin.dashboard');
 Route::get('/ioka_admin/activity', [AdminController::class, 'activity'])->name('admin.activity');
 Route::redirect('/ioka_admin', '/ioka_admin/menu');
@@ -23,3 +23,4 @@ Route::resource('/ioka_admin/policy-pages', PolicyPageController::class)
         'update' => 'admin.policy-pages.update'
     ]);
     Route::resource('ioka_admin/faqs', FaqController::class)->names('admin.faq');
+    Route::post('ioka_admin/settings/delete-logo', [SettingsController::class, 'deleteLogo'])->name('admin.settings.delete-logo');

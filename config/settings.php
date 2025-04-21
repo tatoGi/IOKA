@@ -1,7 +1,20 @@
 <?php return array (
   'header' => 
   array (
-    'logo' => 'logo.png',
+    'logo' => 'logos/TdztuVdOo99btqlE60lzv8aOY1vfpPxeDUZyBRhO.png',
+  ),
+  'meta' => 
+  array (
+    'title' => 'IOKA - Your Trusted Real Estate Partner',
+    'description' => '<p>IOKA - Your Trusted Real Estate Partner</p>',
+    'keywords' => 'IOKA - Your Trusted Real Estate Partner',
+    'og_title' => 'IOKA - Your Trusted Real Estate Partner',
+    'og_description' => '<p>IOKA - Your Trusted Real Estate Partner</p>',
+    'og_image' => 'meta/meta-og-1745255365.png',
+    'twitter_card' => 'summary',
+    'twitter_title' => 'IOKA - Your Trusted Real Estate Partner',
+    'twitter_description' => '<p>IOKA - Your Trusted Real Estate Partner</p>',
+    'twitter_image' => 'meta/meta-twitter-1745255365.png',
   ),
   'footer' => 
   array (
@@ -17,7 +30,7 @@
     'newsletter' => 
     array (
       'title' => 'Newsletter',
-      'description' => 'Your Weekly/Monthly Dose of Knowledge and Inspiration',
+      'description' => '<p>Your Weekly/Monthly Dose of Knowledge and Inspiration</p>',
       'placeholder' => 'Your Email Address',
       'button_text' => 'Subscribe',
     ),
@@ -27,17 +40,17 @@
       0 => 
       array (
         'title' => 'Terms of Service',
-        'url' => '/terms',
+        'url' => 'terms',
       ),
       1 => 
       array (
         'title' => 'Privacy Policy',
-        'url' => '/privacy',
+        'url' => 'privacy',
       ),
       2 => 
       array (
         'title' => 'Cookie Policy',
-        'url' => '/cookies',
+        'url' => 'cookies',
       ),
     ),
   ),
