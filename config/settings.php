@@ -18,8 +18,11 @@
   ),
   'footer' => 
   array (
+
     'logo' => 'logo.png',
-    'description' => '<p>Specializes in providing high-class tours for those in need</p><p data-f-id="pbf" style="text-align: center; font-size: 14px; margin-top: 30px; opacity: 0.65; font-family: sans-serif;">Powered by <a href="https://www.froala.com/wysiwyg-editor?pb=1" title="Froala Editor">Froala Editor</a></p>',
+    'description' => 'Specializes in providing high-class tours for those in need',
+    'logo' => NULL,
+    'description' => '<p>Specializes in providing high-class tours for those in need</p>',
     'contact' => 
     array (
       'address' => '101 E 129th St. East Fujairah IN 45721, UAE',
