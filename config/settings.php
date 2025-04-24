@@ -18,6 +18,9 @@
   ),
   'footer' => 
   array (
+
+    'logo' => 'logo.png',
+    'description' => 'Specializes in providing high-class tours for those in need',
     'logo' => NULL,
     'description' => '<p>Specializes in providing high-class tours for those in need</p>',
     'contact' => 
