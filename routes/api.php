@@ -35,4 +35,5 @@ use Illuminate\Support\Facades\Route;
     Route::get('/rental/related', [FrontendController::class, 'getRelatedRental']);
     Route::get('/policies', [FrontendController::class, 'policy']);
     Route::get('/faqs', [FrontendController::class, 'getFAQ']);
+    Route::get('/searchOffplanLocations', [FrontendController::class, 'searchOffplanLocations']);
 

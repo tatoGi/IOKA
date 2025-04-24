@@ -5,6 +5,8 @@ use App\Models\Offplan;
 use App\Models\RentalResale;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Log;
+use App\Models\Location;
+use Illuminate\Http\Request;
 
 class FilterService
 {
@@ -50,15 +52,12 @@ class FilterService
         // Location Search Filter
         if (!empty($filters['location'])) {
             $searchTerm = '%' . $filters['location'] . '%';
-            $query->where(function($q) use ($searchTerm) {
+            $query->whereHas('locations', function($q) use ($searchTerm) {
                 $q->where('title', 'LIKE', $searchTerm)
                   ->orWhere('subtitle', 'LIKE', $searchTerm)
-                  ->orWhere('location', 'LIKE', $searchTerm)
+
                   ->orWhere('description', 'LIKE', $searchTerm)
                   ->orWhere('amenities', 'LIKE', $searchTerm)
-                  ->orWhere('map_location', 'LIKE', $searchTerm)
-                  ->orWhere('qr_title', 'LIKE', $searchTerm)
-                  ->orWhere('qr_text', 'LIKE', $searchTerm)
                   ->orWhere('agent_title', 'LIKE', $searchTerm)
                   ->orWhere('agent_status', 'LIKE', $searchTerm)
                   ->orWhere('slug', 'LIKE', $searchTerm);
@@ -128,7 +127,7 @@ class FilterService
         // Location Search Filter
         if (!empty($filters['location'])) {
             $searchTerm = '%' . $filters['location'] . '%';
-            $query->where(function($q) use ($searchTerm) {
+            $query->whereHas('locations', function($q) use ($searchTerm) {
                 $q->where('title', 'LIKE', $searchTerm)
                   ->orWhere('subtitle', 'LIKE', $searchTerm)
                   ->orWhere('location', 'LIKE', $searchTerm)
@@ -162,4 +161,5 @@ class FilterService
             'total' => $results->total(),
         ];
     }
+
 }

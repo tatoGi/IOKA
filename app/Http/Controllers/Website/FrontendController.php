@@ -16,6 +16,7 @@ use App\Models\PolicyPage;
 use App\Models\RentalResale;
 use App\Models\Setting;
 use Illuminate\Support\Facades\DB;
+use App\Models\Location;
 class FrontendController extends Controller
 {
     protected $pageService;
@@ -311,6 +312,26 @@ return $result;
             'faqs' => $faqs,
             ]);
             }
+    public function searchOffplanLocations(Request $request)
+    {
+        $query = $request->get('query');
+
+        if (empty($query)) {
+            return response()->json(['locations' => []]);
+        }
+
+        // Search in the locations table through the relationship
+        $locations = Location::where('title', 'LIKE', '%' . $query . '%')
+            ->distinct()
+            ->pluck('title')
+            ->filter()
+            ->values()
+            ->toArray();
+
+        return response()->json([
+            'locations' => $locations
+        ]);
+    }
 
 
 }
