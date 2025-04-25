@@ -196,7 +196,7 @@ class PageService
     public function getAlloffplan()
     {
 
-        $offplans = Offplan::orderBy('created_at', 'desc')->paginate(10);
+        $offplans = Offplan::orderBy('created_at', 'desc')->paginate(12);
 
 
         return $offplans;

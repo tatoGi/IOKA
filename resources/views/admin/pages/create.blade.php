@@ -72,14 +72,3 @@
         </div>
     </div>
 @endsection
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        if (typeof ClassicEditor !== "undefined") {
-            ClassicEditor.create(document.querySelector("#desc")).catch((error) => {
-                console.error(error);
-            });
-        } else {
-            console.error("CKEditor is not loaded properly.");
-        }
-    });
-</script>
