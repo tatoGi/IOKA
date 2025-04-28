@@ -262,16 +262,39 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="mb-3">
-                        <label for="location_id" class="form-label">Location<span class="text-danger">*</span></label>
-                        <select class="form-control select2" id="location_id" name="location_id[]" required multiple>
-                            @foreach($locations as $location)
-                                <option value="{{ $location->id }}">{{ $location->title }}</option>
-                            @endforeach
-                        </select>
+                    <div class="col-md-12">
+                        <div class="mb-3">
+                            <label for="agent_languages">Agent Languages</label>
+                            <div id="agent_languages_repeater">
+                                <div class="agent_languages_item">
+                                    <input type="text" class="form-control mb-2" name="agent_languages[0]" placeholder="Language">
+                                    <button type="button" class="btn btn-danger btn-sm remove-agent-language">Remove</button>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-secondary" id="add_agent_language">Add More</button>
+                        </div>
                     </div>
                 </div>
-
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="mb-3">
+                            <label for="location_id" class="form-label">Location<span class="text-danger">*</span></label>
+                            <select class="form-control select2" id="location_id" name="location_id[]" required multiple>
+                                @foreach($locations as $location)
+                                    <option value="{{ $location->id }}">{{ $location->title }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-2">
+                        <div class="form-group mt-3">
+                            <label for="agent_email">Agent Email</label>
+                            <input type="email" class="form-control" id="agent_email" name="agent_email">
+                        </div>
+                    </div>
+                </div>
 
                 <button type="submit" class="btn btn-success w-100">Submit</button>
             </div>
@@ -365,6 +388,18 @@
             repeater.appendChild(newItem);
         });
 
+        document.getElementById('add_agent_language').addEventListener('click', function() {
+            var repeater = document.getElementById('agent_languages_repeater');
+            var index = repeater.children.length;
+            var newItem = document.createElement('div');
+            newItem.classList.add('agent_languages_item');
+            newItem.innerHTML = `
+                <input type="text" class="form-control mb-2" name="agent_languages[${index}]" placeholder="Language">
+                <button type="button" class="btn btn-danger btn-sm remove-agent-language">Remove</button>
+            `;
+            repeater.appendChild(newItem);
+        });
+
         document.addEventListener('click', function(event) {
             if (event.target.classList.contains('remove-feature')) {
                 event.target.parentElement.remove();
@@ -373,6 +408,9 @@
                 event.target.parentElement.remove();
             }
             if (event.target.classList.contains('remove-amenities')) {
+                event.target.parentElement.remove();
+            }
+            if (event.target.classList.contains('remove-agent-language')) {
                 event.target.parentElement.remove();
             }
         });

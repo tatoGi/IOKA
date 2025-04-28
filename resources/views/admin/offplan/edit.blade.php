@@ -305,13 +305,31 @@
                                 value="{{ $offplan->agent_linkedin }}">
                         </div>
                     </div>
-
-
+                    <div class="col-md-2">
+                        <div class="form-group mt-3">
+                            <label for="agent_email">Agent Email</label>
+                            <input type="email" class="form-control" id="agent_email" name="agent_email"
+                                value="{{ $offplan->agent_email }}">
+                        </div>
+                    </div>
                 </div>
             </div>
 
-
-
+            <div class="form-group mt-3">
+                <label for="agent_languages">Agent Languages</label>
+                <div id="agent_languages_repeater">
+                    @if($offplan->agent_languages)
+                        @foreach ((is_array($offplan->agent_languages) ? $offplan->agent_languages : json_decode($offplan->agent_languages, true)) as $index => $language)
+                            <div class="agent_languages_item">
+                                <input type="text" class="form-control mb-2" name="agent_languages[{{ $index }}]"
+                                    value="{{ $language }}" placeholder="Language">
+                                <button type="button" class="btn btn-danger btn-sm remove-agent-language">Remove</button>
+                            </div>
+                        @endforeach
+                    @endif
+                </div>
+                <button type="button" class="btn btn-secondary" id="add_agent_language">Add More</button>
+            </div>
 
             <div class="form-group mt-3">
                 <label for="agent_image">Agent Image</label>
@@ -449,20 +467,31 @@
             });
         });
 
-        document.querySelectorAll('.remove-feature').forEach(button => {
-            button.addEventListener('click', function() {
-                this.parentElement.remove();
-            });
+        document.getElementById('add_agent_language').addEventListener('click', function() {
+            var repeater = document.getElementById('agent_languages_repeater');
+            var index = repeater.children.length;
+            var newItem = document.createElement('div');
+            newItem.classList.add('agent_languages_item');
+            newItem.innerHTML = `
+                <input type="text" class="form-control mb-2" name="agent_languages[${index}]" placeholder="Language">
+                <button type="button" class="btn btn-danger btn-sm remove-agent-language">Remove</button>
+            `;
+            repeater.appendChild(newItem);
         });
-        document.querySelectorAll('.remove-amenities').forEach(button => {
-            button.addEventListener('click', function() {
-                this.parentElement.remove();
-            });
-        });
-        document.querySelectorAll('.remove-near-by').forEach(button => {
-            button.addEventListener('click', function() {
-                this.parentElement.remove();
-            });
+
+        document.addEventListener('click', function(event) {
+            if (event.target.classList.contains('remove-feature')) {
+                event.target.parentElement.remove();
+            }
+            if (event.target.classList.contains('remove-near-by')) {
+                event.target.parentElement.remove();
+            }
+            if (event.target.classList.contains('remove-amenities')) {
+                event.target.parentElement.remove();
+            }
+            if (event.target.classList.contains('remove-agent-language')) {
+                event.target.parentElement.remove();
+            }
         });
     </script>
 @endsection

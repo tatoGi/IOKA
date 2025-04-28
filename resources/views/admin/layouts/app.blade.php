@@ -41,8 +41,31 @@
     <script src="https://cdn.ckeditor.com/ckeditor5/27.0.0/classic/ckeditor.js"></script>
     <script>
         var allEditors = document.querySelectorAll('.editor');
+        const editorInstances = new Map();
+
         for (var i = 0; i < allEditors.length; ++i) {
-          ClassicEditor.create(allEditors[i]);
+            const editorElement = allEditors[i];
+            const editorId = editorElement.id || `editor-${i}`;
+
+            ClassicEditor
+                .create(editorElement, {
+                    toolbar: ['heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', '|', 'outdent', 'indent', '|', 'blockQuote', 'insertTable', 'undo', 'redo']
+                })
+                .then(editor => {
+                    // Store the editor instance in the Map
+                    editorInstances.set(editorId, editor);
+
+                    // Update the hidden textarea when the editor content changes
+                    editor.model.document.on('change:data', () => {
+                        const textarea = document.querySelector(`#${editorId}`);
+                        if (textarea) {
+                            textarea.value = editor.getData();
+                        }
+                    });
+                })
+                .catch(error => {
+                    console.error(error);
+                });
         }
     </script>
     @yield('scripts')
