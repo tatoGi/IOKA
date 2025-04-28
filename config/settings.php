@@ -6,21 +6,18 @@
   'meta' => 
   array (
     'title' => 'IOKA - Your Trusted Real Estate Partner',
-    'description' => '<p>IOKA - Your Trusted Real Estate Partner</p><p data-f-id="pbf" style="text-align: center; font-size: 14px; margin-top: 30px; opacity: 0.65; font-family: sans-serif;">Powered by <a href="https://www.froala.com/wysiwyg-editor?pb=1" title="Froala Editor">Froala Editor</a></p>',
+    'description' => '<p>IOKA - Your Trusted Real Estate Partner</p><p>Powered by <a href="https://www.froala.com/wysiwyg-editor?pb=1">Froala Editor</a></p>',
     'keywords' => 'IOKA - Your Trusted Real Estate Partner',
     'og_title' => 'IOKA - Your Trusted Real Estate Partner',
-    'og_description' => '<p>IOKA - Your Trusted Real Estate Partner</p><p data-f-id="pbf" style="text-align: center; font-size: 14px; margin-top: 30px; opacity: 0.65; font-family: sans-serif;">Powered by <a href="https://www.froala.com/wysiwyg-editor?pb=1" title="Froala Editor">Froala Editor</a></p>',
+    'og_description' => '<p>IOKA - Your Trusted Real Estate Partner</p><p>Powered by <a href="https://www.froala.com/wysiwyg-editor?pb=1">Froala Editor</a></p>',
     'og_image' => 'meta/meta-og-1745260429.png',
     'twitter_card' => 'summary',
     'twitter_title' => 'IOKA - Your Trusted Real Estate Partner',
-    'twitter_description' => '<p>IOKA - Your Trusted Real Estate Partner</p><p data-f-id="pbf" style="text-align: center; font-size: 14px; margin-top: 30px; opacity: 0.65; font-family: sans-serif;">Powered by <a href="https://www.froala.com/wysiwyg-editor?pb=1" title="Froala Editor">Froala Editor</a></p>',
+    'twitter_description' => '<p>IOKA - Your Trusted Real Estate Partner</p><p>Powered by <a href="https://www.froala.com/wysiwyg-editor?pb=1">Froala Editor</a></p>',
     'twitter_image' => 'meta/meta-twitter-1745260429.png',
   ),
   'footer' => 
   array (
-
-    'logo' => 'logo.png',
-    'description' => 'Specializes in providing high-class tours for those in need',
     'logo' => NULL,
     'description' => '<p>Specializes in providing high-class tours for those in need</p>',
     'contact' => 
@@ -33,7 +30,7 @@
     'newsletter' => 
     array (
       'title' => 'Newsletter',
-      'description' => '<p>Your Weekly/Monthly Dose of Knowledge and Inspiration</p><p data-f-id="pbf" style="text-align: center; font-size: 14px; margin-top: 30px; opacity: 0.65; font-family: sans-serif;">Powered by <a href="https://www.froala.com/wysiwyg-editor?pb=1" title="Froala Editor">Froala Editor</a></p>',
+      'description' => '<p>Your Weekly/Monthly Dose of Knowledge and Inspiration</p>',
       'placeholder' => 'Your Email Address',
       'button_text' => 'Subscribe',
     ),
