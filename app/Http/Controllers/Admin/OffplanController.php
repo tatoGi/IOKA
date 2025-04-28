@@ -33,24 +33,29 @@ class OffplanController extends Controller
     }
 
     public function store(StoreOffplanRequest $request)
-{
-    try {
-        $data = $request->validated();
-        $data['slug'] = $this->generateUniqueSlug($data['slug']);
+    {
+        try {
+            $data = $request->validated();
+            $data['slug'] = $this->generateUniqueSlug($data['slug']);
 
-        $this->offplanService->handleFileUploads($request, $data);
-        $offplan = $this->offplanService->createOffplan($data);
+            // Handle agent languages
+            if ($request->has('agent_languages')) {
+                $data['agent_languages'] = array_filter($request->input('agent_languages'));
+            }
 
-        return redirect()
-            ->route('admin.offplan.index')
-            ->with('success', 'Offplan created successfully.');
+            $this->offplanService->handleFileUploads($request, $data);
+            $offplan = $this->offplanService->createOffplan($data);
 
-    } catch (\Exception $e) {
-        return back()
-            ->withInput()
-            ->with('error', 'Failed to create offplan: ' . $e->getMessage());
+            return redirect()
+                ->route('admin.offplan.index')
+                ->with('success', 'Offplan created successfully.');
+
+        } catch (\Exception $e) {
+            return back()
+                ->withInput()
+                ->with('error', 'Failed to create offplan: ' . $e->getMessage());
+        }
     }
-}
 
     private function generateUniqueSlug(string $slug): string
     {
@@ -92,6 +97,11 @@ class OffplanController extends Controller
         } else {
             // Keep the existing slug
             $data['slug'] = $offplan->slug;
+        }
+
+        // Handle agent languages
+        if ($request->has('agent_languages')) {
+            $data['agent_languages'] = array_filter($request->input('agent_languages'));
         }
 
         // Handle file uploads and update the offplan

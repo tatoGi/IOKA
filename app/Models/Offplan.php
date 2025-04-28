@@ -39,6 +39,8 @@ class Offplan extends Model
         'agent_telephone',
         'agent_whatsapp',
         'agent_linkedin',
+        'agent_email',
+        'agent_languages',
         'location',
         'developer_id',
     ];
@@ -51,6 +53,7 @@ class Offplan extends Model
         'amenities' => 'array',
         'amount' => 'decimal:2',
         'amount_dirhams' => 'decimal:2',
+        'agent_languages' => 'array',
     ];
 
     public function locations()
