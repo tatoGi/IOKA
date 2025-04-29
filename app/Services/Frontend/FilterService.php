@@ -19,12 +19,16 @@ class FilterService
             $query->where('property_type', $filters['property_type']);
         }
 
-        // Price Range Filter
+        // Price Range Filter - Updated to use amount relationship
         if (!empty($filters['price_min'])) {
-            $query->where('amount', '>=', (float)$filters['price_min']);
+            $query->whereHas('amount', function($q) use ($filters) {
+                $q->where('amount', '>=', (float)$filters['price_min']);
+            });
         }
         if (!empty($filters['price_max'])) {
-            $query->where('amount', '<=', (float)$filters['price_max']);
+            $query->whereHas('amount', function($q) use ($filters) {
+                $q->where('amount', '<=', (float)$filters['price_max']);
+            });
         }
 
         // Bedrooms Filter
@@ -34,14 +38,13 @@ class FilterService
 
         // Bathrooms Filter - Updated to handle NULL values
         if (!empty($filters['bathrooms'])) {
-
             $query->where(function($q) use ($filters) {
                 $q->where('bathroom', '=', (int)$filters['bathrooms'])
                   ->orWhereNull('bathroom');
             });
         }
 
-        // Area (sq_ft) Filter
+        // Area (sq_ft) Filter - Updated to handle type conversion
         if (!empty($filters['sq_ft_min'])) {
             $query->where('sq_ft', '>=', (float)$filters['sq_ft_min']);
         }
@@ -55,7 +58,6 @@ class FilterService
             $query->whereHas('locations', function($q) use ($searchTerm) {
                 $q->where('title', 'LIKE', $searchTerm)
                   ->orWhere('subtitle', 'LIKE', $searchTerm)
-
                   ->orWhere('description', 'LIKE', $searchTerm)
                   ->orWhere('amenities', 'LIKE', $searchTerm)
                   ->orWhere('agent_title', 'LIKE', $searchTerm)
@@ -63,9 +65,6 @@ class FilterService
                   ->orWhere('slug', 'LIKE', $searchTerm);
             });
         }
-
-        // Debug the final SQL query
-
 
         // Get pagination parameters
         $page = $filters['page'] ?? 1;

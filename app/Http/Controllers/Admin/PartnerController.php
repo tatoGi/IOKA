@@ -81,16 +81,26 @@ class PartnerController extends Controller
 
     public function deleteImage($id)
     {
-        $partner = Partner::findOrFail($id);
+        try {
+            $partner = Partner::findOrFail($id);
 
-        // Delete the image file from storage
-        if ($partner->image && Storage::exists($partner->image)) {
-            Storage::delete($partner->image);
+            // Delete the image file from storage
+            if ($partner->image) {
+                Storage::disk('public')->delete($partner->image);
+            }
+
+            // Update the partner record
+            $partner->update(['image' => null]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Image deleted successfully.'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error deleting image: ' . $e->getMessage()
+            ], 500);
         }
-
-        // Set an empty string or a default placeholder for the image
-        $partner->update(['image' => '']); // or set a default image path
-
-        return response()->json(['message' => 'Image deleted successfully.']);
     }
 }

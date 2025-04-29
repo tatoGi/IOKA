@@ -40,6 +40,7 @@
 
                                 <!-- Button to delete the current image -->
                                 <button type="button" class="btn btn-danger btn-sm mt-2" id="deleteImageBtn"
+                                    data-route="{{ route('admin.partners.delete-image', ['id' => $partner->id]) }}"
                                     data-partner-id="{{ $partner->id }}">
                                     Delete Image
                                 </button>
@@ -92,44 +93,67 @@
 @endsection
 
 @push('scripts')
-    <script>
-        document.getElementById('deleteImageBtn').addEventListener('click', function() {
-            const partnerId = this.getAttribute('data-partner-id');
-            $('#deleteImageModal').modal('show'); // Show the modal
+<script>
+    $(document).ready(function() {
+        // Add click handler using jQuery
+        $('#deleteImageBtn').on('click', function() {
+            const partnerId = $(this).data('partner-id');
+            console.log('Partner ID:', partnerId);
 
-            document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+            // Show the modal using jQuery
+            $('#deleteImageModal').modal('show');
+
+            // Handle confirm button click
+            $('#confirmDeleteBtn').off('click').on('click', function() {
+                console.log('Confirm delete clicked');
+
                 // AJAX request to delete the image
                 $.ajax({
-                    url: '/admin/partners/' + partnerId +
-                    '/delete-image', // Endpoint for deleting the image
+                    url: '/ioka_admin/partners/' + partnerId + '/delete-image',
                     method: 'DELETE',
-                    data: {
-                        _token: '{{ csrf_token() }}',
-                        partner_id: partnerId
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
                     },
                     success: function(response) {
-                        // If the image is successfully deleted, remove it from the UI
-                        $('#deleteImageModal').modal('hide');
+                        console.log('Delete response:', response);
+                        if (response.success) {
+                            // Hide the modal
+                            $('#deleteImageModal').modal('hide');
 
-                        // Find and remove the image and delete button from the DOM
-                        const imageElement = document.querySelector(
-                            'img[alt="{{ $partner->title }}"]');
-                        if (imageElement) {
-                            imageElement.remove();
+                            // Find and remove the image and delete button from the DOM
+                            const imageElement = document.querySelector(
+                                'img[alt="{{ $partner->title }}"]');
+                            if (imageElement) {
+                                imageElement.remove();
+                            }
+
+                            const deleteButton = document.getElementById('deleteImageBtn');
+                            if (deleteButton) {
+                                deleteButton.remove();
+                            }
+
+                            // Show success message
+                            alert(response.message);
+                        } else {
+                            alert('Error: ' + response.message);
                         }
-
-                        const deleteButton = document.getElementById('deleteImageBtn');
-                        if (deleteButton) {
-                            deleteButton.remove();
-                        }
-
-                        // Optionally, display a message or do any additional UI updates
                     },
                     error: function(xhr, status, error) {
-                        alert('Something went wrong!');
+                        console.error('Delete error:', xhr, status, error);
+                        let errorMessage = 'Error deleting image';
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            errorMessage += ': ' + xhr.responseJSON.message;
+                        } else {
+                            errorMessage += ': ' + error;
+                        }
+                        alert(errorMessage);
                     }
                 });
             });
         });
-    </script>
+    });
+</script>
 @endpush
+
+
+
