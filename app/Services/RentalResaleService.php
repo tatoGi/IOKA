@@ -53,21 +53,21 @@ class RentalResaleService
             $validatedData['gallery_images'] = json_encode([]);
         }
 
-        // Get and remove location IDs from the validated data
-        $locationIds = $validatedData['location_id'] ?? [];
+        // Get location ID from the validated data
+        $locationId = $validatedData['location_id'] ?? null;
         unset($validatedData['location_id']);
 
         // Remove amount fields for now (they go into a separate table)
         unset($validatedData['amount']);
         unset($validatedData['amount_dirhams']);
 
-        return DB::transaction(function () use ($validatedData, $locationIds, $request) {
+        return DB::transaction(function () use ($validatedData, $locationId, $request) {
             // Create the RentalResale record
             $rentalResale = RentalResale::create($validatedData);
 
-            // Attach locations if available
-            if (!empty($locationIds)) {
-                $rentalResale->locations()->attach($locationIds);
+            // Attach location if available
+            if ($locationId) {
+                $rentalResale->locations()->attach($locationId);
             }
 
             // Create the related Amount record
@@ -182,16 +182,18 @@ class RentalResaleService
         unset($validatedData['amount']);
         unset($validatedData['amount_dirhams']);
 
-        // Store location IDs
-        $locationIds = $request->input('location_id', []);
+        // Store location ID
+        $locationId = $request->input('location_id')[0] ?? null;
         unset($validatedData['location_id']);
 
-        return DB::transaction(function () use ($rentalResale, $validatedData, $locationIds, $request) {
+        return DB::transaction(function () use ($rentalResale, $validatedData, $locationId, $request) {
             // Update the RentalResale record
             $rentalResale->update($validatedData);
 
-            // Sync locations (add new, remove old)
-            $rentalResale->locations()->sync($locationIds);
+            // Sync location (replace old with new)
+            if ($locationId) {
+                $rentalResale->locations()->sync([$locationId]);
+            }
 
             // Update the related Amount record
             $rentalResale->amount->update([

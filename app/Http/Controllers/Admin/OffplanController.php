@@ -80,9 +80,9 @@ class OffplanController extends Controller
    public function edit(Offplan $offplan)
 {
     $locations = Location::all(); // Get all available locations
-    $selectedLocations = $offplan->locations->pluck('id')->toArray();
+    $selectedLocation = $offplan->locations->first()?->id;
 
-    return view('admin.offplan.edit', compact('offplan', 'locations', 'selectedLocations'));
+    return view('admin.offplan.edit', compact('offplan', 'locations', 'selectedLocation'));
 }
 
     public function update(StoreOffplanRequest $request, $id)

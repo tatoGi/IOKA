@@ -86,6 +86,7 @@
                     <div id="awards-container">
                         @foreach ($awards as $index => $award)
                             <div class="award-input-group mb-3">
+                                <input type="hidden" name="awards[{{ $index }}][id]" value="{{ $award->id }}">
                                 <div class="form-group">
                                     <label for="award_title">Award Title</label>
                                     <input type="text" name="awards[{{ $index }}][title]" class="form-control"
@@ -223,6 +224,7 @@
                 const index = $('#awards-container .award-input-group').length;
                 $('#awards-container').append(`
                     <div class="award-input-group mb-3">
+                        <input type="hidden" name="awards[${index}][id]" value="">
                         <div class="form-group">
                             <label for="award_title">Award Title</label>
                             <input type="text" name="awards[${index}][title]" class="form-control">

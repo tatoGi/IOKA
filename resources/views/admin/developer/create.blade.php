@@ -143,9 +143,13 @@
                 <div class="form-group mb-3">
                     <label for="rental_listings">Rental Listings <span class="text-danger">*</span></label>
                     <select name="rental_listings[]" id="rental_listings" class="form-control" multiple>
-                        @foreach ($rentalandresaleListings as $listing)
-                            <option value="{{ $listing->id }}" {{ in_array($listing->id, old('rental_listings', [])) ? 'selected' : '' }}>{{ $listing->title }}</option>
-                        @endforeach
+                        @if($rentalandresaleListings->isEmpty())
+                            <option disabled>No available rental listings</option>
+                        @else
+                            @foreach ($rentalandresaleListings as $listing)
+                                <option value="{{ $listing->id }}" {{ in_array($listing->id, old('rental_listings', [])) ? 'selected' : '' }}>{{ $listing->title }}</option>
+                            @endforeach
+                        @endif
                     </select>
                     @error('rental_listings')
                         <div class="text-danger">{{ $message }}</div>
@@ -156,9 +160,13 @@
                 <div class="form-group mb-3">
                     <label for="offplan_listings">Offplan Listings <span class="text-danger">*</span></label>
                     <select name="offplan_listings[]" id="offplan_listings" class="form-control" multiple>
-                        @foreach ($offplanListings as $listing)
-                            <option value="{{ $listing->id }}" {{ in_array($listing->id, old('offplan_listings', [])) ? 'selected' : '' }}>{{ $listing->title }}</option>
-                        @endforeach
+                        @if($offplanListings->isEmpty())
+                            <option disabled>No available offplan listings</option>
+                        @else
+                            @foreach ($offplanListings as $listing)
+                                <option value="{{ $listing->id }}" {{ in_array($listing->id, old('offplan_listings', [])) ? 'selected' : '' }}>{{ $listing->title }}</option>
+                            @endforeach
+                        @endif
                     </select>
                     @error('offplan_listings')
                         <div class="text-danger">{{ $message }}</div>

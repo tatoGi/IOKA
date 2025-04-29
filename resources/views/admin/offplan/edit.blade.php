@@ -347,10 +347,10 @@
             </div>
             <div class="form-group">
                 <label for="location_id">Locations</label>
-                <select name="location_id[]" id="location_id" class="form-control select2" multiple="multiple">
+                <select name="location_id" id="location_id" class="form-control select2">
                     @foreach($locations as $location)
                         <option value="{{ $location->id }}"
-                            {{ in_array($location->id, $selectedLocations) ? 'selected' : '' }}>
+                            {{ $selectedLocation == $location->id ? 'selected' : '' }}>
                             {{ $location->title }}
                         </option>
                     @endforeach

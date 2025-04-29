@@ -203,10 +203,17 @@ class DeveloperController extends Controller
                 }
             }
         }
-        $logoPath = null;
+
+        // Preserve existing logo if no new one is uploaded
+        $logoPath = $developer->logo;
         if ($request->hasFile('logo')) {
+            // Delete old logo if exists
+            if ($developer->logo && Storage::exists('public/' . $developer->logo)) {
+                Storage::delete('public/' . $developer->logo);
+            }
             $logoPath = $request->file('logo')->store('developer_logos', 'public');
         }
+
         // Update the developer
         $developer->update([
             'title' => $request->input('title'),
@@ -233,25 +240,55 @@ class DeveloperController extends Controller
 
         // Handle awards update
         if ($request->has('awards')) {
-            // Delete existing awards
-            $developer->awards()->delete();
+            // Get existing awards
+            $existingAwards = $developer->awards->keyBy('id');
 
-            // Add new awards
-            foreach ($request->awards as $awardData) {
-                if (! empty($awardData['title']) && ! empty($awardData['year'])) {
-                    $award = new DeveloperAward([
-                        'award_title' => $awardData['title'],
-                        'award_year' => $awardData['year'],
-                        'award_description' => $awardData['description'] ?? null,
-                    ]);
+            foreach ($request->awards as $index => $awardData) {
+                if (!empty($awardData['title']) && !empty($awardData['year'])) {
+                    if (!empty($awardData['id']) && $existingAwards->has($awardData['id'])) {
+                        // Update existing award
+                        $award = $existingAwards->get($awardData['id']);
+                        $award->award_title = $awardData['title'];
+                        $award->award_year = $awardData['year'];
+                        $award->award_description = $awardData['description'] ?? null;
 
-                    // Handle award photo upload
-                    if (isset($awardData['photo'])) {
-                        $awardPhotoPath = $awardData['photo']->store('award_photos', 'public');
-                        $award->award_photo = $awardPhotoPath;
+                        // Only update photo if a new one is actually uploaded
+                        if ($request->hasFile('awards.' . $index . '.photo')) {
+                            // Delete old photo if exists
+                            if ($award->award_photo && Storage::exists('public/' . $award->award_photo)) {
+                                Storage::delete('public/' . $award->award_photo);
+                            }
+                            $awardPhotoPath = $request->file('awards.' . $index . '.photo')->store('award_photos', 'public');
+                            $award->award_photo = $awardPhotoPath;
+                        }
+
+                        $award->save();
+                        $existingAwards->forget($awardData['id']);
+                    } else {
+                        // Create new award
+                        $award = new DeveloperAward([
+                            'award_title' => $awardData['title'],
+                            'award_year' => $awardData['year'],
+                            'award_description' => $awardData['description'] ?? null,
+                        ]);
+
+                        if ($request->hasFile('awards.' . $index . '.photo')) {
+                            $awardPhotoPath = $request->file('awards.' . $index . '.photo')->store('award_photos', 'public');
+                            $award->award_photo = $awardPhotoPath;
+                        }
+
+                        $developer->awards()->save($award);
                     }
+                }
+            }
 
-                    $developer->awards()->save($award);
+            // Delete awards that were not included in the update
+            if ($existingAwards->isNotEmpty()) {
+                foreach ($existingAwards as $award) {
+                    if ($award->award_photo && Storage::exists('public/' . $award->award_photo)) {
+                        Storage::delete('public/' . $award->award_photo);
+                    }
+                    $award->delete();
                 }
             }
         }

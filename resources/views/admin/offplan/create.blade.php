@@ -279,7 +279,7 @@
                     <div class="col-md-12">
                         <div class="mb-3">
                             <label for="location_id" class="form-label">Location<span class="text-danger">*</span></label>
-                            <select class="form-control select2" id="location_id" name="location_id[]" required multiple>
+                            <select class="form-control select2" id="location_id" name="location_id" required>
                                 @foreach($locations as $location)
                                     <option value="{{ $location->id }}">{{ $location->title }}</option>
                                 @endforeach

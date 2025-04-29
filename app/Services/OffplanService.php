@@ -56,15 +56,15 @@ class OffplanService
             $data['features'] = $data['features'] ?? [];
             $data['near_by'] = $data['near_by'] ?? [];
 
-            // Store location IDs before creation
-            $locationIds = $data['location_id'] ?? [];
+            // Store location ID before creation
+            $locationId = $data['location_id'] ?? null;
             unset($data['location_id']);
 
-            return DB::transaction(function () use ($data, $locationIds) {
+            return DB::transaction(function () use ($data, $locationId) {
                 $offplan = Offplan::create($data);
 
-                if (!empty($locationIds)) {
-                    $offplan->locations()->attach($locationIds);
+                if ($locationId) {
+                    $offplan->locations()->attach($locationId);
                 }
 
                 return $offplan;
@@ -83,15 +83,15 @@ class OffplanService
             $data['features'] = $data['features'] ?? [];
             $data['near_by'] = $data['near_by'] ?? [];
 
-            // Handle locations if provided
-            $locationIds = $data['location_id'] ?? null;
+            // Handle location if provided
+            $locationId = $data['location_id'] ?? null;
             unset($data['location_id']);
 
-            return DB::transaction(function () use ($offplan, $data, $locationIds) {
+            return DB::transaction(function () use ($offplan, $data, $locationId) {
                 $offplan->update($data);
 
-                if ($locationIds !== null) {
-                    $offplan->locations()->sync($locationIds);
+                if ($locationId !== null) {
+                    $offplan->locations()->sync([$locationId]);
                 }
 
                 return $offplan;
