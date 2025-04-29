@@ -21,6 +21,11 @@ class FaqController extends Controller
 
     public function store(Request $request)
     {
+        $request->validate([
+            'question' => 'required|string|max:255',
+            'answer' => 'required|string',
+            'is_active' => 'nullable|in:on,off',
+        ]);
 
         Faq::create([
             'question' => $request->question,
@@ -47,7 +52,7 @@ class FaqController extends Controller
         $request->validate([
             'question' => 'required|string|max:255',
             'answer' => 'required|string',
-            'is_active' => 'nullable|boolean',
+            'is_active' => 'nullable|in:on,off',
         ]);
 
         $faq->update([
