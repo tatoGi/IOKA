@@ -66,7 +66,6 @@
                 @break
 
                 @case('repeater')
-
                     <div class="repeater-container" data-field="{{ $fieldKey }}">
                         <div class="repeater-items">
                             @if (isset($additionalFields[$fieldKey]) && is_array($additionalFields[$fieldKey]))
@@ -115,20 +114,27 @@
                                                                 name="fields[{{ $fieldKey }}][{{ $index }}][{{ $repeaterFieldKey }}]"
                                                                 accept="image/*">
                                                         @break
+
                                                         @case('select')
-                                                        <select class="form-control select2"
+                                                            <select class="form-control select2"
                                                                 name="fields[{{ $fieldKey }}][{{ $index }}][{{ $repeaterFieldKey }}]{{ isset($repeaterField['multiple']) && $repeaterField['multiple'] ? '[]' : '' }}"
                                                                 {{ isset($repeaterField['required']) && $repeaterField['required'] ? 'required' : '' }}
                                                                 {{ isset($repeaterField['multiple']) && $repeaterField['multiple'] ? 'multiple' : '' }}
                                                                 data-placeholder="{{ $repeaterField['placeholder'] ?? (isset($repeaterField['multiple']) ? 'Select options...' : 'Select an option...') }}">
-                                                            @if(isset($repeaterField['placeholder']))
-                                                                <option value=""></option>
-                                                            @endif
-                                                            @foreach($repeaterField['options'] as $value => $label)
-                                                                <option value="{{ $value }}">{{ $label }}</option>
-                                                            @endforeach
-                                                        </select>
-                                                    @break
+                                                                @if(isset($repeaterField['placeholder']))
+                                                                    <option value=""></option>
+                                                                @endif
+                                                                @foreach($repeaterField['options'] as $value => $label)
+                                                                    <option value="{{ $value }}"
+                                                                        {{ (isset($item[$repeaterFieldKey]) && (
+                                                                            (is_array($item[$repeaterFieldKey]) && in_array($value, $item[$repeaterFieldKey])) ||
+                                                                            (!is_array($item[$repeaterFieldKey]) && $item[$repeaterFieldKey] == $value)
+                                                                        )) ? 'selected' : '' }}>
+                                                                        {{ $label }}
+                                                                    </option>
+                                                                @endforeach
+                                                            </select>
+                                                        @break
                                                         @default
                                                             <input type="{{ $repeaterField['type'] }}" class="form-control"
                                                                 name="fields[{{ $fieldKey }}][{{ $index }}][{{ $repeaterFieldKey }}]"
@@ -330,7 +336,13 @@
                                                                                                     <option value=""></option>
                                                                                                 @endif
                                                                                                 @foreach($repeaterField['options'] as $value => $label)
-                                                                                                    <option value="{{ $value }}">{{ $label }}</option>
+                                                                                                    <option value="{{ $value }}"
+                                                                                                        {{ (isset($item[$repeaterFieldKey]) && (
+                                                                                                            (is_array($item[$repeaterFieldKey]) && in_array($value, $item[$repeaterFieldKey])) ||
+                                                                                                            (!is_array($item[$repeaterFieldKey]) && $item[$repeaterFieldKey] == $value)
+                                                                                                        )) ? 'selected' : '' }}>
+                                                                                                        {{ $label }}
+                                                                                                    </option>
                                                                                                 @endforeach
                                                                                             </select>
                                                                                         @break

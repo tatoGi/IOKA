@@ -234,7 +234,7 @@ return [
                                 'image_or_like_this' => [
                                     'type' => 'photo',
                                     'label' => 'Image or Like This',
-                                    'required' => true,
+                                    'required' => false,
                                 ],
                             ],
                         ],
@@ -309,7 +309,7 @@ return [
                 'image_or_like_this' => [
                     'type' => 'image',
                     'label' => 'Image or Like This',
-                    'required' => true,
+                    'required' => false,
                 ],
             ],
         ],

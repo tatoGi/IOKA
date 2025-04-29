@@ -113,6 +113,9 @@ class SectionController extends Controller
 
         $sectionConfig = $pageType['sections'][$sectionKey];
 
+        // Set the section in the request for use in processFields
+        $request->merge(['section' => $section]);
+
         // Process fields
         $fields = $request->fields ?? [];
         $processedFields = $this->processFields($request, $fields, $sectionConfig['fields']);
@@ -190,7 +193,8 @@ class SectionController extends Controller
                 $rules[] = 'nullable|string';
         }
 
-        if (! empty($field['required'])) {
+        // Only make required if it's not an image field or if it's a new image
+        if (! empty($field['required']) && !in_array($field['type'], ['image', 'photo'])) {
             $rules[0] = str_replace('nullable', 'required', $rules[0]);
         }
 
@@ -249,10 +253,28 @@ class SectionController extends Controller
     {
         $processedFields = [];
 
+        // First, get all existing data from the section
+        if ($request->section) {
+            $existingData = $request->section->additional_fields;
+            foreach ($configFields as $key => $config) {
+                if (!isset($fields[$key])) {
+                    $processedFields[$key] = $existingData[$key] ?? null;
+                }
+            }
+        }
+
+        // Then process the fields that are being updated
         foreach ($configFields as $key => $config) {
             switch ($config['type']) {
                 case 'repeater':
-                    $processedFields[$key] = $this->processRepeaterField($request, $fields[$key] ?? [], $config);
+                    if (isset($fields[$key])) {
+
+                        $processedFields[$key] = $this->processRepeaterField($request, $fields[$key], $config, $key);
+                    } else {
+
+                        // Keep existing repeater data if not provided in request
+                        $processedFields[$key] = $request->section->additional_fields[$key] ?? [];
+                    }
                     break;
 
                 case 'image':
@@ -282,28 +304,34 @@ class SectionController extends Controller
         return $processedFields;
     }
 
-    protected function processRepeaterField(Request $request, array $repeaterData, array $config)
+    protected function processRepeaterField(Request $request, array $repeaterData, array $config, string $fieldKey)
     {
+
         $processed = [];
 
-        if (! empty($repeaterData)) {
-            foreach ($repeaterData as $index => $item) {
-                $processedItem = [];
-                foreach ($config['fields'] as $fieldKey => $fieldConfig) {
-                    if ($fieldConfig['type'] === 'image') {
-                        if (isset($item[$fieldKey]) && $item[$fieldKey] instanceof \Illuminate\Http\UploadedFile) {
-                            $processedItem[$fieldKey] = $item[$fieldKey]->store('sections', 'public');
-                        } else {
-                            // Keep existing image if no new one uploaded
-                            $processedItem[$fieldKey] = $request->input("old_{$fieldKey}_{$index}") ??
-                                ($request->section->additional_fields[$fieldKey][$index][$fieldKey] ?? null);
-                        }
+        // If no new data is provided, keep the existing data
+        if (empty($repeaterData) && $request->section) {
+            return $request->section->additional_fields[$fieldKey] ?? [];
+        }
+
+        foreach ($repeaterData as $index => $item) {
+
+            $processedItem = [];
+            foreach ($config['fields'] as $repeaterFieldKey => $fieldConfig) {
+                if ($fieldConfig['type'] === 'image') {
+                    if (isset($item[$repeaterFieldKey]) && $item[$repeaterFieldKey] instanceof \Illuminate\Http\UploadedFile) {
+                        $processedItem[$repeaterFieldKey] = $item[$repeaterFieldKey]->store('sections', 'public');
                     } else {
-                        $processedItem[$fieldKey] = $item[$fieldKey] ?? null;
+                        // Keep existing image if no new one uploaded
+                        $oldImageKey = "old_{$repeaterFieldKey}_{$index}";
+                        $processedItem[$repeaterFieldKey] = $request->input($oldImageKey) ??
+                            ($request->section->additional_fields[$fieldKey][$index][$repeaterFieldKey] ?? null);
                     }
+                } else {
+                    $processedItem[$repeaterFieldKey] = $item[$repeaterFieldKey] ?? null;
                 }
-                $processed[] = $processedItem;
             }
+            $processed[] = $processedItem;
         }
 
         return $processed;
