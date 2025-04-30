@@ -226,7 +226,7 @@ class PageService
 
     public function getRentalResale()
     {
-        return RentalResale::orderBy('created_at', 'desc')->with('amount')->paginate(10);
+        return RentalResale::orderBy('created_at', 'desc')->with('amount')->with('locations')->paginate(10);
     }
 
     public function getRentalResaleBySlug($slug)
