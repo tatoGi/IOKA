@@ -180,32 +180,68 @@
     </div>
 @endsection
 
-@section('scripts')
+@push('scripts')
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
         $(document).ready(function() {
-            $('#rental_listings').select2();
-            $('#offplan_listings').select2();
-            $('.tags').select2({
-                tags: true,
-                tokenSeparators: [','],
-                placeholder: 'Type or select tags',
-                allowClear: true,
-                theme: 'default',
-                width: '100%',
-                minimumInputLength: 1,
-                createTag: function(params) {
-                    if (params.term.trim() === '') {
-                        return null;
+            // Debug jQuery and Select2 availability
+            console.log('jQuery version:', $.fn.jquery);
+            console.log('Select2 version:', $.fn.select2.amd.require.version);
+
+            // Initialize Select2 for rental listings
+            try {
+                const rentalSelect = $('#rental_listings');
+                console.log('Rental select element:', rentalSelect.length);
+                rentalSelect.select2({
+                    width: '100%',
+                    placeholder: 'Select rental listings',
+                    dropdownParent: rentalSelect.parent()
+                });
+            } catch (error) {
+                console.error('Error initializing rental listings select2:', error);
+            }
+
+            // Initialize Select2 for offplan listings
+            try {
+                const offplanSelect = $('#offplan_listings');
+                console.log('Offplan select element:', offplanSelect.length);
+                offplanSelect.select2({
+                    width: '100%',
+                    placeholder: 'Select offplan listings',
+                    dropdownParent: offplanSelect.parent()
+                });
+            } catch (error) {
+                console.error('Error initializing offplan listings select2:', error);
+            }
+
+            // Initialize Select2 for tags
+            try {
+                const tagsSelect = $('.tags');
+                console.log('Tags select element:', tagsSelect.length);
+                tagsSelect.select2({
+                    tags: true,
+                    tokenSeparators: [','],
+                    placeholder: 'Type or select tags',
+                    allowClear: true,
+                    theme: 'default',
+                    width: '100%',
+                    minimumInputLength: 1,
+                    dropdownParent: tagsSelect.parent(),
+                    createTag: function(params) {
+                        if (params.term.trim() === '') {
+                            return null;
+                        }
+                        return {
+                            id: params.term,
+                            text: params.term,
+                            newTag: true
+                        };
                     }
-                    return {
-                        id: params.term,
-                        text: params.term,
-                        newTag: true
-                    };
-                }
-            });
+                });
+            } catch (error) {
+                console.error('Error initializing tags select2:', error);
+            }
 
             // Add more photo inputs
             $('#add-photo').click(function() {
@@ -264,4 +300,4 @@
             });
         });
     </script>
-@endsection
+@endpush

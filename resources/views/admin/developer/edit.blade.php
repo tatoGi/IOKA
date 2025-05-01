@@ -158,31 +158,52 @@
     </div>
 @endsection
 
-@section('scripts')
+@push('scripts')
     <script>
         $(document).ready(function() {
-    $('#rental_listings, #offplan_listings, .tags').select2({
-        tags: true,
-        tokenSeparators: [','],
-        placeholder: 'Type or select tags',
-        allowClear: true,
-        theme: 'default',
-        width: '100%',
-        minimumInputLength: 1,
-        createTag: function(params) {
-            if (params.term.trim() === '') {
-                return null;
-            }
-            return {
-                id: params.term,
-                text: params.term,
-                newTag: true
-            };
-        }
-    });
-});
+            // Initialize Select2 for all select elements
+            try {
+                // Initialize rental listings
+                $('#rental_listings').select2({
+                    tags: true,
+                    tokenSeparators: [','],
+                    placeholder: 'Select rental listings',
+                    allowClear: true,
+                    width: '100%'
+                });
 
-        $(document).ready(function() {
+                // Initialize offplan listings
+                $('#offplan_listings').select2({
+                    tags: true,
+                    tokenSeparators: [','],
+                    placeholder: 'Select offplan listings',
+                    allowClear: true,
+                    width: '100%'
+                });
+
+                // Initialize tags
+                $('.tags').select2({
+                    tags: true,
+                    tokenSeparators: [','],
+                    placeholder: 'Type or select tags',
+                    allowClear: true,
+                    width: '100%',
+                    minimumInputLength: 1,
+                    createTag: function(params) {
+                        if (params.term.trim() === '') {
+                            return null;
+                        }
+                        return {
+                            id: params.term,
+                            text: params.term,
+                            newTag: true
+                        };
+                    }
+                });
+            } catch (error) {
+                console.error('Error initializing Select2:', error);
+            }
+
             $('#add-photo').click(function() {
                 $('#photo-container').append(`
                     <div class="photo-input-group mb-3">
@@ -278,4 +299,4 @@
             }
         });
     </script>
-@endsection
+@endpush
