@@ -135,8 +135,8 @@
     </div>
 @endsection
 
-@section('scripts')
+@push('scripts')
     <script src="{{ asset('storage/admin/assets/blogpost.js') }}"></script>
-@endsection
+@endpush
 
 

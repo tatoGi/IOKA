@@ -146,7 +146,7 @@
     </div>
 @endsection
 
-@section('scripts')
+@push('scripts')
     <script src="{{ asset('storage/admin/assets/blogpost.js') }}"></script>
     <script>
         document.getElementById('remove-image-btn').addEventListener('click', function() {
@@ -195,4 +195,4 @@
             }
         });
     </script>
-@endsection
+@endpush
