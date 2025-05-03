@@ -53,6 +53,11 @@ return [
                             'label' => 'Image',
                             'required' => true,
                         ],
+                        'alt_text' => [
+                            'type' => 'text',
+                            'label' => 'Image Alt Text',
+                            'required' => true,
+                        ],
                     ],
                 ],
                 'number_boxes' => [

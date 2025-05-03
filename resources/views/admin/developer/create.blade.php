@@ -74,7 +74,7 @@
                     <div id="photo-container">
                         <div class="photo-input-group mb-3">
                             <input type="file" name="photo[][file]" class="form-control">
-                            <input type="text" name="photo[][alt]" class="form-control mt-2" placeholder="Alt text for this photo">
+                            <input type="text" name="photo[][alt]" class="form-control mt-2" placeholder="Alt text for this photo" required>
                             <button type="button" class="btn btn-danger btn-sm mt-2 remove-photo">Remove</button>
                         </div>
                     </div>
@@ -88,6 +88,7 @@
                 <div class="form-group mb-3">
                     <label for="logo">Logo <span class="text-danger">*</span></label>
                     <input type="file" name="logo" id="logo" class="form-control mt-2" required>
+                    <input type="text" name="logo_alt" class="form-control mt-2" placeholder="Alt text for logo">
                     @error('logo')
                         <div class="text-danger">{{ $message }}</div>
                     @enderror
@@ -97,30 +98,9 @@
                 <div class="form-group mb-3">
                     <label for="awards">Awards</label>
                     <div id="awards-container">
-                        <div class="award-input-group mb-3">
-                            <div class="form-group">
-                                <label for="award_title">Award Title</label>
-                                <input type="text" name="awards[0][title]" class="form-control" value="{{ old('awards.0.title') }}">
-                            </div>
-                            <div class="form-group">
-                                <label for="award_year">Award Year</label>
-                                <input type="text" name="awards[0][year]" class="form-control" value="{{ old('awards.0.year') }}">
-                            </div>
-                            <div class="form-group">
-                                <label for="award_description">Award Description</label>
-                                <textarea name="awards[0][description]" class="form-control editor">{{ old('awards.0.description') }}</textarea>
-                            </div>
-                            <div class="form-group">
-                                <label for="award_photo">Award Photo</label>
-                                <input type="file" name="awards[0][photo]" class="form-control">
-                            </div>
-                            <button type="button" class="btn btn-danger btn-sm remove-award">Remove</button>
-                        </div>
+                        <!-- Awards will be added here dynamically -->
                     </div>
-                    @error('awards')
-                        <div class="text-danger">{{ $message }}</div>
-                    @enderror
-                    <button type="button" id="add-award" class="btn btn-secondary">Add Another Award</button>
+                    <button type="button" id="add-award" class="btn btn-secondary">Add Award</button>
                 </div>
 
                 <!-- Tags Field -->
@@ -174,7 +154,7 @@
                 </div>
 
                 <!-- Submit Button -->
-                <button type="submit" class="btn btn-primary">Save</button>
+                <button type="submit" class="btn btn-primary">Create Developer</button>
             </form>
         </div>
     </div>
@@ -248,7 +228,7 @@
                 $('#photo-container').append(`
                     <div class="photo-input-group mb-3">
                         <input type="file" name="photo[][file]" class="form-control">
-                        <input type="text" name="photo[][alt]" class="form-control mt-2" placeholder="Alt text for this photo">
+                        <input type="text" name="photo[][alt]" class="form-control mt-2" placeholder="Alt text for this photo" required>
                         <button type="button" class="btn btn-danger btn-sm mt-2 remove-photo">Remove</button>
                     </div>
                 `);
@@ -259,44 +239,43 @@
                 $(this).closest('.photo-input-group').remove();
             });
 
-            // Add more award inputs
-            let awardIndex = 1; // Start from 1 since the first award is already present
+            let awardIndex = 0;
 
             $('#add-award').click(function() {
                 $('#awards-container').append(`
-                    <div class="award-input-group mb-3">
-                        <div class="form-group">
-                            <label for="award_title">Award Title</label>
-                            <input type="text" name="awards[${awardIndex}][title]" class="form-control">
+                    <div class="award-item mb-3">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label>Award Title</label>
+                                <input type="text" name="awards[${awardIndex}][title]" class="form-control" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label>Award Year</label>
+                                <input type="number" name="awards[${awardIndex}][year]" class="form-control" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label>Award Description</label>
+                                <textarea name="awards[${awardIndex}][description]" class="form-control editor"></textarea>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label for="award_year">Award Year</label>
-                            <input type="text" name="awards[${awardIndex}][year]" class="form-control">
+                        <div class="row mt-2">
+                            <div class="col-md-6">
+                                <label>Award Photo</label>
+                                <input type="file" name="awards[${awardIndex}][photo]" class="form-control">
+                            </div>
+                            <div class="col-md-6">
+                                <label>Photo Alt Text</label>
+                                <input type="text" name="awards[${awardIndex}][photo_alt]" class="form-control" placeholder="Alt text for award photo">
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label for="award_description">Award Description</label>
-                            <textarea name="awards[${awardIndex}][description]" class="form-control editor"></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label for="award_photo">Award Photo</label>
-                            <input type="file" name="awards[${awardIndex}][photo]" class="form-control">
-                        </div>
-                        <button type="button" class="btn btn-danger btn-sm remove-award">Remove</button>
+                        <button type="button" class="btn btn-danger btn-sm mt-2 remove-award">Remove Award</button>
                     </div>
                 `);
-
-                // Reinitialize TinyMCE for the new textarea
-                tinymce.init({
-                    selector: '.editor',
-                    // Add other TinyMCE configuration options here
-                });
-
-                awardIndex++; // Increment the index for the next award
+                awardIndex++;
             });
 
-            // Remove award input group
             $(document).on('click', '.remove-award', function() {
-                $(this).closest('.award-input-group').remove();
+                $(this).closest('.award-item').remove();
             });
         });
     </script>

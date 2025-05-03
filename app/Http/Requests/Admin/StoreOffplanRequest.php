@@ -51,6 +51,13 @@ class StoreOffplanRequest extends FormRequest
             'location_id' => 'required|exists:locations,id',
             'agent_languages' => 'nullable|array',
             'agent_languages.*' => 'string',
+            // Alt text validation rules
+            'main_photo_alt' => 'nullable|string|max:255',
+            'banner_photo_alt' => 'nullable|string|max:255',
+            'exterior_gallery_alt.*' => 'nullable|string|max:255',
+            'interior_gallery_alt.*' => 'nullable|string|max:255',
+            'qr_photo_alt' => 'nullable|string|max:255',
+            'agent_image_alt' => 'nullable|string|max:255',
         ];
     }
 

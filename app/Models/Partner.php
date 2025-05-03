@@ -10,5 +10,6 @@ class Partner extends Model
         'title',
         'image',
         'url',
+        'alt',
     ];
 }

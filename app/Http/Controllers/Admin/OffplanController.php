@@ -87,6 +87,7 @@ class OffplanController extends Controller
 
     public function update(StoreOffplanRequest $request, $id)
     {
+
         $offplan = Offplan::findOrFail($id);
         $data = $request->validated();
 

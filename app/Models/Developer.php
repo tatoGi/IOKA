@@ -17,6 +17,7 @@ class Developer extends Model
         'whatsapp',
         'photo',
         'logo',
+        'logo_alt',
         'rental_listings',
         'offplan_listings',
         'tags',

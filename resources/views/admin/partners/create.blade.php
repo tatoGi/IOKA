@@ -36,6 +36,17 @@
                         @enderror
                     </div>
 
+                    <!-- Alt Text Field -->
+                    <div class="mb-3">
+                        <label for="alt" class="form-label">Image Alt Text</label>
+                        <input type="text" id="alt" name="alt"
+                            class="form-control @error('alt') is-invalid @enderror" value="{{ old('alt') }}"
+                            placeholder="Enter descriptive text for the image">
+                        @error('alt')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
                     <!-- URL Field -->
                     <div class="mb-3">
                         <label for="url" class="form-label">Partner URL</label>

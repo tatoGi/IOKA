@@ -35,7 +35,7 @@
                         @if ($partner->image)
                             <div class="mt-2">
                                 <!-- Image Display with small view -->
-                                <img src="{{ Storage::url($partner->image) }}" alt="{{ $partner->title }}"
+                                <img src="{{ Storage::url($partner->image) }}" alt="{{ $partner->alt ?? $partner->title }}"
                                     class="img-fluid mb-2 rounded-lg" style="max-height: 100px; object-fit: cover;">
 
                                 <!-- Button to delete the current image -->
@@ -47,6 +47,18 @@
                             </div>
                         @endif
                         @error('image')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <!-- Alt Text Field -->
+                    <div class="mb-3">
+                        <label for="alt" class="form-label">Image Alt Text</label>
+                        <input type="text" id="alt" name="alt"
+                            class="form-control @error('alt') is-invalid @enderror"
+                            value="{{ old('alt', $partner->alt) }}"
+                            placeholder="Enter descriptive text for the image">
+                        @error('alt')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>

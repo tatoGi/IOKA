@@ -27,6 +27,7 @@ class PartnerController extends Controller
             'title' => 'required|max:255',
             'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
             'url' => 'nullable|url',
+            'alt' => 'nullable|max:255',
         ]);
 
         if ($request->hasFile('image')) {
@@ -51,6 +52,7 @@ class PartnerController extends Controller
             'title' => 'required|max:255',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'url' => 'nullable|url',
+            'alt' => 'nullable|max:255',
         ]);
 
         if ($request->hasFile('image')) {

@@ -12,14 +12,25 @@ class OffplanService
     public function handleFileUploads(Request $request, array &$data): void
     {
         try {
+            $altTexts = [];
+
+            // Handle main photo and its alt text
             if ($request->hasFile('main_photo')) {
                 $data['main_photo'] = $request->file('main_photo')->store('offplan_main_photos', 'public');
             }
+            if ($request->has('main_photo_alt')) {
+                $altTexts['main_photo'] = $request->input('main_photo_alt');
+            }
 
+            // Handle banner photo and its alt text
             if ($request->hasFile('banner_photo')) {
                 $data['banner_photo'] = $request->file('banner_photo')->store('offplan_banner_photos', 'public');
             }
+            if ($request->has('banner_photo_alt')) {
+                $altTexts['banner_photo'] = $request->input('banner_photo_alt');
+            }
 
+            // Handle exterior gallery and its alt texts
             if ($request->hasFile('exterior_gallery')) {
                 $exteriorGallery = [];
                 foreach ($request->file('exterior_gallery') as $file) {
@@ -27,7 +38,11 @@ class OffplanService
                 }
                 $data['exterior_gallery'] = $exteriorGallery;
             }
+            if ($request->has('exterior_gallery_alt')) {
+                $altTexts['exterior_gallery'] = $request->input('exterior_gallery_alt');
+            }
 
+            // Handle interior gallery and its alt texts
             if ($request->hasFile('interior_gallery')) {
                 $interiorGallery = [];
                 foreach ($request->file('interior_gallery') as $file) {
@@ -35,13 +50,29 @@ class OffplanService
                 }
                 $data['interior_gallery'] = $interiorGallery;
             }
+            if ($request->has('interior_gallery_alt')) {
+                $altTexts['interior_gallery'] = $request->input('interior_gallery_alt');
+            }
 
+            // Handle QR photo and its alt text
             if ($request->hasFile('qr_photo')) {
                 $data['qr_photo'] = $request->file('qr_photo')->store('offplan_qr_photos', 'public');
             }
+            if ($request->has('qr_photo_alt')) {
+                $altTexts['qr_photo'] = $request->input('qr_photo_alt');
+            }
 
+            // Handle agent image and its alt text
             if ($request->hasFile('agent_image')) {
                 $data['agent_image'] = $request->file('agent_image')->store('offplan_agent_images', 'public');
+            }
+            if ($request->has('agent_image_alt')) {
+                $altTexts['agent_image'] = $request->input('agent_image_alt');
+            }
+
+            // Store alt texts in the data array if we have any
+            if (!empty($altTexts)) {
+                $data['alt_texts'] = $altTexts;
             }
         } catch (\Exception $e) {
             Log::error('File upload failed: ' . $e->getMessage());

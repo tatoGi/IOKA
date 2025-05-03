@@ -40,8 +40,9 @@ class DeveloperController extends Controller
             'phone' => 'required|string|max:20',
             'whatsapp' => 'required|string|max:20',
             'photo.*.file' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'photo.*.alt' => 'nullable|string|max:255',
+            'photo.*.alt' => 'required|string|max:255',
             'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'logo_alt' => 'required|string|max:255',
             'tags' => 'nullable|array',
             'tags.*' => 'string|max:255',
             'rental_listings' => 'nullable|array',
@@ -51,29 +52,13 @@ class DeveloperController extends Controller
             'awards' => 'nullable|array',
         ]);
 
-        // Add conditional validation for awards
-        if ($request->has('awards')) {
-            foreach ($request->awards as $index => $award) {
-                // Only validate if both title and year are present
-                if (! empty($award['title']) && ! empty($award['year'])) {
-                    $validator->sometimes("awards.$index.title", 'required|string|max:255', function ($input) {
-                        return true;
-                    });
-
-                    $validator->sometimes("awards.$index.year", 'required|integer|min:1900|max:'.date('Y'), function ($input) {
-                        return true;
-                    });
-                }
-            }
-        }
-
         // Validate the request
         $validator->validate();
 
         // Handle multiple photo uploads with alt text
         $photos = [];
         if ($request->has('photo')) {
-            foreach ($request->photo as $photo) {
+            foreach ($request->photo as $index => $photo) {
                 if (isset($photo['file'])) {
                     $path = $photo['file']->store('photos', 'public');
                     $photos[] = [
@@ -83,10 +68,12 @@ class DeveloperController extends Controller
                 }
             }
         }
+
         $logoPath = null;
         if ($request->hasFile('logo')) {
             $logoPath = $request->file('logo')->store('developer_logos', 'public');
         }
+
         // Create the developer
         $developer = Developer::create([
             'title' => $request->input('title'),
@@ -96,23 +83,13 @@ class DeveloperController extends Controller
             'whatsapp' => $request->input('whatsapp'),
             'photo' => json_encode($photos),
             'logo' => $logoPath,
+            'logo_alt' => $request->input('logo_alt'),
             'tags' => json_encode($request->input('tags')),
             'rental_listings' => json_encode($request->input('rental_listings')),
             'offplan_listings' => json_encode($request->input('offplan_listings')),
         ]);
 
-        // Attach rental listings
-        if ($request->has('rental_listings')) {
-            $developer->rentalResaleListings()->sync($request->input('rental_listings'));
-        }
-
-        // Attach offplan listings
-        if ($request->has('offplan_listings')) {
-            $developer->offplanListings()->sync($request->input('offplan_listings'));
-        }
-
         // Handle awards
-        $awards = [];
         if ($request->has('awards')) {
             foreach ($request->awards as $awardData) {
                 if (! empty($awardData['title']) && ! empty($awardData['year'])) {
@@ -128,13 +105,18 @@ class DeveloperController extends Controller
                         $award->award_photo = $awardPhotoPath;
                     }
 
-                    $awards[] = $award;
+                    $developer->awards()->save($award);
+
+                    // Save award photo alt text
+                    if (isset($awardData['photo_alt'])) {
+                        $award->photoAlt()->create([
+                            'photo_path' => $award->award_photo,
+                            'alt_text' => $awardData['photo_alt']
+                        ]);
+                    }
                 }
             }
         }
-
-        // Save awards using sync
-        $developer->awards()->saveMany($awards);
 
         return redirect()->route('admin.developer.list')->with('success', 'Developer created successfully!');
     }
@@ -175,8 +157,9 @@ class DeveloperController extends Controller
             'phone' => 'required|string|max:20',
             'whatsapp' => 'required|string|max:20',
             'photo.*.file' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'photo.*.alt' => 'nullable|string|max:255',
+            'photo.*.alt' => 'required|string|max:255',
             'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'logo_alt' => 'required|string|max:255',
             'tags' => 'nullable|array',
             'tags.*' => 'string|max:255',
             'rental_listings' => 'nullable|array',
@@ -184,21 +167,23 @@ class DeveloperController extends Controller
             'offplan_listings' => 'nullable|array',
             'offplan_listings.*' => 'exists:offplans,id',
             'awards' => 'nullable|array',
-            'awards.*.title' => 'required|string|max:255',
-            'awards.*.year' => 'required|integer|min:1900|max:'.date('Y'),
-            'awards.*.description' => 'nullable|string',
-            'awards.*.photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         // Handle multiple photo uploads with alt text
         $photos = json_decode($developer->photo, true) ?? [];
         if ($request->has('photo')) {
-            foreach ($request->photo as $photo) {
+            foreach ($request->photo as $index => $photo) {
                 if (isset($photo['file'])) {
                     $path = $photo['file']->store('photos', 'public');
                     $photos[] = [
                         'file' => $path,
                         'alt' => $photo['alt'] ?? '',
+                    ];
+                } else if (isset($photo['alt'])) {
+                    // If only alt text is updated without new file
+                    $photos[] = [
+                        'file' => $photos[$index]['file'] ?? '',
+                        'alt' => $photo['alt'],
                     ];
                 }
             }
@@ -212,30 +197,6 @@ class DeveloperController extends Controller
                 Storage::delete('public/' . $developer->logo);
             }
             $logoPath = $request->file('logo')->store('developer_logos', 'public');
-        }
-
-        // Update the developer
-        $developer->update([
-            'title' => $request->input('title'),
-            'slug' => $this->generateUniqueSlug($request->input('slug')),
-            'paragraph' => $request->input('paragraph'),
-            'phone' => $request->input('phone'),
-            'whatsapp' => $request->input('whatsapp'),
-            'photo' => json_encode($photos),
-            'logo' => $logoPath,
-            'tags' => json_encode($request->input('tags')),
-            'rental_listings' => json_encode($request->input('rental_listings')),
-            'offplan_listings' => json_encode($request->input('offplan_listings')),
-        ]);
-
-        // Sync rental listings
-        if ($request->has('rental_listings')) {
-            $developer->rentalResaleListings()->sync($request->input('rental_listings'));
-        }
-
-        // Sync offplan listings
-        if ($request->has('offplan_listings')) {
-            $developer->offplanListings()->sync($request->input('offplan_listings'));
         }
 
         // Handle awards update
@@ -263,6 +224,21 @@ class DeveloperController extends Controller
                         }
 
                         $award->save();
+
+                        // Update award photo alt text
+                        if (isset($awardData['photo_alt'])) {
+                            if ($award->photoAlt) {
+                                $award->photoAlt->update([
+                                    'alt_text' => $awardData['photo_alt']
+                                ]);
+                            } else {
+                                $award->photoAlt()->create([
+                                    'photo_path' => $award->award_photo,
+                                    'alt_text' => $awardData['photo_alt']
+                                ]);
+                            }
+                        }
+
                         $existingAwards->forget($awardData['id']);
                     } else {
                         // Create new award
@@ -278,6 +254,14 @@ class DeveloperController extends Controller
                         }
 
                         $developer->awards()->save($award);
+
+                        // Save award photo alt text
+                        if (isset($awardData['photo_alt'])) {
+                            $award->photoAlt()->create([
+                                'photo_path' => $award->award_photo,
+                                'alt_text' => $awardData['photo_alt']
+                            ]);
+                        }
                     }
                 }
             }
@@ -292,6 +276,21 @@ class DeveloperController extends Controller
                 }
             }
         }
+
+        // Update the developer
+        $developer->update([
+            'title' => $request->input('title'),
+            'slug' => $this->generateUniqueSlug($request->input('slug')),
+            'paragraph' => $request->input('paragraph'),
+            'phone' => $request->input('phone'),
+            'whatsapp' => $request->input('whatsapp'),
+            'photo' => json_encode($photos),
+            'logo' => $logoPath,
+            'logo_alt' => $request->input('logo_alt'),
+            'tags' => json_encode($request->input('tags')),
+            'rental_listings' => json_encode($request->input('rental_listings')),
+            'offplan_listings' => json_encode($request->input('offplan_listings')),
+        ]);
 
         return redirect()->route('admin.developer.list')->with('success', 'Developer updated successfully!');
     }

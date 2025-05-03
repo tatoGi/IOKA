@@ -109,10 +109,11 @@
                             <label for="main_photo">Main Photo</label>
                             <input type="file" class="form-control" id="main_photo" name="main_photo"
                                 accept="image/*">
+                            <input type="text" class="form-control mt-2" name="main_photo_alt" placeholder="Alt text for main photo" value="{{ $offplan->alt_texts['main_photo'] ?? '' }}">
                             <div id="main_photo_preview" class="uploaded-files">
                                 @if ($offplan->main_photo)
                                     <div class="uploaded-file">
-                                        <img src="{{ asset('storage/' . $offplan->main_photo) }}" alt="Main Photo"
+                                        <img src="{{ asset('storage/' . $offplan->main_photo) }}" alt="{{ $offplan->alt_texts['main_photo'] ?? 'Main Property Photo - ' . $offplan->title }}"
                                             class="img-thumbnail" style="max-width: 100px;">
                                         <button type="button" class="btn btn-danger btn-sm remove-image"
                                             data-id="{{ $offplan->id }}" data-type="main_photo" data-path="{{ $offplan->main_photo }}">Delete</button>
@@ -125,10 +126,11 @@
                         <div class="form-group">
                             <label for="main_photo">Banner</label>
                             <input type="file" class="form-control" id="banner_photo" name="banner_photo">
+                            <input type="text" class="form-control mt-2" name="banner_photo_alt" placeholder="Alt text for banner photo" value="{{ $offplan->alt_texts['banner_photo'] ?? '' }}">
                             <div id="main_photo_preview" class="uploaded-files">
                                 @if ($offplan->banner_photo)
                                     <div class="uploaded-file">
-                                        <img src="{{ asset('storage/' . $offplan->banner_photo) }}" alt="Main Photo"
+                                        <img src="{{ asset('storage/' . $offplan->banner_photo) }}" alt="{{ $offplan->alt_texts['banner_photo'] ?? 'Property Banner - ' . $offplan->title }}"
                                             class="img-thumbnail" style="max-width: 100px;">
                                         <button type="button" class="btn btn-danger btn-sm remove-image"
                                             data-id="{{ $offplan->id }}" data-type="banner_photo" data-path="{{ $offplan->banner_photo }}">Delete</button>
@@ -143,21 +145,24 @@
                             <label for="exterior_gallery">Exterior Gallery</label>
                             <input type="file" class="form-control" id="exterior_gallery" name="exterior_gallery[]"
                                 multiple accept="image/*">
-                                <div id="exterior_gallery_preview" class="uploaded-files">
-                                    @if(!empty($offplan->exterior_gallery))
-                                        @foreach ($offplan->exterior_gallery as $photo)
-                                            <div class="uploaded-file">
-                                                <img src="{{ asset('storage/' . $photo) }}" alt="Exterior Photo"
-                                                    class="img-thumbnail" style="max-width: 100px;">
-                                                <button type="button" class="btn btn-danger btn-sm remove-image"
-                                                    data-id="{{ $offplan->id }}" data-type="exterior_gallery"
-                                                    data-path="{{ $photo }}">Delete</button>
-                                            </div>
-                                        @endforeach
-                                    @else
-                                        <p>No exterior gallery photos available.</p>
-                                    @endif
-                                </div>
+                            <div id="exterior_gallery_preview" class="uploaded-files">
+                                @if(!empty($offplan->exterior_gallery))
+                                    @foreach ($offplan->exterior_gallery as $index => $photo)
+                                        <div class="uploaded-file">
+                                            <img src="{{ asset('storage/' . $photo) }}" alt="{{ $offplan->alt_texts['exterior_gallery'][$index] ?? 'Exterior Photo ' . ($index + 1) . ' - ' . $offplan->title }}"
+                                                class="img-thumbnail" style="max-width: 100px;">
+                                            <input type="text" class="form-control mt-2" name="exterior_gallery_alt[]"
+                                                placeholder="Alt text for exterior photo {{ $index + 1 }}"
+                                                value="{{ $offplan->alt_texts['exterior_gallery'][$index] ?? '' }}">
+                                            <button type="button" class="btn btn-danger btn-sm remove-image"
+                                                data-id="{{ $offplan->id }}" data-type="exterior_gallery"
+                                                data-path="{{ $photo }}">Delete</button>
+                                        </div>
+                                    @endforeach
+                                @else
+                                    <p>No exterior gallery photos available.</p>
+                                @endif
+                            </div>
 
                         </div>
                     </div>
@@ -167,21 +172,24 @@
                             <label for="interior_gallery">Interior Gallery</label>
                             <input type="file" class="form-control" id="interior_gallery" name="interior_gallery[]"
                                 multiple accept="image/*">
-                                <div id="interior_gallery_preview" class="uploaded-files">
-                                    @if(!empty($offplan->interior_gallery))
-                                        @foreach ($offplan->interior_gallery as $photo)
-                                            <div class="uploaded-file">
-                                                <img src="{{ asset('storage/' . $photo) }}" alt="Interior Photo"
-                                                    class="img-thumbnail" style="max-width: 100px;">
-                                                <button type="button" class="btn btn-danger btn-sm remove-image"
-                                                    data-id="{{ $offplan->id }}" data-type="interior_gallery"
-                                                    data-path="{{ $photo }}">Delete</button>
-                                            </div>
-                                        @endforeach
-                                    @else
-                                        <p>No interior gallery photos available.</p>
-                                    @endif
-                                </div>
+                            <div id="interior_gallery_preview" class="uploaded-files">
+                                @if(!empty($offplan->interior_gallery))
+                                    @foreach ($offplan->interior_gallery as $index => $photo)
+                                        <div class="uploaded-file">
+                                            <img src="{{ asset('storage/' . $photo) }}" alt="{{ $offplan->alt_texts['interior_gallery'][$index] ?? 'Interior Photo ' . ($index + 1) . ' - ' . $offplan->title }}"
+                                                class="img-thumbnail" style="max-width: 100px;">
+                                            <input type="text" class="form-control mt-2" name="interior_gallery_alt[]"
+                                                placeholder="Alt text for interior photo {{ $index + 1 }}"
+                                                value="{{ $offplan->alt_texts['interior_gallery'][$index] ?? '' }}">
+                                            <button type="button" class="btn btn-danger btn-sm remove-image"
+                                                data-id="{{ $offplan->id }}" data-type="interior_gallery"
+                                                data-path="{{ $photo }}">Delete</button>
+                                        </div>
+                                    @endforeach
+                                @else
+                                    <p>No interior gallery photos available.</p>
+                                @endif
+                            </div>
 
 
                         </div>
@@ -248,10 +256,11 @@
             <div class="form-group mt-3">
                 <label for="qr_photo">QR Photo</label>
                 <input type="file" class="form-control" id="qr_photo" name="qr_photo" accept="image/*">
+                <input type="text" class="form-control mt-2" name="qr_photo_alt" placeholder="Alt text for QR photo" value="{{ $offplan->alt_texts['qr_photo'] ?? '' }}">
                 <div id="qr_photo_preview" class="uploaded-files">
                     @if ($offplan->qr_photo)
                         <div class="uploaded-file">
-                            <img src="{{ asset('storage/' . $offplan->qr_photo) }}" alt="QR Photo" class="img-thumbnail"
+                            <img src="{{ asset('storage/' . $offplan->qr_photo) }}" alt="{{ $offplan->alt_texts['qr_photo'] ?? 'QR Code - ' . $offplan->title }}" class="img-thumbnail"
                                 style="max-width: 100px;">
                             <button type="button" class="btn btn-danger btn-sm remove-image"
                                 data-id="{{ $offplan->id }}" data-type="qr_photo" data-path="{{ $offplan->qr_photo }}">Delete</button>
@@ -334,10 +343,11 @@
             <div class="form-group mt-3">
                 <label for="agent_image">Agent Image</label>
                 <input type="file" class="form-control" id="agent_image" name="agent_image" accept="image/*">
+                <input type="text" class="form-control mt-2" name="agent_image_alt" placeholder="Alt text for agent photo" value="{{ $offplan->alt_texts['agent_image'] ?? '' }}">
                 <div id="agent_image_preview" class="uploaded-files">
                     @if ($offplan->agent_image)
                         <div class="uploaded-file">
-                            <img src="{{ asset('storage/' . $offplan->agent_image) }}" alt="Agent Image"
+                            <img src="{{ asset('storage/' . $offplan->agent_image) }}" alt="{{ $offplan->alt_texts['agent_image'] ?? 'Agent Photo - ' . $offplan->agent_title }}"
                                 class="img-thumbnail" style="max-width: 100px;">
                             <button type="button" class="btn btn-danger btn-sm remove-image"
                                 data-id="{{ $offplan->id }}" data-type="agent_image" data-path="{{ $offplan->agent_image }}">Delete</button>

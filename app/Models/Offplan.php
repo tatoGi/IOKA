@@ -43,17 +43,19 @@ class Offplan extends Model
         'agent_languages',
         'location',
         'developer_id',
+        'alt_texts',
     ];
 
     protected $casts = [
         'features' => 'array',
+        'amenities' => 'array',
         'near_by' => 'array',
         'exterior_gallery' => 'array',
-        'interior_gallery' => 'array', // Fixed typo
-        'amenities' => 'array',
+        'interior_gallery' => 'array',
+        'agent_languages' => 'array',
+        'alt_texts' => 'array',
         'amount' => 'decimal:2',
         'amount_dirhams' => 'decimal:2',
-        'agent_languages' => 'array',
     ];
 
     public function locations()

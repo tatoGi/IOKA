@@ -114,6 +114,7 @@
                         <div class="mb-3">
                             <label for="main_photo" class="form-label">Main Photo</label>
                             <input type="file" class="form-control" id="main_photo" name="main_photo" accept="image/*">
+                            <input type="text" class="form-control mt-2" name="main_photo_alt" placeholder="Alt text for main photo">
                             <div id="main_photo_preview" class="uploaded-files"></div>
                             <input type="hidden" id="main_photo_path" name="main_photo_path">
                         </div>
@@ -122,6 +123,7 @@
                         <div class="mb-3">
                             <label for="main_photo" class="form-label">Banner</label>
                             <input type="file" class="form-control" id="main_banner" name="main_banner">
+                            <input type="text" class="form-control mt-2" name="banner_photo_alt" placeholder="Alt text for banner photo">
                             <div id="main_banner_preview" class="uploaded-files"></div>
                             <input type="hidden" id="main_banner_path" name="main_banner">
                         </div>
@@ -132,6 +134,7 @@
                             <input type="file" class="form-control" id="exterior_gallery" name="exterior_gallery[]" multiple accept="image/*">
                             <div id="exterior_gallery_preview" class="uploaded-files"></div>
                             <input type="hidden" id="exterior_gallery_paths" name="exterior_gallery_paths">
+                            <input type="hidden" id="exterior_gallery_alt" name="exterior_gallery_alt[]">
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -140,6 +143,7 @@
                             <input type="file" class="form-control" id="interior_gallery" name="interior_gallery[]" multiple accept="image/*">
                             <div id="interior_gallery_preview" class="uploaded-files"></div>
                             <input type="hidden" id="interior_gallery_paths" name="interior_gallery_paths">
+                            <input type="hidden" id="interior_gallery_alt" name="interior_gallery_alt[]">
                         </div>
                     </div>
                 </div>
@@ -197,6 +201,7 @@
                         <div class="mb-3">
                             <label for="qr_photo" class="form-label">QR Photo</label>
                             <input type="file" class="form-control" id="qr_photo" name="qr_photo">
+                            <input type="text" class="form-control mt-2" name="qr_photo_alt" placeholder="Alt text for QR photo">
                             <input type="hidden" id="qr_photo_path" name="qr_photo_path">
                         </div>
                     </div>
@@ -256,6 +261,7 @@
                         <div class="mb-3">
                             <label for="agent_image" class="form-label">Agent Image</label>
                             <input type="file" class="form-control" id="agent_image" name="agent_image" accept="image/*">
+                            <input type="text" class="form-control mt-2" name="agent_image_alt" placeholder="Alt text for agent photo">
                             <div id="agent_image_preview" class="uploaded-files"></div>
                             <input type="hidden" id="agent_image_path" name="agent_image_path">
                         </div>
@@ -308,6 +314,8 @@
             const hiddenInput = document.getElementById(hiddenInputId);
             preview.innerHTML = '';
             let filePaths = [];
+            let altTexts = [];
+
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];
                 const reader = new FileReader();
@@ -315,7 +323,8 @@
                     const fileDiv = document.createElement('div');
                     fileDiv.classList.add('uploaded-file');
                     fileDiv.innerHTML = `
-                        <img src="${e.target.result}" alt="${file.name}" class="img-thumbnail" style="max-width: 100px;">
+                        <img src="${e.target.result}" alt="Property ${file.name}" class="img-thumbnail" style="max-width: 100px;">
+                        <input type="text" class="form-control mt-2" name="${hiddenInputId}[]" placeholder="Alt text for ${file.name}">
                         <button type="button" class="btn btn-danger btn-sm remove-file" onclick="removeFile('${previewId}', ${i})">Remove</button>
                     `;
                     preview.appendChild(fileDiv);

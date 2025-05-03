@@ -64,7 +64,7 @@
                                 <input type="file" name="photo[][file]" class="form-control">
                                 <input type="text" name="photo[][alt]" class="form-control mt-2"
                                     value="{{ $photo['alt'] ?? '' }}" placeholder="Alt text for this photo">
-                                <img src="{{ asset('storage/' . ($photo['file'] ?? '')) }}" class="mt-2" width="100">
+                                <img src="{{ asset('storage/' . ($photo['file'] ?? '')) }}" class="mt-2" width="100" alt="{{ $photo['alt'] ?? '' }}">
                                 <button type="button" class="btn btn-danger remove-photo" data-photo="{{ $photo['file'] }}"
                                     data-developer-id="{{ $developer->id }}">Remove</button>
                             </div>
@@ -76,43 +76,47 @@
                 <div class="form-group mb-3">
                     <label for="logo">Logo</label>
                     <input type="file" name="logo" id="logo" class="form-control">
+                    <input type="text" name="logo_alt" class="form-control mt-2" value="{{ $developer->logo_alt ?? '' }}" placeholder="Alt text for logo">
                     @if (isset($developer) && $developer->logo)
-                        <img src="{{ asset('storage/' . $developer->logo) }}" class="mt-2" width="100">
+                        <img src="{{ asset('storage/' . $developer->logo) }}" class="mt-2" width="100" alt="{{ $developer->logo_alt ?? '' }}">
                     @endif
                 </div>
                 <!-- Awards Section -->
                 <div class="form-group mb-3">
                     <label for="awards">Awards</label>
                     <div id="awards-container">
-                        @foreach ($awards as $index => $award)
-                            <div class="award-input-group mb-3">
-                                <input type="hidden" name="awards[{{ $index }}][id]" value="{{ $award->id }}">
-                                <div class="form-group">
-                                    <label for="award_title">Award Title</label>
-                                    <input type="text" name="awards[{{ $index }}][title]" class="form-control"
-                                        value="{{ $award->award_title }}">
+                        @foreach ($developer->awards as $index => $award)
+                        <div class="award-item mb-3">
+                            <input type="hidden" name="awards[{{ $index }}][id]" value="{{ $award->id }}">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label>Award Title</label>
+                                    <input type="text" name="awards[{{ $index }}][title]" class="form-control" value="{{ $award->award_title }}" required>
                                 </div>
-                                <div class="form-group">
-                                    <label for="award_year">Award Year</label>
-                                    <input type="text" name="awards[{{ $index }}][year]" class="form-control"
-                                        value="{{ $award->award_year }}">
+                                <div class="col-md-4">
+                                    <label>Award Year</label>
+                                    <input type="number" name="awards[{{ $index }}][year]" class="form-control" value="{{ $award->award_year }}" required>
                                 </div>
-                                <div class="form-group">
-                                    <label for="award_description">Award Description</label>
+                                <div class="col-md-4">
+                                    <label>Award Description</label>
                                     <textarea name="awards[{{ $index }}][description]" class="form-control editor">{{ $award->award_description }}</textarea>
                                 </div>
-                                <div class="form-group">
-                                    <label for="award_photo">Award Photo</label>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-md-6">
+                                    <label>Award Photo</label>
                                     <input type="file" name="awards[{{ $index }}][photo]" class="form-control">
-                                    @if ($award->award_photo)
-                                        <img src="{{ asset('storage/' . $award->award_photo) }}" class="mt-2"
-                                            width="100">
+                                    @if($award->award_photo)
+                                        <img src="{{ asset('storage/' . $award->award_photo) }}" alt="{{ $award->photoAlt?->alt_text }}" class="img-thumbnail mt-2" style="max-width: 200px;">
                                     @endif
                                 </div>
-                                <!-- Add a Remove Award button -->
-                                <button type="button" class="btn btn-danger remove-award"
-                                    data-award-id="{{ $award->id }}">Remove Award</button>
+                                <div class="col-md-6">
+                                    <label>Photo Alt Text</label>
+                                    <input type="text" name="awards[{{ $index }}][photo_alt]" class="form-control" value="{{ $award->photoAlt?->alt_text }}" placeholder="Alt text for award photo">
+                                </div>
                             </div>
+                            <button type="button" class="btn btn-danger btn-sm mt-2 remove-award">Remove Award</button>
+                        </div>
                         @endforeach
                     </div>
                     <button type="button" id="add-award" class="btn btn-secondary">Add Another Award</button>
@@ -208,7 +212,8 @@
                 $('#photo-container').append(`
                     <div class="photo-input-group mb-3">
                         <input type="file" name="photo[][file]" class="form-control">
-                        <input type="text" name="photo[][alt]" class="form-control mt-2" placeholder="Alt text for this photo">
+                        <input type="text" name="photo[][alt]" class="form-control mt-2" placeholder="Alt text for this photo" required>
+                        <button type="button" class="btn btn-danger remove-photo">Remove</button>
                     </div>
                 `);
             });
@@ -242,25 +247,33 @@
             });
             // Add more award inputs
             $('#add-award').click(function() {
-                const index = $('#awards-container .award-input-group').length;
+                const index = $('#awards-container .award-item').length;
                 $('#awards-container').append(`
-                    <div class="award-input-group mb-3">
+                    <div class="award-item mb-3">
                         <input type="hidden" name="awards[${index}][id]" value="">
-                        <div class="form-group">
-                            <label for="award_title">Award Title</label>
-                            <input type="text" name="awards[${index}][title]" class="form-control">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label>Award Title</label>
+                                <input type="text" name="awards[${index}][title]" class="form-control">
+                            </div>
+                            <div class="col-md-4">
+                                <label>Award Year</label>
+                                <input type="number" name="awards[${index}][year]" class="form-control">
+                            </div>
+                            <div class="col-md-4">
+                                <label>Award Description</label>
+                                <input type="text" name="awards[${index}][description]" class="form-control">
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label for="award_year">Award Year</label>
-                            <input type="text" name="awards[${index}][year]" class="form-control">
-                        </div>
-                        <div class="form-group">
-                            <label for="award_description">Award Description</label>
-                            <textarea name="awards[${index}][description]" class="form-control editor"></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label for="award_photo">Award Photo</label>
-                            <input type="file" name="awards[${index}][photo]" class="form-control">
+                        <div class="row mt-2">
+                            <div class="col-md-6">
+                                <label>Award Photo</label>
+                                <input type="file" name="awards[${index}][photo]" class="form-control">
+                            </div>
+                            <div class="col-md-6">
+                                <label>Photo Alt Text</label>
+                                <input type="text" name="awards[${index}][photo_alt]" class="form-control" placeholder="Alt text for award photo">
+                            </div>
                         </div>
                     </div>
                 `);
@@ -274,7 +287,7 @@
         });
         $(document).on('click', '.remove-award', function() {
             const awardId = $(this).data('award-id'); // Get the award ID (for backend)
-            const awardGroup = $(this).closest('.award-input-group'); // The award input group to remove
+            const awardGroup = $(this).closest('.award-item'); // The award input group to remove
 
             // If the award has an ID, send an AJAX request to delete it from the database
             if (awardId) {

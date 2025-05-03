@@ -27,6 +27,11 @@ return [
                             'label' => 'Photo',
                             'required' => true,
                         ],
+                        'alt_text' => [
+                            'type' => 'text',
+                            'label' => 'Image Alt Text',
+                            'required' => true,
+                        ],
                     ],
                 ],
 
@@ -62,6 +67,11 @@ return [
                         'image' => [
                             'type' => 'image',
                             'label' => 'Image',
+                            'required' => true,
+                        ],
+                        'alt_text' => [
+                            'type' => 'text',
+                            'label' => 'Image Alt Text',
                             'required' => true,
                         ],
                         'url' => [
@@ -117,6 +127,20 @@ return [
                                     'type' => 'image',
                                     'label' => 'Image Field',
                                     'required' => true,
+                                ],
+                                'alt_text' => [
+                                    'type' => 'text',
+                                    'label' => 'Image Alt Text',
+                                    'required' => false,
+                                    'attributes' => [
+                                        'placeholder' => 'Enter descriptive text for the image',
+                                        'tabindex' => '0'
+                                    ],
+                                    'conditions' => [
+                                        'image_field' => [
+                                            'type' => 'not_empty'
+                                        ]
+                                    ]
                                 ],
                                 'title_one' => [
                                     'type' => 'text',
@@ -179,6 +203,20 @@ return [
                                     'type' => 'image',
                                     'label' => 'Image Field',
                                     'required' => true,
+                                ],
+                                'alt_text' => [
+                                    'type' => 'text',
+                                    'label' => 'Image Alt Text',
+                                    'required' => false,
+                                    'attributes' => [
+                                        'placeholder' => 'Enter descriptive text for the image',
+                                        'tabindex' => '0'
+                                    ],
+                                    'conditions' => [
+                                        'image_field' => [
+                                            'type' => 'not_empty'
+                                        ]
+                                    ]
                                 ],
                                 'title_one' => [
                                     'type' => 'text',
@@ -245,6 +283,20 @@ return [
                                     'type' => 'image',
                                     'label' => 'Image Field',
                                     'required' => true,
+                                ],
+                                'alt_text' => [
+                                    'type' => 'text',
+                                    'label' => 'Image Alt Text',
+                                    'required' => false,
+                                    'attributes' => [
+                                        'placeholder' => 'Enter descriptive text for the image',
+                                        'tabindex' => '0'
+                                    ],
+                                    'conditions' => [
+                                        'image_field' => [
+                                            'type' => 'not_empty'
+                                        ]
+                                    ]
                                 ],
                                 'title_one' => [
                                     'type' => 'text',
@@ -342,6 +394,11 @@ return [
                     'label' => 'Image',
                     'required' => true,
                 ],
+                'alt_text' => [
+                    'type' => 'text',
+                    'label' => 'Image Alt Text',
+                    'required' => true,
+                ],
                 'property_types' => [
                     'type' => 'select',
                     'label' => 'Property Types',
@@ -378,6 +435,11 @@ return [
                         'image' => [
                             'type' => 'image',
                             'label' => 'Team Member Photo',
+                            'required' => true,
+                        ],
+                        'alt_text' => [
+                            'type' => 'text',
+                            'label' => 'Image Alt Text',
                             'required' => true,
                         ],
                         'title' => [
@@ -459,6 +521,11 @@ return [
                             'label' => 'Client Photo',
                             'required' => true,
                         ],
+                        'alt_text' => [
+                            'type' => 'text',
+                            'label' => 'Image Alt Text',
+                            'required' => true,
+                        ],
                         'name' => [
                             'type' => 'text',
                             'label' => 'Client Name',
@@ -484,5 +551,5 @@ return [
             ],
         ],
 
-        ]
+    ]
 ];
