@@ -51,7 +51,7 @@
                 </div>
                 <div class="form-group mb-3">
                     <label for="photo">Photos</label>
-                    <div id="photo-container">
+                    <div id="photo-container" class="row">
                         @php
                             $photos = json_decode($developer->photo, true) ?? [];
                             if (!is_array($photos)) {
@@ -60,17 +60,21 @@
                         @endphp
 
                         @foreach ($photos as $photo)
-                            <div class="photo-input-group mb-3">
-                                <input type="file" name="photo[][file]" class="form-control">
-                                <input type="text" name="photo[][alt]" class="form-control mt-2"
-                                    value="{{ $photo['alt'] ?? '' }}" placeholder="Alt text for this photo">
-                                <img src="{{ asset('storage/' . ($photo['file'] ?? '')) }}" class="mt-2" width="100" alt="{{ $photo['alt'] ?? '' }}">
-                                <button type="button" class="btn btn-danger remove-photo" data-photo="{{ $photo['file'] }}"
-                                    data-developer-id="{{ $developer->id }}">Remove</button>
+                            <div class="col-md-4 mb-3">
+                                <div class="gallery-image-wrapper">
+                                    <img src="{{ asset('storage/' . ($photo['file'] ?? '')) }}" class="img-fluid" alt="{{ $photo['alt'] ?? '' }}">
+                                    <input type="file" name="photo[][file]" class="form-control mt-2">
+                                    <input type="text" name="photo[][alt]" class="form-control mt-2"
+                                        value="{{ $photo['alt'] ?? '' }}" placeholder="Alt text for this photo">
+                                    <button type="button" class="remove-gallery-image" data-photo="{{ $photo['file'] }}"
+                                        data-developer-id="{{ $developer->id }}">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
                             </div>
                         @endforeach
                     </div>
-                    <button type="button" id="add-photo" class="btn btn-secondary">Add Another Photo</button>
+                    <button type="button" id="add-photo" class="btn btn-secondary mt-3">Add Another Photo</button>
                 </div>
 
                 <div class="form-group mb-3">

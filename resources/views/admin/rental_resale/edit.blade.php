@@ -8,6 +8,7 @@
             @csrf
             @method('PUT')
             <input type="hidden" id="postId" value="{{ $rentalResale->id }}">
+            <input type="hidden" name="alt_texts[gallery_images]" id="gallery-alt-texts-input" value="{{ $rentalResale->alt_texts }}">
             @if ($errors->any())
                 <div class="alert alert-danger">
                     <ul>
@@ -153,10 +154,10 @@
                             <div class="amenities-repeater">
                                 <div data-repeater-list="amenities">
                                     @if(isset($rentalResale->amenities))
-                                    @foreach ($rentalResale->amenities as $index => $amenity)
+                                    @foreach ((is_array($rentalResale->amenities) ? $rentalResale->amenities : json_decode($rentalResale->amenities, true)) as $index => $amenity)
                                         <div data-repeater-item class="repeater-item mb-2">
                                             <input type="text" class="form-control mb-2"
-                                                name="amenities[{{ $index }}]" value="{{ implode(', ', $amenity) }}"
+                                                name="amenities[{{ $index }}]" value="{{ is_array($amenity) ? implode(', ', $amenity) : $amenity }}"
                                                 placeholder="Amenity" required>
                                             <button type="button" class="btn btn-danger" data-repeater-delete>
                                                 <i class="fas fa-trash-alt"></i> Remove
@@ -190,10 +191,10 @@
                             <div class="addresses-repeater">
                                 <div data-repeater-list="addresses">
                                     @if(isset($rentalResale->addresses))
-                                    @foreach ($rentalResale->addresses as $index => $address)
+                                    @foreach ((is_array($rentalResale->addresses) ? $rentalResale->addresses : json_decode($rentalResale->addresses, true)) as $index => $address)
                                     <div data-repeater-item class="repeater-item mb-2">
                                         <input type="text" class="form-control mb-2"
-                                        name="addresses[{{ $index }}]" value="{{ implode(', ', $address) }}"
+                                        name="addresses[{{ $index }}]" value="{{ is_array($address) ? implode(', ', $address) : $address }}"
                                         placeholder="Address" required>
                                         <button type="button" class="btn btn-danger" data-repeater-delete>
                                             <i class="fas fa-trash-alt"></i> Remove
@@ -259,7 +260,7 @@
                     </div>
                     <div class="col-md-3">
                         <div class="mb-3">
-                            <label for="qr_photo" class="form-label">Agent Photo</label>
+                            <label for="agent_photo" class="form-label">Agent Photo</label>
                             @if ($rentalResale->agent_photo)
                                 <div class="mb-2">
                                     <img src="{{ asset('storage/' . $rentalResale->agent_photo) }}" alt="agent_photo"
@@ -268,6 +269,9 @@
                                 </div>
                             @endif
                             <input type="file" class="form-control" id="agent_photo" name="agent_photo">
+                            <input type="text" class="form-control mt-2" name="alt_texts[agent_photo]"
+                                   value="{{ json_decode($rentalResale->alt_texts, true)['agent_photo'] ?? '' }}"
+                                   placeholder="Alt text for agent photo">
                         </div>
                     </div>
                     <div class="col-md-3">
@@ -275,10 +279,10 @@
                             <label for="languages" class="form-label">languages</label>
                             <div class="languages-repeater">
                                 <div data-repeater-list="languages">
-                                    @if(isset($rentalResale->languages ))
-                                    @foreach ($rentalResale->languages  as $index => $language)
+                                    @if(isset($rentalResale->languages))
+                                    @foreach ((is_array($rentalResale->languages) ? $rentalResale->languages : json_decode($rentalResale->languages, true)) as $index => $language)
                                     <div data-repeater-item class="repeater-item mb-2">
-                                        <input type="text" class="form-control mb-2" name="languages[{{ $index }}]" value="{{ implode(', ', $language) }}" required>
+                                        <input type="text" class="form-control mb-2" name="languages[{{ $index }}]" value="{{ is_array($language) ? implode(', ', $language) : $language }}" required>
                                         <button type="button" class="btn btn-danger" data-repeater-delete>
                                             <i class="fas fa-trash-alt"></i> Remove
                                         </button>
@@ -357,6 +361,9 @@
             <div class="mb-3">
                 <label for="gallery" class="form-label">Gallery</label>
                 <input type="file" class="form-control" id="gallery" name="gallery_images[]" multiple>
+                <div id="gallery-alt-texts" class="mt-2">
+                    <!-- New gallery images alt text inputs will be added here dynamically -->
+                </div>
                 <button type="button" class="btn btn-primary mt-2" data-bs-toggle="modal"
                     data-bs-target="#galleryModal">Manage Gallery</button>
             </div>
@@ -374,217 +381,113 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div id="gallery-images">
-                        @foreach (json_decode($rentalResale->gallery_images, true) as $image)
-                            <div class="gallery-image-wrapper"
-                                style="display: inline-block; position: relative; margin-right: 10px;">
-                                <img src="{{ asset('storage/' . $image) }}" alt="Gallery Image" class="img-thumbnail"
-                                    style="max-width: 100px;">
-                                <button type="button" class="btn btn-danger btn-sm remove-gallery-image"
-                                    data-image="{{ $image }}"
-                                    style="position: absolute; top: 0; right: 0;">Remove</button>
-                            </div>
-                        @endforeach
+                    <div class="container">
+                        <div id="gallery-images" class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-3">
+                            @foreach (json_decode($rentalResale->gallery_images, true) as $index => $image)
+                                <div class="col gallery-image-wrapper position-relative">
+                                    <button type="button"
+                                        class="btn btn-danger btn-sm remove-gallery-image"
+                                        data-image="{{ $image }}"
+                                        style="position: absolute; top: 10px; left: 10px; z-index: 2;">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                    <div class="card h-100">
+                                        <img src="{{ asset('storage/' . $image) }}" alt="Gallery Image" class="card-img-top">
+                                        <div class="card-body">
+                                            <div class="mb-2">
+                                                <label class="form-label">Alt Text</label>
+                                                @php
+                                                    $altTexts = json_decode($rentalResale->alt_texts, true);
+                                                    $galleryAltTexts = $altTexts['gallery_images'] ?? [];
+                                                    $currentAltText = '';
+
+                                                    if (is_array($galleryAltTexts)) {
+                                                        if (isset($galleryAltTexts[$index])) {
+                                                            $currentAltText = $galleryAltTexts[$index];
+                                                        } elseif (isset($galleryAltTexts['gallery_images'][$index])) {
+                                                            $currentAltText = $galleryAltTexts['gallery_images'][$index];
+                                                        }
+                                                    }
+                                                @endphp
+                                                <input type="text"
+                                                       class="form-control gallery-alt-text"
+                                                       name="alt_texts[gallery_images][{{ $index }}]"
+                                                       value="{{ $currentAltText }}"
+                                                       placeholder="Describe this image">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <div id="modal-gallery-alt-texts">
+                            <!-- New image alt text inputs will be added here -->
+                        </div>
                     </div>
                 </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="save-gallery-changes">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-                <script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const postId = document.getElementById('postId').value;
+            const form = document.querySelector('form');
+            const modal = document.getElementById('galleryModal');
+            const saveChangesBtn = document.getElementById('save-gallery-changes');
+            const galleryAltTextsInput = document.getElementById('gallery-alt-texts-input');
 
-                    document.addEventListener('DOMContentLoaded', function() {
-                                    // Initialize Details Repeater
-                                    $('.details-repeater').repeater({
-                                initEmpty: false, // Ensure one field is present initially
-                                defaultValues: {
-                                    'title': '',
-                                    'info': ''
-                                },
-                                show: function () {
-                                    console.log("New detail field added.");
-                                    $(this).slideDown(); // Animate adding a new field
-                                },
-                                hide: function (deleteElement) {
-                                    console.log("Detail field removed.");
-                                    $(this).slideUp(deleteElement); // Animate removal of field
-                                }
-                            });
+            // Handle save changes button click
+            saveChangesBtn.addEventListener('click', function() {
+                // Collect all alt texts from the modal
+                const altTexts = {
+                    gallery_images: {}
+                };
 
-                        // Initialize Amenities Repeater
-                        $('.amenities-repeater').repeater({
-                            initEmpty: false, // Ensure one field is present initially
-                            defaultValues: {
-                                'amenity': ''
-                            },
-                            show: function () {
-                                $(this).slideDown(); // Animate adding a new field
-                            },
-                            hide: function (deleteElement) {
-                                $(this).slideUp(deleteElement); // Animate removal of field
-                            }
-                        });
-                        $('.languages-repeater').repeater({
-                            initEmpty: false, // Ensure one field is present initially
-                            defaultValues: {
-                                'languages': ''
-                            },
-                            show: function () {
-                                $(this).slideDown(); // Animate adding a new field
-                            },
-                            hide: function (deleteElement) {
-                                $(this).slideUp(deleteElement); // Animate removal of field
-                            }
-                        });
-                        // Initialize Addresses Repeater
-                        $('.addresses-repeater').repeater({
-                            initEmpty: false, // Ensure one field is present initially
-                            defaultValues: {
-                                'address': ''
-                            },
-                            show: function () {
-                                $(this).slideDown(); // Animate adding a new field
-                            },
-                            hide: function (deleteElement) {
-                                $(this).slideUp(deleteElement); // Animate removal of field
-                            }
-                        });
+                // Get existing alt texts
+                let existingAltTexts = {};
+                try {
+                    existingAltTexts = JSON.parse(galleryAltTextsInput.value || '{}');
+                } catch (e) {
+                    console.error('Error parsing existing alt texts:', e);
+                }
 
-                        const postId = {{ $rentalResale->id }};
-
-                        // Remove QR Photo
-                        const removeQrPhotoButton = document.getElementById('remove-qr-photo');
-                        if (removeQrPhotoButton) {
-                            removeQrPhotoButton.addEventListener('click', function() {
-                                fetch(`/ioka_admin/postypes/rental_resale/${postId}/remove-qr-photo`, {
-                                        method: 'DELETE',
-                                        headers: {
-                                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                                        }
-                                    })
-                                    .then(response => response.json())
-                                    .then(data => {
-                                        if (data.success) {
-                                            location.reload();
-                                        }
-                                    })
-                                    .catch(error => console.error('Error:', error));
-                            });
+                // Collect alt texts from the modal
+                document.querySelectorAll('.gallery-alt-text').forEach(input => {
+                    const name = input.getAttribute('name');
+                    const value = input.value;
+                    if (name && value) {
+                        // Extract the index from the name attribute
+                        const match = name.match(/\[(\d+)\]$/);
+                        if (match) {
+                            const index = match[1];
+                            altTexts.gallery_images[index] = value;
                         }
+                    }
+                });
 
-                        // Remove Gallery Image
-                        document.querySelectorAll('.remove-gallery-image').forEach(button => {
-                            button.addEventListener('click', function() {
-                                const image = this.dataset.image;
-                                fetch(`/ioka_admin/postypes/rental_resale/${postId}/remove-gallery-image`, {
-                                        method: 'DELETE',
-                                        headers: {
-                                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                                            'Content-Type': 'application/json'
-                                        },
-                                        body: JSON.stringify({
-                                            image
-                                        })
-                                    })
-                                    .then(response => response.json())
-                                    .then(data => {
-                                        if (data.success) {
-                                            this.closest('.gallery-image-wrapper').remove();
-                                        }
-                                    })
-                                    .catch(error => console.error('Error:', error));
-                            });
-                        });
+                // Merge with existing alt texts
+                const mergedAltTexts = {
+                    ...existingAltTexts,
+                    gallery_images: altTexts.gallery_images
+                };
 
-                        // Upload New Gallery Image
-                        const uploadNewImageButton = document.getElementById('upload-new-image');
-                        if (uploadNewImageButton) {
-                            uploadNewImageButton.addEventListener('click', function() {
-                                const files = document.getElementById('new-gallery-image').files;
-                                const formData = new FormData();
-                                for (let i = 0; i < files.length; i++) {
-                                    formData.append('gallery_images[]', files[i]);
-                                }
-                                fetch(`/ioka_admin/postypes/rental_resale/${postId}/upload-gallery-images`, {
-                                        method: 'POST',
-                                        headers: {
-                                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                                        },
-                                        body: formData
-                                    })
-                                    .then(response => response.json())
-                                    .then(data => {
-                                        if (data.success) {
-                                            loadGalleryImages();
-                                        }
-                                    })
-                                    .catch(error => console.error('Error:', error));
-                            });
-                        }
+                // Update the hidden input value
+                galleryAltTextsInput.value = JSON.stringify(mergedAltTexts);
 
-                        // Load Gallery Images
-                        function loadGalleryImages() {
-                            fetch(`/ioka_admin/postypes/rental_resale/${postId}/gallery-images`, {
-                                    method: 'GET',
-                                    headers: {
-                                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                                    }
-                                })
-                                .then(response => response.json())
-                                .then(data => {
-                                    const galleryImagesContainer = document.getElementById('gallery-images');
-                                    galleryImagesContainer.innerHTML = '';
-                                    data.images.forEach(image => {
-                                        const imageWrapper = document.createElement('div');
-                                        imageWrapper.classList.add('gallery-image-wrapper');
-                                        imageWrapper.style.position = 'relative';
-
-                                        const img = document.createElement('img');
-                                        img.src = `/storage/${image}`;
-                                        img.alt = 'Gallery Image';
-
-                                        const removeButton = document.createElement('button');
-                                        removeButton.classList.add('btn', 'btn-danger', 'btn-sm',
-                                            'remove-gallery-image');
-                                        removeButton.dataset.image = image;
-                                        removeButton.textContent = 'Remove';
-                                        removeButton.addEventListener('click', function() {
-                                            fetch(`/ioka_admin/postypes/rental_resale/${postId}/remove-gallery-image`, {
-                                                    method: 'DELETE',
-                                                    headers: {
-                                                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                                                        'Content-Type': 'application/json'
-                                                    },
-                                                    body: JSON.stringify({
-                                                        image
-                                                    })
-                                                })
-                                                .then(response => response.json())
-                                                .then(data => {
-                                                    if (data.success) {
-                                                        imageWrapper.remove();
-                                                    }
-                                                })
-                                                .catch(error => console.error('Error:', error));
-                                        });
-
-                                        imageWrapper.appendChild(img);
-                                        imageWrapper.appendChild(removeButton);
-                                        galleryImagesContainer.appendChild(imageWrapper);
-                                    });
-                                })
-                                .catch(error => console.error('Error:', error));
-                        }
-
-                        // Load gallery images when modal is shown
-                        const galleryModal = document.getElementById('galleryModal');
-                        if (galleryModal) {
-                            galleryModal.addEventListener('shown.bs.modal', function() {
-                                loadGalleryImages();
-                            });
-                        }
-
-                    });
-                </script>
-
-            @endsection
+                // Close the modal
+                const modalInstance = bootstrap.Modal.getInstance(modal);
+                modalInstance.hide();
+            });
+        });
+    </script>
+@endsection
 
 
 

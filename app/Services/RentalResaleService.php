@@ -171,11 +171,46 @@ class RentalResaleService
 
         // Handle gallery images update
         if ($request->hasFile('gallery_images')) {
-            $galleryImages = $rentalResale->gallery_images ?? [];
+            $galleryImages = is_array($rentalResale->gallery_images) ? $rentalResale->gallery_images : json_decode($rentalResale->gallery_images, true) ?? [];
             foreach ($request->file('gallery_images') as $image) {
                 $galleryImages[] = $image->store('gallery_images', 'public');
             }
-            $validatedData['gallery_images'] = $galleryImages;
+            $validatedData['gallery_images'] = json_encode($galleryImages);
+        }
+
+        // Handle alt texts
+        if ($request->has('alt_texts')) {
+            $altTexts = $request->input('alt_texts');
+            if (is_array($altTexts)) {
+                // Get existing alt texts
+                $existingAltTexts = json_decode($rentalResale->alt_texts, true) ?? [];
+
+                // Handle gallery images alt texts
+                if (isset($altTexts['gallery_images'])) {
+                    if (is_string($altTexts['gallery_images'])) {
+                        // If it's a JSON string, decode it
+                        $galleryAltTexts = json_decode($altTexts['gallery_images'], true);
+                        if ($galleryAltTexts) {
+                            $existingAltTexts['gallery_images'] = $galleryAltTexts;
+                        }
+                    } else {
+                        // If it's already an array, use it directly
+                        $existingAltTexts['gallery_images'] = $altTexts['gallery_images'];
+                    }
+                }
+
+                // Handle agent photo alt text
+                if (isset($altTexts['agent_photo'])) {
+                    $existingAltTexts['agent_photo'] = $altTexts['agent_photo'];
+                }
+
+                // Clean up any nested gallery_images structure
+                if (isset($existingAltTexts['gallery_images']['gallery_images'])) {
+                    $existingAltTexts['gallery_images'] = $existingAltTexts['gallery_images']['gallery_images'];
+                }
+
+                $validatedData['alt_texts'] = json_encode($existingAltTexts);
+            }
         }
 
         // Remove amount fields

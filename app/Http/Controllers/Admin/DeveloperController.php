@@ -172,21 +172,26 @@ class DeveloperController extends Controller
         // Handle multiple photo uploads with alt text
         $photos = json_decode($developer->photo, true) ?? [];
         if ($request->has('photo')) {
+            $newPhotos = [];
             foreach ($request->photo as $index => $photo) {
                 if (isset($photo['file'])) {
+                    // New photo upload
                     $path = $photo['file']->store('photos', 'public');
-                    $photos[] = [
+                    $newPhotos[] = [
                         'file' => $path,
                         'alt' => $photo['alt'] ?? '',
                     ];
                 } else if (isset($photo['alt'])) {
-                    // If only alt text is updated without new file
-                    $photos[] = [
-                        'file' => $photos[$index]['file'] ?? '',
-                        'alt' => $photo['alt'],
-                    ];
+                    // Only updating alt text for existing photo
+                    if (isset($photos[$index])) {
+                        $newPhotos[] = [
+                            'file' => $photos[$index]['file'],
+                            'alt' => $photo['alt'],
+                        ];
+                    }
                 }
             }
+            $photos = $newPhotos;
         }
 
         // Preserve existing logo if no new one is uploaded

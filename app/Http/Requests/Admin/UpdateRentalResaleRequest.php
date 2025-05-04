@@ -41,6 +41,8 @@ class UpdateRentalResaleRequest extends FormRequest
             'gallery_images' => 'sometimes|array',
             'tags' => 'sometimes|array',
             'languages' => 'sometimes|array',
+            'alt_texts' => 'sometimes|array',
+            'alt_texts.*' => 'sometimes|string|max:255',
         ];
     }
 }

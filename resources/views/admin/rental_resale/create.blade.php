@@ -194,6 +194,7 @@
                         <div class="mb-3">
                             <label for="agent_photo" class="form-label">Agent Photo<span class="text-danger">*</span></label>
                             <input type="file" class="form-control" id="agent_photo" name="agent_photo" multiple>
+                            <input type="text" class="form-control mt-2" name="alt_texts[agent_photo]" placeholder="Alt text for agent photo">
                         </div>
                     </div>
                     <div class="col-md-3">
@@ -254,10 +255,9 @@
             <div class="mb-3">
                 <label for="gallery" class="form-label">Gallery<span class="text-danger">*</span></label>
                 <input type="file" class="form-control" id="gallery" name="gallery_images[]" multiple>
-                <button type="button" class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#galleryModal">Manage Gallery</button>
-            </div>
-            <div class="mb-3">
-                <label for="gallery" class="form-label">Gallery<span class="text-danger">*</span></label>
+                <div id="gallery-alt-texts" class="mt-2">
+                    <!-- Alt text inputs will be added here dynamically -->
+                </div>
                 <button type="button" class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#galleryModal">Manage Gallery</button>
             </div>
 
@@ -277,14 +277,39 @@
                     <div id="gallery-images">
                         <!-- Gallery images will be loaded here dynamically -->
                     </div>
+                    <div id="gallery-alt-texts-container" class="mt-3">
+                        <!-- Alt text inputs will be added here dynamically -->
+                    </div>
                 </div>
             </div>
         </div>
-
     </div>
 
     <!-- Hidden element to pass uploadedImages variable -->
     <div id="uploadedImages" style="display: none;">{{ json_encode($uploadedImages ?? []) }}</div>
 
     <script src="{{ asset('storage/admin/assets/rental_resale.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Handle gallery image file input change
+            const galleryInput = document.getElementById('gallery');
+            const galleryAltTexts = document.getElementById('gallery-alt-texts');
+
+            galleryInput.addEventListener('change', function() {
+                galleryAltTexts.innerHTML = ''; // Clear existing alt text inputs
+
+                Array.from(this.files).forEach((file, index) => {
+                    const altTextDiv = document.createElement('div');
+                    altTextDiv.className = 'mb-2';
+                    altTextDiv.innerHTML = `
+                        <input type="text"
+                               class="form-control"
+                               name="alt_texts[gallery_images][${index}]"
+                               placeholder="Alt text for ${file.name}">
+                    `;
+                    galleryAltTexts.appendChild(altTextDiv);
+                });
+            });
+        });
+    </script>
 @endsection

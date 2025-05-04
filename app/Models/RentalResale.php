@@ -41,6 +41,7 @@ class RentalResale extends Model
         'top', // Add 'top' to the fillable attributes
         'languages',
         'subtitle',
+        'alt_texts',
     ];
 
     protected $casts = [
@@ -50,6 +51,7 @@ class RentalResale extends Model
         'gallery_images' => 'array',
         'tags' => 'array',
         'languages' => 'array', // Ensuring JSON is handled properly
+        'alt_texts' => 'array',
     ];
 
     public function amount()
