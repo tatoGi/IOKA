@@ -36,35 +36,64 @@ class BlogPostController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'subtitle' => 'nullable|string|max:255',
-            'body' => 'required',
-            'slug' => 'required|string|max:255|unique:blog_posts,slug',
+            'slug' => 'required|string|max:255|unique:blog_posts',
+            'body' => 'required|string',
             'date' => 'required|date',
-            'show_on_main_page' => 'boolean',
-            'tags' => 'array',
-            'image' => 'nullable|image|max:2048',
-            'banner_image' => 'nullable|image|max:2048',
-            'image_alt' => 'nullable|string|max:255',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'banner_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'banner_image_alt' => 'nullable|string|max:255',
+            'image_alt' => 'nullable|string|max:255',
+            'show_on_main_page' => 'nullable|boolean',
+            'tags' => 'nullable|array',
+            'tags.*' => 'string',
+            // Metadata validation
+            'metadata.meta_title' => 'nullable|string|max:255',
+            'metadata.meta_description' => 'nullable|string',
+            'metadata.meta_keywords' => 'nullable|string',
+            'metadata.og_title' => 'nullable|string|max:255',
+            'metadata.og_description' => 'nullable|string',
+            'metadata.og_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'metadata.twitter_card' => 'nullable|string|in:summary,summary_large_image',
+            'metadata.twitter_title' => 'nullable|string|max:255',
+            'metadata.twitter_description' => 'nullable|string',
+            'metadata.twitter_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $validated['slug'] = $this->generateUniqueSlug($validated['slug']);
-
+        // Handle file uploads for the blog post
         if ($request->hasFile('image')) {
-            $validated['image'] = $request->file('image')->store('blog_images', 'public');
+            $validated['image'] = $request->file('image')->store('blog-images', 'public');
         }
-
         if ($request->hasFile('banner_image')) {
-            $validated['banner_image'] = $request->file('banner_image')->store('blog_banners', 'public');
+            $validated['banner_image'] = $request->file('banner_image')->store('blog-banners', 'public');
         }
 
+        // Create the blog post
         $blogPost = BlogPost::create($validated);
-        $tags = collect($request->tags)->map(function ($tagName) {
-            return Tag::firstOrCreate(['name' => $tagName])->id;
-        });
 
-        $blogPost->tags()->sync($tags);
+        // Handle metadata if provided
+        if ($request->has('metadata')) {
+            $metadata = $request->input('metadata');
 
-        return redirect()->route('blogposts.index')->with('success', 'Blog post created successfully.');
+            // Handle metadata file uploads
+            if ($request->hasFile('og_image')) {
+                $metadata['og_image'] = $request->file('og_image')->store('meta-images/og', 'public');
+            }
+
+            if ($request->hasFile('twitter_image')) {
+                $metadata['twitter_image'] = $request->file('twitter_image')->store('meta-images/twitter', 'public');
+            }
+
+            // Create or update metadata
+            $blogPost->updateMetadata($metadata);
+        }
+
+        // Handle tags
+        if ($request->has('tags')) {
+            $blogPost->syncTags($request->input('tags'));
+        }
+
+        return redirect()->route('blogposts.index')
+            ->with('success', 'Blog post created successfully.');
     }
 
     public function edit(BlogPost $blogPost)
@@ -88,6 +117,17 @@ class BlogPostController extends Controller
             'banner_image' => 'nullable|image|max:2048',
             'image_alt' => 'nullable|string|max:255',
             'banner_image_alt' => 'nullable|string|max:255',
+            // Metadata validation
+            'metadata.meta_title' => 'nullable|string|max:255',
+            'metadata.meta_description' => 'nullable|string',
+            'metadata.meta_keywords' => 'nullable|string',
+            'metadata.og_title' => 'nullable|string|max:255',
+            'metadata.og_description' => 'nullable|string',
+            'metadata.og_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'metadata.twitter_card' => 'nullable|string|in:summary,summary_large_image',
+            'metadata.twitter_title' => 'nullable|string|max:255',
+            'metadata.twitter_description' => 'nullable|string',
+            'metadata.twitter_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         if ($validated['slug'] !== $blogPost->slug) {
@@ -109,6 +149,30 @@ class BlogPostController extends Controller
         }
 
         $blogPost->update($validated);
+
+        // Handle metadata if provided
+        if ($request->has('metadata')) {
+            $metadata = $request->input('metadata');
+
+            // Handle metadata file uploads
+            if ($request->hasFile('og_image')) {
+                if ($blogPost->metadata?->og_image) {
+                    Storage::disk('public')->delete($blogPost->metadata->og_image);
+                }
+                $metadata['og_image'] = $request->file('og_image')->store('meta-images/og', 'public');
+            }
+
+            if ($request->hasFile('twitter_image')) {
+                if ($blogPost->metadata?->twitter_image) {
+                    Storage::disk('public')->delete($blogPost->metadata->twitter_image);
+                }
+                $metadata['twitter_image'] = $request->file('twitter_image')->store('meta-images/twitter', 'public');
+            }
+
+            // Update metadata
+            $blogPost->updateMetadata($metadata);
+        }
+
         $tags = collect($request->tags)->map(function ($tagName) {
             return Tag::firstOrCreate(['name' => $tagName])->id;
         });
@@ -168,5 +232,31 @@ class BlogPostController extends Controller
         }
 
         return $slug;
+    }
+
+    /**
+     * Delete the OG image for the specified blog post.
+     */
+    public function deleteOgImage(BlogPost $blogpost)
+    {
+        if ($blogpost->metadata && $blogpost->metadata->og_image) {
+            Storage::disk('public')->delete($blogpost->metadata->og_image);
+            $blogpost->metadata->update(['og_image' => null]);
+            return response()->json(['success' => true]);
+        }
+        return response()->json(['success' => false, 'message' => 'No OG image found.'], 404);
+    }
+
+    /**
+     * Delete the Twitter image for the specified blog post.
+     */
+    public function deleteTwitterImage(BlogPost $blogpost)
+    {
+        if ($blogpost->metadata && $blogpost->metadata->twitter_image) {
+            Storage::disk('public')->delete($blogpost->metadata->twitter_image);
+            $blogpost->metadata->update(['twitter_image' => null]);
+            return response()->json(['success' => true]);
+        }
+        return response()->json(['success' => false, 'message' => 'No Twitter image found.'], 404);
     }
 }

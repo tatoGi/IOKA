@@ -3,6 +3,7 @@
 use App\Http\Controllers\Website\FrontendController;
 use App\Http\Controllers\Website\PropertySearchController;
 use App\Http\Controllers\Website\SubscriptionController;
+use App\Http\Controllers\Api\MetadataController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -35,5 +36,10 @@ use Illuminate\Support\Facades\Route;
     Route::get('/rental/related', [FrontendController::class, 'getRelatedRental']);
     Route::get('/policies', [FrontendController::class, 'policy']);
     Route::get('/faqs', [FrontendController::class, 'getFAQ']);
-    
+
     Route::get('/searchOffplanLocations', [FrontendController::class, 'searchOffplanLocations']);
+    Route::get('/page-meta/{slug}', [FrontendController::class, 'getPageMeta']);
+
+    // Universal Metadata Endpoint
+    Route::get('/metadata/{type}/{slug?}', [FrontendController::class, 'getDynamicMetadata'])->name('api.metadata.dynamic');
+

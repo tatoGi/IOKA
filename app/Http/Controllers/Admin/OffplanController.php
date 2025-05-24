@@ -6,12 +6,15 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreOffplanRequest;
 use App\Models\Offplan;
 use App\Services\OffplanService;
+use App\Traits\HandlesMetaData;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Location;
 
 class OffplanController extends Controller
 {
+    use HandlesMetaData;
+
     protected $offplanService;
 
     public function __construct(OffplanService $offplanService)
@@ -35,7 +38,11 @@ class OffplanController extends Controller
     public function store(StoreOffplanRequest $request)
     {
         try {
-            $data = $request->validated();
+            $data = $request->validate(array_merge(
+                $request->rules(),
+                $this->getMetadataValidationRules()
+            ));
+
             $data['slug'] = $this->generateUniqueSlug($data['slug']);
 
             // Handle agent languages
@@ -45,6 +52,9 @@ class OffplanController extends Controller
 
             $this->offplanService->handleFileUploads($request, $data);
             $offplan = $this->offplanService->createOffplan($data);
+
+            // Handle metadata
+            $this->handleMetadata($request, $offplan);
 
             return redirect()
                 ->route('admin.offplan.index')
@@ -87,9 +97,11 @@ class OffplanController extends Controller
 
     public function update(StoreOffplanRequest $request, $id)
     {
-
         $offplan = Offplan::findOrFail($id);
-        $data = $request->validated();
+        $data = $request->validate(array_merge(
+            $request->rules(),
+            $this->getMetadataValidationRules()
+        ));
 
         // Check if the slug has changed
         if ($request->has('slug') && $request->input('slug') !== $offplan->slug) {
@@ -109,15 +121,53 @@ class OffplanController extends Controller
         $this->offplanService->handleFileUploads($request, $data);
         $this->offplanService->updateOffplan($offplan, $data);
 
+        // Handle metadata
+        $this->handleMetadata($request, $offplan);
+
         return redirect()->route('admin.offplan.index')->with('success', 'Offplan updated successfully.');
     }
 
     public function destroy($id)
     {
         $offplan = Offplan::findOrFail($id);
+
+        // Delete metadata images if they exist
+        if ($offplan->metadata?->og_image) {
+            Storage::disk('public')->delete($offplan->metadata->og_image);
+        }
+        if ($offplan->metadata?->twitter_image) {
+            Storage::disk('public')->delete($offplan->metadata->twitter_image);
+        }
+
         $offplan->delete();
 
         return redirect()->route('admin.offplan.index')->with('success', 'Offplan deleted successfully.');
+    }
+
+    /**
+     * Delete the OG image for the specified offplan.
+     */
+    public function deleteOgImage(Offplan $offplan)
+    {
+        if ($offplan->metadata && $offplan->metadata->og_image) {
+            Storage::disk('public')->delete($offplan->metadata->og_image);
+            $offplan->metadata->update(['og_image' => null]);
+            return response()->json(['success' => true]);
+        }
+        return response()->json(['success' => false, 'message' => 'No OG image found.'], 404);
+    }
+
+    /**
+     * Delete the Twitter image for the specified offplan.
+     */
+    public function deleteTwitterImage(Offplan $offplan)
+    {
+        if ($offplan->metadata && $offplan->metadata->twitter_image) {
+            Storage::disk('public')->delete($offplan->metadata->twitter_image);
+            $offplan->metadata->update(['twitter_image' => null]);
+            return response()->json(['success' => true]);
+        }
+        return response()->json(['success' => false, 'message' => 'No Twitter image found.'], 404);
     }
 
     public function exteriorGallery()

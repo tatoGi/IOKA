@@ -5,9 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use App\Traits\HasMetaData;
+
 class Developer extends Model
 {
-    use HasFactory;
+    use HasFactory, HasMetaData;
 
     protected $fillable = [
         'title',
@@ -21,6 +23,7 @@ class Developer extends Model
         'rental_listings',
         'offplan_listings',
         'tags',
+        'banner_image',
     ];
 
     protected $casts = [

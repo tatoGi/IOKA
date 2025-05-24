@@ -17,140 +17,161 @@
                     </div>
                 @endif
 
-                <!-- Title Field -->
-                <div class="form-group mb-3">
-                    <label for="title">Title <span class="text-danger">*</span></label>
-                    <input type="text" name="title" id="title" class="form-control" value="{{ old('title') }}" required>
-                    @error('title')
-                        <div class="text-danger">{{ $message }}</div>
-                    @enderror
-                </div>
+                <!-- Nav tabs -->
+                <ul class="nav nav-tabs mb-4" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-bs-toggle="tab" href="#basic-info" role="tab">Basic Information</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" href="#metadata-tab" role="tab">Meta Data</a>
+                    </li>
+                </ul>
 
-                <!-- Slug Field -->
-                <div class="form-group mb-3">
-                    <label for="slug">Slug <span class="text-danger">*</span></label>
-                    <input type="text" name="slug" id="slug" class="form-control" value="{{ old('slug') }}" required>
-                    @error('slug')
-                        <div class="text-danger">{{ $message }}</div>
-                    @enderror
-                </div>
+                <!-- Tab panes -->
+                <div class="tab-content">
+                    <!-- Basic Info Tab -->
+                    <div class="tab-pane active" id="basic-info" role="tabpanel">
+                        <!-- Title Field -->
+                        <div class="form-group mb-3">
+                            <label for="title">Title <span class="text-danger">*</span></label>
+                            <input type="text" name="title" id="title" class="form-control" value="{{ old('title') }}" required>
+                            @error('title')
+                                <div class="text-danger">{{ $message }}</div>
+                            @enderror
+                        </div>
 
-                <!-- Paragraph Field -->
-                <div class="form-group mb-3">
-                    <label for="paragraph">Paragraph <span class="text-danger">*</span></label>
-                    <textarea name="paragraph" id="paragraph" class="form-control editor" required>{{ old('paragraph') }}</textarea>
-                    @error('paragraph')
-                        <div class="text-danger">{{ $message }}</div>
-                    @enderror
-                </div>
+                        <!-- Slug Field -->
+                        <div class="form-group mb-3">
+                            <label for="slug">Slug <span class="text-danger">*</span></label>
+                            <input type="text" name="slug" id="slug" class="form-control" value="{{ old('slug') }}" required>
+                            @error('slug')
+                                <div class="text-danger">{{ $message }}</div>
+                            @enderror
+                        </div>
 
-                <!-- Phone and WhatsApp Fields -->
-                <div class="container mb-3">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="phone">Phone <span class="text-danger">*</span></label>
-                                <input type="text" name="phone" id="phone" class="form-control" value="{{ old('phone') }}" required>
-                                @error('phone')
-                                    <div class="text-danger">{{ $message }}</div>
-                                @enderror
+                        <!-- Paragraph Field -->
+                        <div class="form-group mb-3">
+                            <label for="paragraph">Paragraph <span class="text-danger">*</span></label>
+                            <textarea name="paragraph" id="paragraph" class="form-control editor" required>{{ old('paragraph') }}</textarea>
+                            @error('paragraph')
+                                <div class="text-danger">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <!-- Phone and WhatsApp Fields -->
+                        <div class="container mb-3">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="phone">Phone <span class="text-danger">*</span></label>
+                                        <input type="text" name="phone" id="phone" class="form-control" value="{{ old('phone') }}" required>
+                                        @error('phone')
+                                            <div class="text-danger">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="whatsapp">WhatsApp <span class="text-danger">*</span></label>
+                                        <input type="text" name="whatsapp" id="whatsapp" class="form-control" value="{{ old('whatsapp') }}" required>
+                                        @error('whatsapp')
+                                            <div class="text-danger">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="whatsapp">WhatsApp <span class="text-danger">*</span></label>
-                                <input type="text" name="whatsapp" id="whatsapp" class="form-control" value="{{ old('whatsapp') }}" required>
-                                @error('whatsapp')
-                                    <div class="text-danger">{{ $message }}</div>
-                                @enderror
+
+                        <!-- Photos Field -->
+                        <div class="form-group mb-3">
+                            <label for="photo">Photos <span class="text-danger">*</span></label>
+                            <div id="photo-container">
+                                <div class="photo-input-group mb-3">
+                                    <input type="file" name="photo[][file]" class="form-control">
+                                    <input type="text" name="photo[][alt]" class="form-control mt-2" placeholder="Alt text for this photo" required>
+                                    <button type="button" class="btn btn-danger btn-sm mt-2 remove-photo">Remove</button>
+                                </div>
                             </div>
+                            @error('photo')
+                                <div class="text-danger">{{ $message }}</div>
+                            @enderror
+                            <button type="button" id="add-photo" class="btn btn-secondary">Add Another Photo</button>
+                        </div>
+
+                        <!-- Logo Field -->
+                        <div class="form-group mb-3">
+                            <label for="logo">Logo <span class="text-danger">*</span></label>
+                            <input type="file" name="logo" id="logo" class="form-control mt-2" required>
+                            <input type="text" name="logo_alt" class="form-control mt-2" placeholder="Alt text for logo">
+                            @error('logo')
+                                <div class="text-danger">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <!-- Awards Section -->
+                        <div class="form-group mb-3">
+                            <label for="awards">Awards</label>
+                            <div id="awards-container">
+                                <!-- Awards will be added here dynamically -->
+                            </div>
+                            <button type="button" id="add-award" class="btn btn-secondary">Add Award</button>
+                        </div>
+
+                        <!-- Tags Field -->
+                        <div class="mb-3">
+                            <label for="tags" class="form-label">Tags <span class="text-danger">*</span></label>
+                            <select class="form-control tags" id="tags" name="tags[]" multiple="multiple">
+                                @if (old('tags'))
+                                    @foreach (old('tags') as $tag)
+                                        <option value="{{ $tag }}" selected>{{ $tag }}</option>
+                                    @endforeach
+                                @endif
+                            </select>
+                            @error('tags')
+                                <div class="text-danger">{{ $message }}</div>
+                            @enderror
+                            <small class="form-text text-muted">Type to add new tags or select existing ones. Press Enter or comma to add.</small>
+                        </div>
+
+                        <!-- Rental Listings Field -->
+                        <div class="form-group mb-3">
+                            <label for="rental_listings">Rental Listings <span class="text-danger">*</span></label>
+                            <select name="rental_listings[]" id="rental_listings" class="form-control" multiple>
+                                @if($rentalandresaleListings->isEmpty())
+                                    <option disabled>No available rental listings</option>
+                                @else
+                                    @foreach ($rentalandresaleListings as $listing)
+                                        <option value="{{ $listing->id }}" {{ in_array($listing->id, old('rental_listings', [])) ? 'selected' : '' }}>{{ $listing->title }}</option>
+                                    @endforeach
+                                @endif
+                            </select>
+                            @error('rental_listings')
+                                <div class="text-danger">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <!-- Offplan Listings Field -->
+                        <div class="form-group mb-3">
+                            <label for="offplan_listings">Offplan Listings <span class="text-danger">*</span></label>
+                            <select name="offplan_listings[]" id="offplan_listings" class="form-control" multiple>
+                                @if($offplanListings->isEmpty())
+                                    <option disabled>No available offplan listings</option>
+                                @else
+                                    @foreach ($offplanListings as $listing)
+                                        <option value="{{ $listing->id }}" {{ in_array($listing->id, old('offplan_listings', [])) ? 'selected' : '' }}>{{ $listing->title }}</option>
+                                    @endforeach
+                                @endif
+                            </select>
+                            @error('offplan_listings')
+                                <div class="text-danger">{{ $message }}</div>
+                            @enderror
                         </div>
                     </div>
-                </div>
 
-                <!-- Photos Field -->
-                <div class="form-group mb-3">
-                    <label for="photo">Photos <span class="text-danger">*</span></label>
-                    <div id="photo-container">
-                        <div class="photo-input-group mb-3">
-                            <input type="file" name="photo[][file]" class="form-control">
-                            <input type="text" name="photo[][alt]" class="form-control mt-2" placeholder="Alt text for this photo" required>
-                            <button type="button" class="btn btn-danger btn-sm mt-2 remove-photo">Remove</button>
-                        </div>
+                    <!-- Meta Data Tab -->
+                    <div class="tab-pane" id="metadata-tab" role="tabpanel">
+                        <x-metadata-form :model="new App\Models\Developer" />
                     </div>
-                    @error('photo')
-                        <div class="text-danger">{{ $message }}</div>
-                    @enderror
-                    <button type="button" id="add-photo" class="btn btn-secondary">Add Another Photo</button>
-                </div>
-
-                <!-- Logo Field -->
-                <div class="form-group mb-3">
-                    <label for="logo">Logo <span class="text-danger">*</span></label>
-                    <input type="file" name="logo" id="logo" class="form-control mt-2" required>
-                    <input type="text" name="logo_alt" class="form-control mt-2" placeholder="Alt text for logo">
-                    @error('logo')
-                        <div class="text-danger">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                <!-- Awards Section -->
-                <div class="form-group mb-3">
-                    <label for="awards">Awards</label>
-                    <div id="awards-container">
-                        <!-- Awards will be added here dynamically -->
-                    </div>
-                    <button type="button" id="add-award" class="btn btn-secondary">Add Award</button>
-                </div>
-
-                <!-- Tags Field -->
-                <div class="mb-3">
-                    <label for="tags" class="form-label">Tags <span class="text-danger">*</span></label>
-                    <select class="form-control tags" id="tags" name="tags[]" multiple="multiple">
-                        @if (old('tags'))
-                            @foreach (old('tags') as $tag)
-                                <option value="{{ $tag }}" selected>{{ $tag }}</option>
-                            @endforeach
-                        @endif
-                    </select>
-                    @error('tags')
-                        <div class="text-danger">{{ $message }}</div>
-                    @enderror
-                    <small class="form-text text-muted">Type to add new tags or select existing ones. Press Enter or comma to add.</small>
-                </div>
-
-                <!-- Rental Listings Field -->
-                <div class="form-group mb-3">
-                    <label for="rental_listings">Rental Listings <span class="text-danger">*</span></label>
-                    <select name="rental_listings[]" id="rental_listings" class="form-control" multiple>
-                        @if($rentalandresaleListings->isEmpty())
-                            <option disabled>No available rental listings</option>
-                        @else
-                            @foreach ($rentalandresaleListings as $listing)
-                                <option value="{{ $listing->id }}" {{ in_array($listing->id, old('rental_listings', [])) ? 'selected' : '' }}>{{ $listing->title }}</option>
-                            @endforeach
-                        @endif
-                    </select>
-                    @error('rental_listings')
-                        <div class="text-danger">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                <!-- Offplan Listings Field -->
-                <div class="form-group mb-3">
-                    <label for="offplan_listings">Offplan Listings <span class="text-danger">*</span></label>
-                    <select name="offplan_listings[]" id="offplan_listings" class="form-control" multiple>
-                        @if($offplanListings->isEmpty())
-                            <option disabled>No available offplan listings</option>
-                        @else
-                            @foreach ($offplanListings as $listing)
-                                <option value="{{ $listing->id }}" {{ in_array($listing->id, old('offplan_listings', [])) ? 'selected' : '' }}>{{ $listing->title }}</option>
-                            @endforeach
-                        @endif
-                    </select>
-                    @error('offplan_listings')
-                        <div class="text-danger">{{ $message }}</div>
-                    @enderror
                 </div>
 
                 <!-- Submit Button -->

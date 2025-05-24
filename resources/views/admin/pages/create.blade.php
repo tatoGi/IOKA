@@ -6,67 +6,73 @@
             <div class="card-body">
                 <h4 class="mb-4 text-center">Create New Page</h4>
 
-                <form action="/ioka_admin/menu" method="POST" class="bg-white p-4 rounded">
+                <form action="/ioka_admin/menu" method="POST" class="bg-white p-4 rounded" enctype="multipart/form-data">
                     @csrf
 
-                    <div class="mb-3">
-                        <label for="title" class="form-label">Title</label>
-                        <input type="text" name="title" id="title" value="{{ old('title') }}"
-                            class="form-control @error('title') is-invalid @enderror">
-                        @error('title')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
+                    <!-- Nav tabs -->
+                    <ul class="nav nav-tabs" id="myTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="general-tab" data-bs-toggle="tab"
+                                data-bs-target="#general" type="button" role="tab" aria-controls="general"
+                                aria-selected="true">General</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="metadata-tab-button" data-bs-toggle="tab" data-bs-target="#metadata-tab"
+                                type="button" role="tab" aria-controls="metadata-tab"
+                                aria-selected="false">Metadata</button>
+                        </li>
+                    </ul>
+
+                    <!-- Tab panes -->
+                    <div class="tab-content mt-3">
+                        <div class="tab-pane fade show active" id="general" role="tabpanel"
+                            aria-labelledby="general-tab">
+                            <div class="mb-3">
+                                <label for="title" class="form-label">Title</label>
+                                <input type="text" name="title" id="title" value="{{ old('title') }}"
+                                    class="form-control @error('title') is-invalid @enderror">
+                                @error('title')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="desc" class="form-label">Main Description (for page content)</label>
+                                <textarea name="desc" id="desc" rows="4" class="form-control editor @error('desc') is-invalid @enderror">{{ old('desc') }}</textarea>
+                                @error('desc')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="mb-3">
+                                <label for="type_id" class="form-label">Type</label>
+                                <select name="type_id" id="type_id" class="form-select @error('type_id') is-invalid @enderror">
+                                    <option value="">Select Page Type</option>
+                                    @foreach (Config::get('PageTypes') as $type)
+                                        <option value="{{ $type['id'] }}" {{ old('type_id') == $type['id'] ? 'selected' : '' }}>
+                                            {{ $type['name'] }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('type_id')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="mb-3">
+                                <label for="active" class="form-check-label">Active</label>
+                                <input type="checkbox" name="active" id="active" value="1"
+                                    {{ old('active', 1) ? 'checked' : '' }} class="form-check-input">
+                                @error('active')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <!-- Metadata Tab Pane (from component) -->
+                        @include('components.metadata-tab')
+
                     </div>
 
-                    <div class="mb-3">
-                        <label for="slug" class="form-label">Slug</label>
-                        <input type="text" name="slug" id="slug" value="{{ old('slug') }}"
-                            class="form-control @error('slug') is-invalid @enderror">
-                        @error('slug')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="keywords" class="form-label">Keywords</label>
-                        <input type="text" name="keywords" id="keywords" value="{{ old('keywords') }}"
-                            class="form-control @error('keywords') is-invalid @enderror">
-                        @error('keywords')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="desc" class="form-label">Description</label>
-                        <textarea name="desc" id="desc" rows="4" class="form-control editor @error('desc') is-invalid @enderror">{{ old('desc') }}</textarea>
-                        @error('desc')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                    <div class="mb-3">
-                        <label for="type_id" class="form-label">Type</label>
-                        <select name="type_id" id="type_id" class="form-select @error('type_id') is-invalid @enderror">
-                            <option value="">Select Page Type</option>
-                            @foreach (Config::get('PageTypes') as $type)
-                                <option value="{{ $type['id'] }}" {{ old('type_id') == $type['id'] ? 'selected' : '' }}>
-                                    {{ $type['name'] }}
-                                </option>
-                            @endforeach
-                        </select>
-                        @error('type_id')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                    <div class="mb-3">
-                        <label for="active" class="form-check-label">Active</label>
-                        <input type="checkbox" name="active" id="active" value="1"
-                            {{ old('active', 1) ? 'checked' : '' }} class="form-check-input">
-                        @error('active')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <button type="submit" class="btn btn-primary w-100">Save</button>
+                    <button type="submit" class="btn btn-primary w-100 mt-3">Save</button>
                 </form>
             </div>
         </div>

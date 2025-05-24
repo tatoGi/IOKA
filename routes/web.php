@@ -58,3 +58,15 @@ Route::get('/create-storage-link', function() {
         ], 500);
     }
 })->name('create.storage.link');
+
+// Developer metadata image routes
+Route::delete('admin/developer/{developer}/delete-og-image', [App\Http\Controllers\Admin\DeveloperController::class, 'deleteOgImage'])->name('admin.developer.delete-og-image');
+Route::delete('admin/developer/{developer}/delete-twitter-image', [App\Http\Controllers\Admin\DeveloperController::class, 'deleteTwitterImage'])->name('admin.developer.delete-twitter-image');
+
+// Blog post metadata image routes
+Route::delete('admin/blogposts/{blogpost}/delete-og-image', [App\Http\Controllers\Admin\BlogPostController::class, 'deleteOgImage'])->name('admin.blogposts.delete-og-image');
+Route::delete('admin/blogposts/{blogpost}/delete-twitter-image', [App\Http\Controllers\Admin\BlogPostController::class, 'deleteTwitterImage'])->name('admin.blogposts.delete-twitter-image');
+
+// Rental/Resale metadata image routes
+Route::delete('admin/rental_resale/{postype}/delete-og-image', [App\Http\Controllers\Admin\PostypeController::class, 'deleteOgImage'])->name('admin.rental_resale.delete-og-image');
+Route::delete('admin/rental_resale/{postype}/delete-twitter-image', [App\Http\Controllers\Admin\PostypeController::class, 'deleteTwitterImage'])->name('admin.rental_resale.delete-twitter-image');

@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use App\Traits\HasMetaData;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class RentalResale extends Model
 {
-    use HasFactory;
+    use HasFactory, HasMetaData;
 
     protected $table = 'rental_resale';
 

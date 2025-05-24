@@ -332,6 +332,34 @@ return $result;
             'locations' => $locations
         ]);
     }
+    public function getPageMeta($slug): JsonResponse
+    {
 
+        $page = Page::where('slug', $slug)
+            ->select('meta_title', 'keywords', 'desc')
+            ->first();
 
+        if (!$page) {
+            return response()->json([
+                'error' => 'Page not found'
+            ], 404);
+        }
+
+        return response()->json([
+            'meta_title' => $page->meta_title,
+            'meta_keywords' => $page->keywords,
+            'meta_description' => $page->desc
+        ]);
+    }
+
+    public function getDynamicMetadata(Request $request, $type, $slug = null): JsonResponse
+    {
+        $metadata = $this->pageService->getMetadataByType($type, $slug);
+
+        if (empty($metadata)) {
+            return response()->json(['error' => ucfirst($type) . ' metadata not found'], 404);
+        }
+
+        return response()->json($metadata);
+    }
 }

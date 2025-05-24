@@ -7,12 +7,15 @@ use App\Models\Developer;
 use App\Models\DeveloperAward;
 use App\Models\Offplan;
 use App\Models\RentalResale;
+use App\Traits\HandlesMetaData;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class DeveloperController extends Controller
 {
+    use HandlesMetaData;
+
     public function index()
     {
         $developers = Developer::orderBy('created_at', 'desc')->paginate(10);
@@ -32,8 +35,7 @@ class DeveloperController extends Controller
     // Store a newly created developer in storage
     public function store(Request $request)
     {
-        // Validate the request
-        $validator = Validator::make($request->all(), [
+        $validatedData = $request->validate(array_merge([
             'title' => 'required|string|max:255',
             'slug' => 'required|string|max:255|unique:developers,slug',
             'paragraph' => 'required|string',
@@ -50,10 +52,18 @@ class DeveloperController extends Controller
             'offplan_listings' => 'nullable|array',
             'offplan_listings.*' => 'exists:offplans,id',
             'awards' => 'nullable|array',
-        ]);
+            'name' => 'required|string|max:255',
+            'description' => 'required|string',
+            'banner_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ], $this->getMetadataValidationRules()));
 
-        // Validate the request
-        $validator->validate();
+        if ($request->hasFile('logo')) {
+            $validatedData['logo'] = $request->file('logo')->store('developer_logos', 'public');
+        }
+
+        if ($request->hasFile('banner_image')) {
+            $validatedData['banner_image'] = $request->file('banner_image')->store('developer_banners', 'public');
+        }
 
         // Handle multiple photo uploads with alt text
         $photos = [];
@@ -69,25 +79,10 @@ class DeveloperController extends Controller
             }
         }
 
-        $logoPath = null;
-        if ($request->hasFile('logo')) {
-            $logoPath = $request->file('logo')->store('developer_logos', 'public');
-        }
-
         // Create the developer
-        $developer = Developer::create([
-            'title' => $request->input('title'),
-            'slug' => $this->generateUniqueSlug($request->input('slug')),
-            'paragraph' => $request->input('paragraph'),
-            'phone' => $request->input('phone'),
-            'whatsapp' => $request->input('whatsapp'),
+        $developer = Developer::create(array_merge($validatedData, [
             'photo' => json_encode($photos),
-            'logo' => $logoPath,
-            'logo_alt' => $request->input('logo_alt'),
-            'tags' => json_encode($request->input('tags')),
-            'rental_listings' => json_encode($request->input('rental_listings')),
-            'offplan_listings' => json_encode($request->input('offplan_listings')),
-        ]);
+        ]));
 
         // Handle awards
         if ($request->has('awards')) {
@@ -117,6 +112,9 @@ class DeveloperController extends Controller
                 }
             }
         }
+
+        // Handle metadata
+        $this->handleMetadata($request, $developer);
 
         return redirect()->route('admin.developer.list')->with('success', 'Developer created successfully!');
     }
@@ -149,8 +147,7 @@ class DeveloperController extends Controller
     {
         $developer = Developer::findOrFail($id);
 
-        // Validate the request
-        $request->validate([
+        $validatedData = $request->validate(array_merge([
             'title' => 'required|string|max:255',
             'slug' => 'required|string|max:255|unique:developers,slug,'.$developer->id,
             'paragraph' => 'required|string',
@@ -167,7 +164,22 @@ class DeveloperController extends Controller
             'offplan_listings' => 'nullable|array',
             'offplan_listings.*' => 'exists:offplans,id',
             'awards' => 'nullable|array',
-        ]);
+            'banner_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ], $this->getMetadataValidationRules()));
+
+        if ($request->hasFile('logo')) {
+            if ($developer->logo) {
+                Storage::disk('public')->delete($developer->logo);
+            }
+            $validatedData['logo'] = $request->file('logo')->store('developer_logos', 'public');
+        }
+
+        if ($request->hasFile('banner_image')) {
+            if ($developer->banner_image) {
+                Storage::disk('public')->delete($developer->banner_image);
+            }
+            $validatedData['banner_image'] = $request->file('banner_image')->store('developer_banners', 'public');
+        }
 
         // Handle multiple photo uploads with alt text
         $photos = json_decode($developer->photo, true) ?? [];
@@ -192,16 +204,6 @@ class DeveloperController extends Controller
                 }
             }
             $photos = $newPhotos;
-        }
-
-        // Preserve existing logo if no new one is uploaded
-        $logoPath = $developer->logo;
-        if ($request->hasFile('logo')) {
-            // Delete old logo if exists
-            if ($developer->logo && Storage::exists('public/' . $developer->logo)) {
-                Storage::delete('public/' . $developer->logo);
-            }
-            $logoPath = $request->file('logo')->store('developer_logos', 'public');
         }
 
         // Handle awards update
@@ -283,19 +285,12 @@ class DeveloperController extends Controller
         }
 
         // Update the developer
-        $developer->update([
-            'title' => $request->input('title'),
-            'slug' => $this->generateUniqueSlug($request->input('slug')),
-            'paragraph' => $request->input('paragraph'),
-            'phone' => $request->input('phone'),
-            'whatsapp' => $request->input('whatsapp'),
+        $developer->update(array_merge($validatedData, [
             'photo' => json_encode($photos),
-            'logo' => $logoPath,
-            'logo_alt' => $request->input('logo_alt'),
-            'tags' => json_encode($request->input('tags')),
-            'rental_listings' => json_encode($request->input('rental_listings')),
-            'offplan_listings' => json_encode($request->input('offplan_listings')),
-        ]);
+        ]));
+
+        // Handle metadata
+        $this->handleMetadata($request, $developer);
 
         return redirect()->route('admin.developer.list')->with('success', 'Developer updated successfully!');
     }
@@ -305,6 +300,14 @@ class DeveloperController extends Controller
     {
         $developer = Developer::findOrFail($id);
         $developer->delete();
+
+        // Delete metadata images if they exist
+        if ($developer->metadata?->og_image) {
+            Storage::disk('public')->delete($developer->metadata->og_image);
+        }
+        if ($developer->metadata?->twitter_image) {
+            Storage::disk('public')->delete($developer->metadata->twitter_image);
+        }
 
         return redirect()->route('admin.developer.list');
     }
@@ -379,5 +382,31 @@ class DeveloperController extends Controller
         $award->delete();
 
         return response()->json(['success' => true]);
+    }
+
+    /**
+     * Delete the OG image for the specified developer.
+     */
+    public function deleteOgImage(Developer $developer)
+    {
+        if ($developer->metadata && $developer->metadata->og_image) {
+            Storage::disk('public')->delete($developer->metadata->og_image);
+            $developer->metadata->update(['og_image' => null]);
+            return response()->json(['success' => true]);
+        }
+        return response()->json(['success' => false, 'message' => 'No OG image found.'], 404);
+    }
+
+    /**
+     * Delete the Twitter image for the specified developer.
+     */
+    public function deleteTwitterImage(Developer $developer)
+    {
+        if ($developer->metadata && $developer->metadata->twitter_image) {
+            Storage::disk('public')->delete($developer->metadata->twitter_image);
+            $developer->metadata->update(['twitter_image' => null]);
+            return response()->json(['success' => true]);
+        }
+        return response()->json(['success' => false, 'message' => 'No Twitter image found.'], 404);
     }
 }

@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use App\Traits\HasMetaData;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Offplan extends Model
 {
-    use HasFactory;
+    use HasFactory, HasMetaData;
 
     protected $fillable = [
         'title',
@@ -23,7 +24,7 @@ class Offplan extends Model
         'main_photo',
         'banner_photo',
         'exterior_gallery',
-        'interior_gallery', // Fixed typo (was 'interior_gallery')
+        'interior_gallery',
         'property_type',
         'bathroom',
         'bedroom',

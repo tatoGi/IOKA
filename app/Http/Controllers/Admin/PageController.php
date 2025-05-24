@@ -7,6 +7,7 @@ use App\Http\Requests\Admin\PageRequestStore;
 use App\Models\Page;
 use App\Repositories\Interface\PageRepositoryInterface; // Import the repository interface
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage; // Added import for Storage
 
 class PageController extends Controller
 {
@@ -46,8 +47,27 @@ class PageController extends Controller
         // Generate a unique slug
         $validatedData['slug'] = $this->generateUniqueSlug($validatedData['slug']);
 
+        // Ensure meta_title is included in the data
+        // $validatedData['meta_title'] = $request->input('meta_title'); // Already handled by PageRequestStore
+
         // Use the repository to create a new page
-        $this->pageRepository->createPage($validatedData);
+        $page = $this->pageRepository->createPage($validatedData);
+
+        // Handle metadata if provided
+        if ($request->has('metadata')) {
+            $metadata = $request->input('metadata');
+
+            // Handle metadata file uploads
+            if ($request->hasFile('metadata.og_image')) {
+                $metadata['og_image'] = $request->file('metadata.og_image')->store('meta-images/og', 'public');
+            }
+
+            if ($request->hasFile('metadata.twitter_image')) {
+                $metadata['twitter_image'] = $request->file('metadata.twitter_image')->store('meta-images/twitter', 'public');
+            }
+            // Create or update metadata
+            $page->updateMetadata($metadata);
+        }
 
         // Redirect with a success message
         return redirect()->route('menu.index')->with('success', 'Page created successfully!');
@@ -86,22 +106,60 @@ class PageController extends Controller
     }
 
     // Update method to save the changes made to a page
-    // Update method to save the changes made to a page
     public function update(Request $request, $id)
     {
         // Get the existing page
         $page = $this->pageRepository->findPageById($id);
 
         // Prepare the update data
-        $data = $request->all();
+        $data = $request->all(); // Using all() for now, will add validation later
 
         // Check if the slug is being updated
-        if ($data['slug'] && $data['slug'] !== $page->slug) {
-            $data['slug'] = $this->generateUniqueSlug($request['slug']);
+        if (isset($data['slug']) && $data['slug'] && $data['slug'] !== $page->slug) {
+            $data['slug'] = $this->generateUniqueSlug($data['slug']);
         }
 
-        // Use the repository to update the page
-        $this->pageRepository->updatePage($id, $data);
+        // Ensure meta_title is included in the update data
+        // $data['meta_title'] = $request->input('meta_title'); // Will be part of $request->all()
+
+        // Use the repository to update the page (excluding metadata for now)
+        $pageData = $request->except('metadata'); // Exclude metadata from main page update
+        $pageData['active'] = $request->has('active') ? 1 : 0; // Handle active state
+
+        $this->pageRepository->updatePage($id, $pageData);
+
+        // Handle metadata if provided
+        if ($request->has('metadata')) {
+            $metadata = $request->input('metadata');
+
+            // Handle metadata file uploads
+            if ($request->hasFile('metadata.og_image')) {
+                if ($page->metadata && $page->metadata->og_image) {
+                    Storage::disk('public')->delete($page->metadata->og_image);
+                }
+                $metadata['og_image'] = $request->file('metadata.og_image')->store('meta-images/og', 'public');
+            } elseif (isset($metadata['remove_og_image']) && $metadata['remove_og_image'] == 1 && $page->metadata && $page->metadata->og_image) {
+                Storage::disk('public')->delete($page->metadata->og_image);
+                $metadata['og_image'] = null;
+            }
+
+            if ($request->hasFile('metadata.twitter_image')) {
+                if ($page->metadata && $page->metadata->twitter_image) {
+                    Storage::disk('public')->delete($page->metadata->twitter_image);
+                }
+                $metadata['twitter_image'] = $request->file('metadata.twitter_image')->store('meta-images/twitter', 'public');
+            } elseif (isset($metadata['remove_twitter_image']) && $metadata['remove_twitter_image'] == 1 && $page->metadata && $page->metadata->twitter_image) {
+                Storage::disk('public')->delete($page->metadata->twitter_image);
+                $metadata['twitter_image'] = null;
+            }
+
+            // Clean up remove flags if they exist
+            unset($metadata['remove_og_image']);
+            unset($metadata['remove_twitter_image']);
+
+            // Update metadata
+            $page->updateMetadata($metadata);
+        }
 
         return redirect()->route('menu.index')->with('success', 'Page updated successfully!');
     }

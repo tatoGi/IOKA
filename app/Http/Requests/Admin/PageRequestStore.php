@@ -24,12 +24,23 @@ class PageRequestStore extends FormRequest
         return [
             'title' => 'required|string|max:255',
             'slug' => 'required|string|max:255',
-            'keywords' => 'nullable|string|max:255',
             'desc' => 'nullable|string',
             'parent_id' => 'nullable|exists:pages,id',
             'type_id' => 'required', // Assuming you have a PageType model
             'sort' => 'nullable|integer',
             'active' => 'nullable|boolean',
+
+            // Metadata validation rules (similar to BlogPostController)
+            'metadata.meta_title' => 'nullable|string|max:255',
+            'metadata.meta_description' => 'nullable|string',
+            'metadata.meta_keywords' => 'nullable|string',
+            'metadata.og_title' => 'nullable|string|max:255',
+            'metadata.og_description' => 'nullable|string',
+            'metadata.og_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'metadata.twitter_card' => 'nullable|string|in:summary,summary_large_image',
+            'metadata.twitter_title' => 'nullable|string|max:255',
+            'metadata.twitter_description' => 'nullable|string',
+            'metadata.twitter_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ];
     }
 
@@ -43,10 +54,13 @@ class PageRequestStore extends FormRequest
         return [
             'title.required' => 'The title is required.',
             'slug.required' => 'The slug is required.',
-            'slug.unique' => 'The slug must be unique.',
             'type_id.required' => 'The page type is required.',
-            'type_id.exists' => 'The selected page type is invalid.',
-            // Add more custom messages as needed
+            'metadata.og_image.image' => 'The OG image must be an image file.',
+            'metadata.og_image.mimes' => 'The OG image must be a file of type: jpeg, png, jpg, gif.',
+            'metadata.og_image.max' => 'The OG image may not be greater than 2MB.',
+            'metadata.twitter_image.image' => 'The Twitter image must be an image file.',
+            'metadata.twitter_image.mimes' => 'The Twitter image must be a file of type: jpeg, png, jpg, gif.',
+            'metadata.twitter_image.max' => 'The Twitter image may not be greater than 2MB.',
         ];
     }
 }

@@ -10,17 +10,19 @@ use App\Models\Partner;
 use App\Models\RentalResale;
 use App\Models\Section;
 use App\Models\Location;
+use App\Models\MetaData;
 
 class PageService
 {
     /**
-     * Get all pages with their sections
+     * Get all pages with their sections and metadata
      */
     public function getAllPages()
     {
         $pages = Page::with(['sections' => function ($query) {
             $query->orderBy('sort_order', 'asc');
-        }])->get();
+        }])->with('metadata')
+        ->get();
 
         return [
             'pages' => $pages->map(fn ($page) => $this->formatPage($page)),
@@ -31,13 +33,14 @@ class PageService
     }
 
     /**
-     * Get a specific page by slug
+     * Get a specific page by slug with its sections and metadata
      */
     public function getPageBySlug($slug)
     {
         $page = Page::with(['sections' => function ($query) {
             $query->orderBy('sort_order', 'asc');
-        }])->where('slug', $slug)->first();
+        }])->with('metadata')
+        ->where('slug', $slug)->first();
 
         if (! $page) {
             return null;
@@ -96,6 +99,7 @@ class PageService
             'active' => $page->active,
             'created_at' => $page->created_at,
             'updated_at' => $page->updated_at,
+            'metadata' => $page->metadata ? $page->metadata->toArray() : null,
         ];
     }
 
@@ -123,7 +127,7 @@ class PageService
 
     public function getBlogs()
     {
-        return BlogPost::with('tags')->orderBy('created_at', 'asc')->paginate(10);
+        return BlogPost::with('tags')->with('metadata')->orderBy('created_at', 'asc')->paginate(10);
     }
 
     /**
@@ -131,13 +135,13 @@ class PageService
      */
     public function getBlogBySlug($slug)
     {
-        $blog = BlogPost::with('tags')->orderBy('created_at', 'desc')->where('slug', $slug)->first();
+        $blog = BlogPost::with('tags')->with('metadata')->orderBy('created_at', 'desc')->where('slug', $slug)->first();
 
         if (! $blog) {
             return null;
         }
 
-        $relatedBlogs = BlogPost::with('tags')
+        $relatedBlogs = BlogPost::with('tags')->with('metadata')
             ->whereHas('tags', function ($query) use ($blog) {
                 $query->whereIn('name', $blog->tags->pluck('name'));
             })
@@ -170,19 +174,20 @@ class PageService
             'tags' => $blog->tags->pluck('name'),
             'created_at' => $blog->created_at,
             'updated_at' => $blog->updated_at,
+            'metadata' => $blog->metadata ? $blog->metadata->toArray() : null,
         ];
     }
 
     public function getAllDevelopers()
     {
-        return Developer::orderBy('created_at', 'desc')->paginate(10);
+        return Developer::with('metadata')->orderBy('created_at', 'desc')->paginate(10);
     }
 
     public function getDeveloperBySlug($slug)
     {
-        // Fetch the developer with related awards, offplans, and rental_resale
+        // Fetch the developer with related awards, offplans, rental_resale and metadata
         $developer = Developer::where('slug', $slug)
-            ->with(['awards', 'offplanListings', 'rentalResaleListings'])
+            ->with(['awards', 'offplanListings', 'rentalResaleListings', 'metadata'])
             ->orderBy('created_at', 'desc')
             ->first();
 
@@ -195,43 +200,39 @@ class PageService
 
     public function getAlloffplan()
     {
-
-        $offplans = Offplan::orderBy('created_at', 'desc')->paginate(12);
-
-
-        return $offplans;
+        return Offplan::with('metadata')->orderBy('created_at', 'desc')->paginate(12);
     }
 
     public function getOffplanBySlug($slug)
     {
-        // Fetch the current offplan by slug
-        $offplan = Offplan::where('slug', $slug)->orderBy('created_at', 'desc')->first();
+        // Fetch the current offplan by slug with metadata
+        $offplan = Offplan::with('metadata')->where('slug', $slug)->orderBy('created_at', 'desc')->first();
 
         if (! $offplan) {
             return null;
         }
 
-        // Fetch the last 4 added offplans excluding the current one
-        $lastAddedOffplans = Offplan::where('id', '!=', $offplan->id)
+        // Fetch the last 4 added offplans excluding the current one, with metadata
+        $lastAddedOffplans = Offplan::with('metadata')->where('id', '!=', $offplan->id)
             ->orderBy('created_at', 'desc')
             ->take(4)
             ->get();
 
         // Return the current offplan along with the last added offplans
         return [
-            'offplan' => $offplan,
-            'lastAddedOffplans' => $lastAddedOffplans,
+            'offplan' => $offplan, // metadata will be on this object
+            'lastAddedOffplans' => $lastAddedOffplans, // metadata will be on these objects
         ];
     }
 
     public function getRentalResale()
     {
-        return RentalResale::orderBy('created_at', 'desc')->with('amount')->with('locations')->paginate(10);
+        return RentalResale::with('metadata')->with('amount')->with('locations')->orderBy('created_at', 'desc')->paginate(10);
     }
 
     public function getRentalResaleBySlug($slug)
     {
-        $rentalResale = RentalResale::where('slug', $slug)->with('amount')->first();
+        $rentalResale = RentalResale::with('metadata')->with('amount')->where('slug', $slug)->first();
 
         if (! $rentalResale) {
             return null;
@@ -255,19 +256,19 @@ class PageService
 
     public function search($query)
     {
-        $blogs = BlogPost::where('title', 'like', "%$query%")
+        $blogs = BlogPost::with('metadata')->where('title', 'like', "%$query%")
             ->orWhere('body', 'like', "%$query%")
             ->get();
 
-        $developers = Developer::where('title', 'like', "%$query%")
+        $developers = Developer::with('metadata')->where('title', 'like', "%$query%")
             ->orWhere('paragraph', 'like', "%$query%")
             ->get();
 
-        $offplans = Offplan::where('title', 'like', "%$query%")
+        $offplans = Offplan::with('metadata')->where('title', 'like', "%$query%")
             ->orWhere('description', 'like', "%$query%")
             ->get();
 
-        $rentalResales = RentalResale::where('title', 'like', "%$query%")
+        $rentalResales = RentalResale::with('metadata')->where('title', 'like', "%$query%")
             ->orWhere('description', 'like', "%$query%")
             ->get();
 
@@ -281,5 +282,34 @@ class PageService
     public function getLocations()
     {
         return Location::all();
+    }
+
+    public function getMetadataByType($type, $slug = null)
+    {
+        // Convert type to PascalCase (e.g., "blog-post" -> "BlogPost", "page" -> "Page")
+        $className = str_replace(['-', '_'], ' ', $type);
+        $className = str_replace(' ', '', ucwords($className));
+        $modelClass = 'App\\\\Models\\\\' . $className;
+
+        if (!class_exists($modelClass)) {
+            return ['message' => "Model for type '{$type}' not found."];
+        }
+
+        // If slug is null, fetch all metadata for the type
+        if ($slug === null) {
+            // Ensure MetaData model is imported or use full namespace
+            return MetaData::where('metadatable_type', $modelClass)->get()->toArray();
+        }
+
+        // If a slug is provided, fetch specific metadata for the entity
+        $queryColumn = 'slug'; // Default column to query by
+        $parentModel = $modelClass::where($queryColumn, $slug)->first();
+
+        if ($parentModel && method_exists($parentModel, 'metadata')) {
+            $metadata = $parentModel->metadata; // This loads the MetaData via morphOne
+            return $metadata ? $metadata->toArray() : null;
+        }
+
+        return ['message' => "Metadata not found for '{$type}' with slug '{$slug}'."];
     }
 }

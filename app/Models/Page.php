@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Config;
+use App\Models\MetaData;
 
 class Page extends Model
 {
-    protected $fillable = ['title', 'keywords', 'slug', 'desc', 'parent_id', 'type_id', 'sort', 'active'];
+    protected $fillable = ['title', 'meta_title', 'keywords', 'slug', 'desc', 'parent_id', 'type_id', 'sort', 'active'];
 
     public function children()
     {
@@ -62,5 +63,25 @@ class Page extends Model
     public function sections()
     {
         return $this->hasMany(Section::class)->orderBy('sort_order');
+    }
+
+    /**
+     * Get the metadata associated with the page.
+     */
+    public function metadata()
+    {
+        return $this->morphOne(MetaData::class, 'metadatable');
+    }
+
+    /**
+     * Update or create metadata for the page.
+     */
+    public function updateMetadata(array $metadata)
+    {
+        if ($this->metadata) {
+            return $this->metadata->update($metadata);
+        }
+
+        return $this->metadata()->create($metadata);
     }
 }
