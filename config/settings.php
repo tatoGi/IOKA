@@ -5,8 +5,8 @@
   ),
   'meta' => 
   array (
-    'title' => 'IOKA - Your Trusted Real Estate Partner',
-    'description' => '<p>IOKA - Your Trusted Real Estate Partner</p><p>Powered by <a href="https://www.froala.com/wysiwyg-editor?pb=1">Froala Editor</a></p>',
+    'title' => 'IOKA - Your Trusted Real Estate Partner!!',
+    'description' => '<p>IOKA - Your Trusted Real Estate Partner ??</p><p>Powered by <a href="https://www.froala.com/wysiwyg-editor?pb=1">Froala Editor</a></p>',
     'keywords' => 'IOKA - Your Trusted Real Estate Partner',
     'og_title' => 'IOKA - Your Trusted Real Estate Partner',
     'og_description' => '<p>IOKA - Your Trusted Real Estate Partner</p><p>Powered by <a href="https://www.froala.com/wysiwyg-editor?pb=1">Froala Editor</a></p>',
