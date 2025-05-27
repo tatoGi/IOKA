@@ -77,10 +77,14 @@ class RentalResaleService
                 'amount_dirhams' => $request->amount_dirhams,
             ]);
 
+            // Handle metadata creation
+            if ($request->has('metadata')) {
+                $this->handleMetadataCreation($rentalResale, $request);
+            }
+
             return $rentalResale;
         });
     }
-
 
     public function getRentalResaleById($id)
     {
@@ -236,6 +240,11 @@ class RentalResaleService
                 'amount_dirhams' => $request->amount_dirhams,
             ]);
 
+            // Handle metadata update
+            if ($request->has('metadata')) {
+                $this->handleMetadataUpdate($rentalResale, $request);
+            }
+
             return $rentalResale;
         });
     }
@@ -258,5 +267,105 @@ class RentalResaleService
         }
 
         return $slug;
+    }
+
+    /**
+     * Handle metadata creation for a rental resale
+     *
+     * @param RentalResale $rentalResale
+     * @param Request $request
+     * @return void
+     */
+    private function handleMetadataCreation(RentalResale $rentalResale, Request $request)
+    {
+        $metadata = $request->input('metadata');
+
+        // Handle metadata file uploads
+        if ($request->hasFile('metadata.og_image')) {
+            $metadata['og_image'] = $request->file('metadata.og_image')->store('meta-images/og', 'public');
+        } elseif ($request->hasFile('og_image')) {
+            // Fallback for direct og_image upload
+            $metadata['og_image'] = $request->file('og_image')->store('meta-images/og', 'public');
+        }
+
+        if ($request->hasFile('metadata.twitter_image')) {
+            $metadata['twitter_image'] = $request->file('metadata.twitter_image')->store('meta-images/twitter', 'public');
+        } elseif ($request->hasFile('twitter_image')) {
+            // Fallback for direct twitter_image upload
+            $metadata['twitter_image'] = $request->file('twitter_image')->store('meta-images/twitter', 'public');
+        }
+
+        // Ensure we have a metadata record
+        if (!$rentalResale->metadata) {
+            $rentalResale->metadata()->create($metadata);
+        } else {
+            $rentalResale->updateMetadata($metadata);
+        }
+    }
+
+    /**
+     * Handle metadata update for a rental resale
+     *
+     * @param RentalResale $rentalResale
+     * @param Request $request
+     * @return void
+     */
+    private function handleMetadataUpdate(RentalResale $rentalResale, Request $request)
+    {
+        $metadata = $request->input('metadata') ?? [];
+
+        // Handle metadata file uploads
+        if ($request->hasFile('metadata.og_image')) {
+            // Delete old OG image if it exists
+            if ($rentalResale->metadata?->og_image) {
+                Storage::disk('public')->delete($rentalResale->metadata->og_image);
+            }
+            $metadata['og_image'] = $request->file('metadata.og_image')->store('meta-images/og', 'public');
+        } elseif ($request->hasFile('og_image')) {
+            // Fallback for direct og_image upload
+            if ($rentalResale->metadata?->og_image) {
+                Storage::disk('public')->delete($rentalResale->metadata->og_image);
+            }
+            $metadata['og_image'] = $request->file('og_image')->store('meta-images/og', 'public');
+        }
+
+        if ($request->hasFile('metadata.twitter_image')) {
+            // Delete old Twitter image if it exists
+            if ($rentalResale->metadata?->twitter_image) {
+                Storage::disk('public')->delete($rentalResale->metadata->twitter_image);
+            }
+            $metadata['twitter_image'] = $request->file('metadata.twitter_image')->store('meta-images/twitter', 'public');
+        } elseif ($request->hasFile('twitter_image')) {
+            // Fallback for direct twitter_image upload
+            if ($rentalResale->metadata?->twitter_image) {
+                Storage::disk('public')->delete($rentalResale->metadata->twitter_image);
+            }
+            $metadata['twitter_image'] = $request->file('twitter_image')->store('meta-images/twitter', 'public');
+        }
+
+        // Handle image removal
+        if (isset($metadata['remove_og_image']) && $metadata['remove_og_image']) {
+            if ($rentalResale->metadata?->og_image) {
+                Storage::disk('public')->delete($rentalResale->metadata->og_image);
+            }
+            $metadata['og_image'] = null;
+        }
+
+        if (isset($metadata['remove_twitter_image']) && $metadata['remove_twitter_image']) {
+            if ($rentalResale->metadata?->twitter_image) {
+                Storage::disk('public')->delete($rentalResale->metadata->twitter_image);
+            }
+            $metadata['twitter_image'] = null;
+        }
+
+        // Remove the removal flags from metadata
+        unset($metadata['remove_og_image'], $metadata['remove_twitter_image']);
+
+        // Ensure we have a metadata record
+        if (!$rentalResale->metadata) {
+            $rentalResale->metadata()->create($metadata);
+        } else {
+            $rentalResale->updateMetadata($metadata);
+        }
     }
 }

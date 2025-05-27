@@ -76,22 +76,6 @@ class PostypeController extends Controller
 
             $rentalResale = $this->rentalResaleService->storeRentalResale($request);
 
-            // Handle metadata
-            if ($request->has('metadata')) {
-                $metadata = $request->input('metadata');
-
-                // Handle metadata file uploads
-                if ($request->hasFile('og_image')) {
-                    $metadata['og_image'] = $request->file('og_image')->store('meta-images/og', 'public');
-                }
-
-                if ($request->hasFile('twitter_image')) {
-                    $metadata['twitter_image'] = $request->file('twitter_image')->store('meta-images/twitter', 'public');
-                }
-
-                $rentalResale->updateMetadata($metadata);
-            }
-
             return redirect()->route('admin.postypes.rental.index')->with('success', 'Rental/Resale created successfully.');
         } catch (\Exception $e) {
             return back()->with('error', 'Error creating Rental/Resale: ' . $e->getMessage());
@@ -110,35 +94,11 @@ class PostypeController extends Controller
     public function rentalupdate(UpdateRentalResaleRequest $request, RentalResale $postype)
     {
         try {
-            $this->rentalResaleService->updateRentalResale($request, $postype);
-
-            // Handle metadata
-            if ($request->has('metadata')) {
-                $metadata = $request->input('metadata');
-
-                // Handle metadata file uploads
-                if ($request->hasFile('og_image')) {
-                    // Delete old OG image if it exists
-                    if ($postype->metadata?->og_image) {
-                        Storage::disk('public')->delete($postype->metadata->og_image);
-                    }
-                    $metadata['og_image'] = $request->file('og_image')->store('meta-images/og', 'public');
-                }
-
-                if ($request->hasFile('twitter_image')) {
-                    // Delete old Twitter image if it exists
-                    if ($postype->metadata?->twitter_image) {
-                        Storage::disk('public')->delete($postype->metadata->twitter_image);
-                    }
-                    $metadata['twitter_image'] = $request->file('twitter_image')->store('meta-images/twitter', 'public');
-                }
-
-                $postype->updateMetadata($metadata);
-            }
+            $this->rentalResaleService->updateRentalResale($request, $postype->id);
 
             return redirect()->route('admin.postypes.rental.index')->with('success', 'Rental/Resale updated successfully.');
         } catch (\Exception $e) {
-            return back()->with('error', 'Error updating Rental/Resale: ' . $e->getMessage());
+            return back()->with('error', 'Error updating Rental/Resale: ' . $e->getMessage())->withInput();
         }
     }
 

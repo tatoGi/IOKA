@@ -126,10 +126,10 @@ class DeveloperController extends Controller
         $offplanListings = Offplan::all(); // Fetch all offplan listings
         $rentalListings = RentalResale::all(); // Fetch all rental listings
         $awards = $developer->awards; // Fetch all awards associated with the developer
-        // Decode JSON fields for the form
-        $photos = json_decode($developer->photo, true) ?? [];
-        $tags = json_decode($developer->tags, true) ?? [];
-        $rentalListingsArray = json_decode($developer->rental_listings, true) ?? []; // Decode rental_listings JSON
+        // Get the arrays directly from the model since they're already cast
+        $photos = $developer->photo ?? [];
+        $tags = $developer->tags ?? [];
+        $rentalListingsArray = $developer->rental_listings ?? []; // Get rental_listings array directly
 
         return view('admin.developer.edit', compact(
             'developer',

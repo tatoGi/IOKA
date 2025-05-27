@@ -69,4 +69,9 @@ class RentalResale extends Model
     {
         return $this->belongsToMany(Location::class, 'rental_resale_location');
     }
+    public function metadata()
+    {
+        return $this->morphOne(MetaData::class, 'metadatable');
+    }
+
 }

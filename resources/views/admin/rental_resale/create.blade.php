@@ -279,7 +279,7 @@
 
                 <!-- Meta Data Tab -->
                 <div class="tab-pane" id="metadata-tab" role="tabpanel">
-                    <x-metadata-form :model="new App\Models\RentalResale" />
+                    @include('components.metadata-tab')
                 </div>
             </div>
 

@@ -68,4 +68,9 @@ class Offplan extends Model
     {
         return $this->belongsTo(Developer::class);
     }
+    public function metadata()
+    {
+        return $this->morphOne(MetaData::class, 'metadatable');
+    }
+
 }

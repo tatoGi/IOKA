@@ -81,4 +81,9 @@ class Developer extends Model
             });
         });
     }
+    public function metadata()
+    {
+        return $this->morphOne(MetaData::class, 'metadatable');
+    }
+
 }

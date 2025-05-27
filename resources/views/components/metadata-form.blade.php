@@ -61,10 +61,7 @@
     @if($model->metadata?->og_image)
         <div class="mt-2">
             <img src="{{ asset('storage/' . $model->metadata->og_image) }}" class="img-thumbnail" width="200">
-            <button type="button" class="btn btn-danger btn-sm mt-2 delete-metadata-image"
-                data-url="{{ route('admin.' . strtolower(class_basename($model)) . '.delete-og-image', $model->id) }}">
-                Delete OG Image
-            </button>
+            <button type="button" class="btn btn-danger mt-2 remove-og-image-btn">Remove OG Image</button>
         </div>
     @endif
 </div>
@@ -112,35 +109,49 @@
     @if($model->metadata?->twitter_image)
         <div class="mt-2">
             <img src="{{ asset('storage/' . $model->metadata->twitter_image) }}" class="img-thumbnail" width="200">
-            <button type="button" class="btn btn-danger btn-sm mt-2 delete-metadata-image"
-                data-url="{{ route('admin.' . strtolower(class_basename($model)) . '.delete-twitter-image', $model->id) }}">
-                Delete Twitter Image
-            </button>
+            <button type="button" class="btn btn-danger mt-2 remove-twitter-image-btn">Remove Twitter Image</button>
         </div>
     @endif
 </div>
 
 @push('scripts')
 <script>
-$(document).ready(function() {
-    $('.delete-metadata-image').click(function() {
-        const button = $(this);
-        const url = button.data('url');
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle image removal buttons
+    document.querySelectorAll('.remove-image-button').forEach(button => {
+        button.addEventListener('click', function() {
+            const imageType = this.dataset.imageType;
+            const previewContainer = document.getElementById(imageType + '_image_preview_container');
+            const hiddenInput = document.getElementById('remove_' + imageType + '_image_hidden_input');
+            const fileInput = document.getElementById('metadata[' + imageType + '_image]');
 
-        if (confirm('Are you sure you want to delete this image?')) {
-            $.ajax({
-                url: url,
-                type: 'DELETE',
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                success: function(response) {
-                    if (response.success) {
-                        button.closest('.mt-2').remove();
+            if (previewContainer) {
+                previewContainer.style.display = 'none';
+            }
+            if (hiddenInput) {
+                hiddenInput.value = '1';
+            }
+            if (fileInput) {
+                fileInput.value = '';
+            }
+        });
+    });
+
+    // Handle file input changes
+    ['og_image', 'twitter_image'].forEach(imageType => {
+        const fileInput = document.getElementById('metadata[' + imageType + ']');
+        if (fileInput) {
+            fileInput.addEventListener('change', function() {
+                const previewContainer = document.getElementById(imageType + '_preview_container');
+                const hiddenInput = document.getElementById('remove_' + imageType + '_image_hidden_input');
+
+                if (this.files.length > 0) {
+                    if (previewContainer) {
+                        previewContainer.style.display = 'none';
                     }
-                },
-                error: function(xhr) {
-                    alert('Error deleting image. Please try again.');
+                    if (hiddenInput) {
+                        hiddenInput.value = '0';
+                    }
                 }
             });
         }

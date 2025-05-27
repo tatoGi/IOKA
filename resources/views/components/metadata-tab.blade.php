@@ -145,17 +145,34 @@
                 const previewContainer = document.getElementById(imageType + '_image_preview_container');
                 const hiddenInput = document.getElementById('remove_' + imageType + '_image_hidden_input');
 
-                if (previewContainer) {
-                    previewContainer.style.display = 'none';
+                if (confirm('Are you sure you want to remove this image?')) {
+                    // Make AJAX request to delete the image
+                    fetch(`/admin/developer/{{ $model->id }}/delete-${imageType}-image`, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            if (previewContainer) {
+                                previewContainer.style.display = 'none';
+                            }
+                            if (hiddenInput) {
+                                hiddenInput.value = '1';
+                            }
+                            alert('Image removed successfully.');
+                        } else {
+                            alert(data.message || 'Failed to remove image.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Error removing image.');
+                    });
                 }
-                if (hiddenInput) {
-                    hiddenInput.value = '1';
-                }
-                // Optionally, you might want to clear/reset the file input as well
-                // const fileInput = document.getElementById(imageType + '_image_input');
-                // if (fileInput) {
-                //     fileInput.value = '';
-                // }
             });
         });
     });

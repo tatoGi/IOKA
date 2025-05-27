@@ -310,10 +310,122 @@
                     </div>
                 </div>
 
-                <!-- Meta Data Tab -->
-                <div class="tab-pane" id="metadata-tab" role="tabpanel">
-                    <x-metadata-form :model="$rentalResale" />
+               <!-- Meta Data Tab -->
+               <div class="tab-pane" id="metadata-tab" role="tabpanel">
+                <div class="mb-3">
+                    <label for="metadata[meta_title]" class="form-label">Meta Title</label>
+                    <input type="text" class="form-control @error('metadata.meta_title') is-invalid @enderror"
+                        id="metadata[meta_title]" name="metadata[meta_title]"
+                        value="{{ old('metadata.meta_title', $rentalResale->metadata?->meta_title) }}">
+                    @error('metadata.meta_title')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
                 </div>
+
+                <div class="mb-3">
+                    <label for="metadata[meta_description]" class="form-label">Meta Description</label>
+                    <textarea class="form-control @error('metadata.meta_description') is-invalid @enderror"
+                        id="metadata[meta_description]" name="metadata[meta_description]" rows="3"
+                        >{{ old('metadata.meta_description', $rentalResale->metadata?->meta_description) }}</textarea>
+                    @error('metadata.meta_description')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="mb-3">
+                    <label for="metadata[meta_keywords]" class="form-label">Meta Keywords</label>
+                    <input type="text" class="form-control @error('metadata.meta_keywords') is-invalid @enderror"
+                        id="metadata[meta_keywords]" name="metadata[meta_keywords]"
+                        value="{{ old('metadata.meta_keywords', $rentalResale->metadata?->meta_keywords) }}">
+                    @error('metadata.meta_keywords')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <h4 class="mt-4">Open Graph</h4>
+                <div class="mb-3">
+                    <label for="metadata[og_title]" class="form-label">OG Title</label>
+                    <input type="text" class="form-control @error('metadata.og_title') is-invalid @enderror"
+                        id="metadata[og_title]" name="metadata[og_title]"
+                        value="{{ old('metadata.og_title', $rentalResale->metadata?->og_title) }}">
+                    @error('metadata.og_title')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="mb-3">
+                    <label for="metadata[og_description]" class="form-label">OG Description</label>
+                    <textarea class="form-control @error('metadata.og_description') is-invalid @enderror"
+                        id="metadata[og_description]" name="metadata[og_description]" rows="3"
+                        >{{ old('metadata.og_description', $rentalResale->metadata?->og_description) }}</textarea>
+                    @error('metadata.og_description')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="mb-3">
+                    <label for="og_image" class="form-label">OG Image</label>
+                    <input type="file" class="form-control @error('metadata.og_image') is-invalid @enderror"
+                        id="og_image" name="og_image">
+                    @error('metadata.og_image')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                    @if($rentalResale->metadata?->og_image)
+                        <div class="mt-2">
+                            <img src="{{ asset('storage/' . $rentalResale->metadata->og_image) }}" class="img-thumbnail" width="200">
+                            <button type="button" class="btn btn-danger mt-2" id="remove-og-image-btn">Remove OG Image</button>
+                        </div>
+                    @endif
+                </div>
+
+                <h4 class="mt-4">Twitter Card</h4>
+                <div class="mb-3">
+                    <label for="metadata[twitter_card]" class="form-label">Twitter Card Type</label>
+                    <select class="form-control @error('metadata.twitter_card') is-invalid @enderror"
+                        id="metadata[twitter_card]" name="metadata[twitter_card]">
+                        <option value="summary" {{ old('metadata.twitter_card', $rentalResale->metadata?->twitter_card) == 'summary' ? 'selected' : '' }}>Summary</option>
+                        <option value="summary_large_image" {{ old('metadata.twitter_card', $rentalResale->metadata?->twitter_card) == 'summary_large_image' ? 'selected' : '' }}>Summary Large Image</option>
+                    </select>
+                    @error('metadata.twitter_card')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="mb-3">
+                    <label for="metadata[twitter_title]" class="form-label">Twitter Title</label>
+                    <input type="text" class="form-control @error('metadata.twitter_title') is-invalid @enderror"
+                        id="metadata[twitter_title]" name="metadata[twitter_title]"
+                        value="{{ old('metadata.twitter_title', $rentalResale->metadata?->twitter_title) }}">
+                    @error('metadata.twitter_title')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="mb-3">
+                    <label for="metadata[twitter_description]" class="form-label">Twitter Description</label>
+                    <textarea class="form-control @error('metadata.twitter_description') is-invalid @enderror"
+                        id="metadata[twitter_description]" name="metadata[twitter_description]" rows="3"
+                        >{{ old('metadata.twitter_description', $rentalResale->metadata?->twitter_description) }}</textarea>
+                    @error('metadata.twitter_description')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="mb-3">
+                    <label for="twitter_image" class="form-label">Twitter Image</label>
+                    <input type="file" class="form-control @error('metadata.twitter_image') is-invalid @enderror"
+                        id="twitter_image" name="twitter_image">
+                    @error('metadata.twitter_image')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                    @if($rentalResale->metadata?->twitter_image)
+                        <div class="mt-2">
+                            <img src="{{ asset('storage/' . $rentalResale->metadata->twitter_image) }}" class="img-thumbnail" width="200">
+                            <button type="button" class="btn btn-danger mt-2" id="remove-twitter-image-btn">Remove Twitter Image</button>
+                        </div>
+                    @endif
+                </div>
+            </div>
             </div>
 
             <div class="mt-4">
@@ -428,6 +540,50 @@
                 const modalInstance = bootstrap.Modal.getInstance(modal);
                 modalInstance.hide();
             });
+        });
+        document.getElementById('remove-og-image-btn')?.addEventListener('click', function() {
+            if (confirm('Are you sure you want to remove the OG image?')) {
+                fetch('{{ route('admin.rental-resale.delete-og-image', ['rentalResale' => $rentalResale]) }}', {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('OG image removed successfully.');
+                        location.reload();
+                    } else {
+                        alert('Failed to remove OG image.');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            }
+        });
+
+        document.getElementById('remove-twitter-image-btn')?.addEventListener('click', function() {
+            if (confirm('Are you sure you want to remove the Twitter image?')) {
+                fetch('{{ route('admin.rental-resale.delete-twitter-image', ['rentalResale' => $rentalResale]) }}', {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ type: 'twitter_image' })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        location.reload();
+                    } else {
+                        alert('Failed to remove Twitter image.');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            }
         });
     </script>
 @endsection
