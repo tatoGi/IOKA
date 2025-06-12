@@ -142,9 +142,23 @@
                             <button type="button" id="add-award" class="btn btn-secondary">Add Another Award</button>
                         </div>
 
-                        <!-- Tags and Listings -->
-                        @php
+                       <!-- Tags and Listings -->
+                       @php
                             $developerTags = $developer->tags ?? [];
+                            if (is_string($developerTags)) {
+                                $developerTags = json_decode($developerTags, true) ?? [];
+                            }
+                            if (!is_array($developerTags)) {
+                                $developerTags = [];
+                            }
+
+                            $rentalListingsArray = $developer->rental_listings ?? [];
+                            if (is_string($rentalListingsArray)) {
+                                $rentalListingsArray = json_decode($rentalListingsArray, true) ?? [];
+                            }
+                            if (!is_array($rentalListingsArray)) {
+                                $rentalListingsArray = [];
+                            }
                         @endphp
                         <div class="mb-3">
                             <label for="tags" class="form-label">Tags</label>
