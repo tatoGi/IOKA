@@ -19,12 +19,12 @@
   'footer' => 
   array (
     'logo' => NULL,
-    'description' => '<p>Specializes in providing high-class tours for those in need</p>',
+    'description' => '<p>test</p>',
     'contact' => 
     array (
-      'address' => '101 E 129th St. East Fujairah IN 45721, UAE',
-      'phone' => '+1-11-111-11-11',
-      'email' => 'contact@example.com',
+      'address' => 'tbilisi',
+      'phone' => '222',
+      'email' => 'ioka@mail.com',
       'working_hours' => 'Mon-Fri: 9AM - 6PM',
     ),
     'newsletter' => 

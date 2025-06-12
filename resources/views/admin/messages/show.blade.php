@@ -66,7 +66,7 @@
                     <strong>Date:</strong>
                 </div>
                 <div class="col-md-8">
-                    {{ $message->created_at->format('d/m/Y H:i') }}
+                    {{ $message->created_at->setTimezone('Asia/Tbilisi')->format('d/m/Y H:i') }}
                 </div>
             </div>
 

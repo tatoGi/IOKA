@@ -39,6 +39,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ asset('storage/admin/assets/main.js') }}"></script>
     <script src="https://cdn.ckeditor.com/ckeditor5/27.0.0/classic/ckeditor.js"></script>
+    <script src="https://cdn.ckeditor.com/ckeditor5/27.0.0/classic/translations/en.js"></script>
     <script>
         var allEditors = document.querySelectorAll('.editor');
         const editorInstances = new Map();
@@ -49,7 +50,37 @@
 
             ClassicEditor
                 .create(editorElement, {
-                    toolbar: ['heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', '|', 'outdent', 'indent', '|', 'blockQuote', 'insertTable', 'undo', 'redo']
+                    toolbar: [
+                        'heading', '|',
+                        'bold', 'italic', 'link', 'bulletedList', 'numberedList', '|',
+                        'fontColor', 'fontBackgroundColor', '|',
+                        'outdent', 'indent', '|',
+                        'blockQuote', 'insertTable', 'undo', 'redo'
+                    ],
+                    fontColor: {
+                        colors: [
+                            { color: 'rgb(0, 0, 0)', label: 'Black' },
+                            { color: 'rgb(255, 255, 255)', label: 'White' },
+                            { color: 'rgb(255, 0, 0)', label: 'Red' },
+                            { color: 'rgb(0, 255, 0)', label: 'Green' },
+                            { color: 'rgb(0, 0, 255)', label: 'Blue' },
+                            { color: 'rgb(255, 255, 0)', label: 'Yellow' },
+                            { color: 'rgb(255, 0, 255)', label: 'Magenta' },
+                            { color: 'rgb(0, 255, 255)', label: 'Cyan' }
+                        ]
+                    },
+                    fontBackgroundColor: {
+                        colors: [
+                            { color: 'rgb(0, 0, 0)', label: 'Black' },
+                            { color: 'rgb(255, 255, 255)', label: 'White' },
+                            { color: 'rgb(255, 0, 0)', label: 'Red' },
+                            { color: 'rgb(0, 255, 0)', label: 'Green' },
+                            { color: 'rgb(0, 0, 255)', label: 'Blue' },
+                            { color: 'rgb(255, 255, 0)', label: 'Yellow' },
+                            { color: 'rgb(255, 0, 255)', label: 'Magenta' },
+                            { color: 'rgb(0, 255, 255)', label: 'Cyan' }
+                        ]
+                    }
                 })
                 .then(editor => {
                     // Store the editor instance in the Map
