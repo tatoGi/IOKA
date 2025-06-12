@@ -108,24 +108,22 @@ class PageController extends Controller
     // Update method to save the changes made to a page
     public function update(Request $request, $id)
     {
+
         // Get the existing page
         $page = $this->pageRepository->findPageById($id);
 
         // Prepare the update data
-        $data = $request->all(); // Using all() for now, will add validation later
+        $pageData = $request->except('metadata'); // Exclude metadata from main page update
+
+        // Handle active state - check if the checkbox is checked
+        $pageData['active'] = $request->active ? 1 : 0;
 
         // Check if the slug is being updated
-        if (isset($data['slug']) && $data['slug'] && $data['slug'] !== $page->slug) {
-            $data['slug'] = $this->generateUniqueSlug($data['slug']);
+        if (isset($pageData['slug']) && $pageData['slug'] && $pageData['slug'] !== $page->slug) {
+            $pageData['slug'] = $this->generateUniqueSlug($pageData['slug']);
         }
 
-        // Ensure meta_title is included in the update data
-        // $data['meta_title'] = $request->input('meta_title'); // Will be part of $request->all()
-
-        // Use the repository to update the page (excluding metadata for now)
-        $pageData = $request->except('metadata'); // Exclude metadata from main page update
-        $pageData['active'] = $request->has('active') ? 1 : 0; // Handle active state
-
+        // Use the repository to update the page
         $this->pageRepository->updatePage($id, $pageData);
 
         // Handle metadata if provided

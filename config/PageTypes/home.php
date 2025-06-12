@@ -164,17 +164,7 @@ return [
                                     'label' => 'Number Suffix',
                                     'default' => 'Units',
                                 ],
-                                'bulletpoint_add_section' => [
-                                    'type' => 'repeater',
-                                    'label' => 'Bullet Points Add Section',
-                                    'fields' => [
-                                        'text' => [
-                                            'type' => 'text',
-                                            'label' => 'Point Text',
-                                            'required' => true,
-                                        ],
-                                    ],
-                                ],
+
                                 'url' => [
                                     'type' => 'url',
                                     'label' => 'See More URL',
@@ -240,17 +230,7 @@ return [
                                     'label' => 'Number Suffix',
                                     'default' => 'Units',
                                 ],
-                                'bulletpoint_add_section' => [
-                                    'type' => 'repeater',
-                                    'label' => 'Bullet Points Add Section',
-                                    'fields' => [
-                                        'text' => [
-                                            'type' => 'text',
-                                            'label' => 'Point Text',
-                                            'required' => true,
-                                        ],
-                                    ],
-                                ],
+
                                 'url' => [
                                     'type' => 'url',
                                     'label' => 'See More URL',
@@ -269,11 +249,7 @@ return [
                                         ],
                                     ],
                                 ],
-                                'image_or_like_this' => [
-                                    'type' => 'photo',
-                                    'label' => 'Image or Like This',
-                                    'required' => false,
-                                ],
+
                             ],
                         ],
                         'rental' => [
@@ -320,17 +296,7 @@ return [
                                     'label' => 'Number Suffix',
                                     'default' => 'Units',
                                 ],
-                                'bulletpoint_add_section' => [
-                                    'type' => 'repeater',
-                                    'label' => 'Bullet Points Add Section',
-                                    'fields' => [
-                                        'text' => [
-                                            'type' => 'text',
-                                            'label' => 'Point Text',
-                                            'required' => true,
-                                        ],
-                                    ],
-                                ],
+
                                 'url' => [
                                     'type' => 'url',
                                     'label' => 'See More URL',
@@ -349,20 +315,12 @@ return [
                                         ],
                                     ],
                                 ],
-                                'image_or_like_this' => [
-                                    'type' => 'image',
-                                    'label' => 'Image or Like This',
-                                    'required' => true,
-                                ],
+
                             ],
                         ],
                     ],
                 ],
-                'image_or_like_this' => [
-                    'type' => 'image',
-                    'label' => 'Image or Like This',
-                    'required' => false,
-                ],
+
             ],
         ],
        'section_four' => [

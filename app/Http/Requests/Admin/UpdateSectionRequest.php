@@ -21,14 +21,33 @@ class UpdateSectionRequest extends FormRequest
 
     public function rules()
     {
-        return [
+        $rules = [
             'fields' => 'required|array',
             'fields.title' => 'required|string|max:255',
-            'fields.subtitle' => 'nullable|string|max:255',
-            'fields.slider_images' => 'nullable|array',
-            'fields.slider_images.*' => 'nullable|string',
             'description' => 'nullable|string',
         ];
+
+        // Add flexible rules for common fields
+        $optionalFields = [
+            'subtitle', 'description', 'title_2', 'number', 'number_suffix', 'url', 'alt_text'
+        ];
+
+        foreach ($optionalFields as $field) {
+            $rules["fields.{$field}"] = 'nullable|string|max:255';
+        }
+
+        // Add flexible rules for repeater fields
+        $repeaterFields = [
+            'phone_numbers', 'email_addresses', 'locations', 'slider_images',
+            'rolling_numbers', 'properties', 'features', 'amenities'
+        ];
+
+        foreach ($repeaterFields as $field) {
+            $rules["fields.{$field}"] = 'nullable|array';
+            $rules["fields.{$field}.*"] = 'nullable|array';
+        }
+
+        return $rules;
     }
 
     public function messages()

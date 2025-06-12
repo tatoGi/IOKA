@@ -9,6 +9,7 @@ use App\Models\Page;
 use App\Models\Section;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -100,36 +101,65 @@ class SectionController extends Controller
 
     public function update(Request $request, $pageId, $sectionKey)
     {
-        $section = Section::where('page_id', $pageId)
-            ->where('section_key', $sectionKey)
-            ->firstOrFail();
+        try {
+            Log::info('Section update started', [
+                'pageId' => $pageId,
+                'sectionKey' => $sectionKey,
+                'requestData' => $request->all()
+            ]);
 
-        $page = Page::findOrFail($pageId);
-        $pageType = collect(Config::get('PageTypes'))->firstWhere('id', $page->type_id);
+            $section = Section::where('page_id', $pageId)
+                ->where('section_key', $sectionKey)
+                ->firstOrFail();
 
-        if (! $pageType || ! isset($pageType['sections'][$sectionKey])) {
-            abort(404);
+            $page = Page::findOrFail($pageId);
+            $pageType = collect(Config::get('PageTypes'))->firstWhere('id', $page->type_id);
+
+            if (! $pageType || ! isset($pageType['sections'][$sectionKey])) {
+                abort(404);
+            }
+
+            $sectionConfig = $pageType['sections'][$sectionKey];
+
+            // Set the section in the request for use in processFields
+            $request->merge(['section' => $section]);
+
+            // Process fields
+            $fields = $request->fields ?? [];
+            $processedFields = $this->processFields($request, $fields, $sectionConfig['fields']);
+
+            Log::info('Fields processed successfully', [
+                'processedFields' => $processedFields
+            ]);
+
+            // Update section
+            $section->title = $processedFields['title'] ?? $section->title;
+            $section->slug = Str::slug($processedFields['title'].'-'.time());
+            $section->description = $request->input('description', $section->description);
+            $section->additional_fields = $processedFields;
+            $section->save();
+
+            Log::info('Section updated successfully', [
+                'sectionId' => $section->id,
+                'newTitle' => $section->title
+            ]);
+
+            return redirect()
+                ->route('admin.sections.edit', ['pageId' => $pageId, 'sectionKey' => $sectionKey])
+                ->with('success', 'Section updated successfully');
+
+        } catch (\Exception $e) {
+            Log::error('Section update failed', [
+                'pageId' => $pageId,
+                'sectionKey' => $sectionKey,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return redirect()
+                ->route('admin.sections.edit', ['pageId' => $pageId, 'sectionKey' => $sectionKey])
+                ->with('error', 'Failed to update section: ' . $e->getMessage());
         }
-
-        $sectionConfig = $pageType['sections'][$sectionKey];
-
-        // Set the section in the request for use in processFields
-        $request->merge(['section' => $section]);
-
-        // Process fields
-        $fields = $request->fields ?? [];
-        $processedFields = $this->processFields($request, $fields, $sectionConfig['fields']);
-
-        // Update section
-        $section->title = $processedFields['title'] ?? $section->title;
-        $section->slug = Str::slug($processedFields['title'].'-'.time());
-        $section->description = $request->input('description', $section->description);
-        $section->additional_fields = $processedFields;
-        $section->save();
-
-        return redirect()
-            ->route('admin.sections.edit', ['pageId' => $pageId, 'sectionKey' => $sectionKey])
-            ->with('success', 'Section updated successfully');
     }
 
     protected function validateSectionData(Request $request, array $sectionConfig)
@@ -268,12 +298,16 @@ class SectionController extends Controller
             switch ($config['type']) {
                 case 'repeater':
                     if (isset($fields[$key])) {
-
-                        $processedFields[$key] = $this->processRepeaterField($request, $fields[$key], $config, $key);
+                        // Check if this is an empty field (hidden input with empty value)
+                        if (is_string($fields[$key]) && $fields[$key] === '') {
+                            $processedFields[$key] = [];
+                        } else {
+                            $processedFields[$key] = $this->processRepeaterField($request, $fields[$key], $config, $key);
+                        }
                     } else {
-
-                        // Keep existing repeater data if not provided in request
-                        $processedFields[$key] = $request->section->additional_fields[$key] ?? [];
+                        // If the field is not in the request, it means all items were removed
+                        // Set it to an empty array instead of keeping existing data
+                        $processedFields[$key] = [];
                     }
                     break;
 
@@ -306,33 +340,100 @@ class SectionController extends Controller
 
     protected function processRepeaterField(Request $request, array $repeaterData, array $config, string $fieldKey)
     {
+        Log::info("Processing repeater field: {$fieldKey}", [
+            'repeaterData' => $repeaterData,
+            'config' => $config,
+            'request_all' => $request->all()
+        ]);
 
         $processed = [];
 
-        // If no new data is provided, keep the existing data
-        if (empty($repeaterData) && $request->section) {
-            return $request->section->additional_fields[$fieldKey] ?? [];
-        }
+        // Get deleted indexes from the form
+        $deletedIndexes = (array)$request->input("deleted_{$fieldKey}", []);
+        $deletedIndexes = array_map('intval', $deletedIndexes);
 
+        // Get existing data to handle file uploads
+        $existingData = $request->section ? ($request->section->additional_fields[$fieldKey] ?? []) : [];
+
+        Log::info("Repeater processing details", [
+            'fieldKey' => $fieldKey,
+            'deletedIndexes' => $deletedIndexes,
+            'existingData' => $existingData,
+            'repeaterDataCount' => count($repeaterData)
+        ]);
+
+        // Process submitted data
         foreach ($repeaterData as $index => $item) {
+            // Skip if the item is empty, not an array, or marked for deletion
+            if (!is_array($item) || in_array($index, $deletedIndexes, true)) {
+                continue;
+            }
 
             $processedItem = [];
+            $hasValue = false;
+
+            // Process each field in the repeater item
             foreach ($config['fields'] as $repeaterFieldKey => $fieldConfig) {
-                if ($fieldConfig['type'] === 'image') {
-                    if (isset($item[$repeaterFieldKey]) && $item[$repeaterFieldKey] instanceof \Illuminate\Http\UploadedFile) {
-                        $processedItem[$repeaterFieldKey] = $item[$repeaterFieldKey]->store('sections', 'public');
+                $value = $item[$repeaterFieldKey] ?? null;
+
+                // Handle file uploads
+                if (in_array($fieldConfig['type'], ['image', 'photo'], true)) {
+                    if ($value instanceof \Illuminate\Http\UploadedFile) {
+                        $processedItem[$repeaterFieldKey] = $value->store('sections', 'public');
+                        $hasValue = true;
                     } else {
-                        // Keep existing image if no new one uploaded
-                        $oldImageKey = "old_{$repeaterFieldKey}_{$index}";
-                        $processedItem[$repeaterFieldKey] = $request->input($oldImageKey) ??
-                            ($request->section->additional_fields[$fieldKey][$index][$repeaterFieldKey] ?? null);
+                        // Keep existing file if exists
+                        $oldImageKey = "old_{$fieldKey}_{$repeaterFieldKey}_{$index}";
+                        $existingValue = $request->input($oldImageKey);
+
+                        if ($existingValue) {
+                            $processedItem[$repeaterFieldKey] = $existingValue;
+                            $hasValue = true;
+                        } elseif (isset($existingData[$index][$repeaterFieldKey])) {
+                            $processedItem[$repeaterFieldKey] = $existingData[$index][$repeaterFieldKey];
+                            $hasValue = true;
+                        }
                     }
                 } else {
-                    $processedItem[$repeaterFieldKey] = $item[$repeaterFieldKey] ?? null;
+                    // For regular fields, always keep them even if empty
+                    $processedItem[$repeaterFieldKey] = $value;
+                    $hasValue = $hasValue || ($value !== null && $value !== '');
                 }
             }
-            $processed[] = $processedItem;
+
+            // Add item if it has any value or if it's a new item
+            if ($hasValue || !isset($existingData[$index])) {
+                $processed[] = $processedItem;
+            }
         }
+
+        // Add any existing items that weren't in the form and aren't marked for deletion
+        foreach ($existingData as $index => $existingItem) {
+            if (!array_key_exists($index, $repeaterData) && !in_array($index, $deletedIndexes, true)) {
+                $processed[] = $existingItem;
+            }
+        }
+
+        // Reset array keys
+        $processed = array_values($processed);
+
+        // Ensure we have at least the minimum number of items
+        $minItems = $config['min_items'] ?? 0;
+        if (count($processed) < $minItems) {
+            for ($i = count($processed); $i < $minItems; $i++) {
+                $emptyItem = [];
+                foreach ($config['fields'] as $repeaterFieldKey => $fieldConfig) {
+                    $emptyItem[$repeaterFieldKey] = $fieldConfig['default'] ?? '';
+                }
+                $processed[] = $emptyItem;
+            }
+        }
+
+        Log::info("Repeater field processed result", [
+            'fieldKey' => $fieldKey,
+            'processedCount' => count($processed),
+            'processed' => $processed
+        ]);
 
         return $processed;
     }
@@ -377,15 +478,43 @@ class SectionController extends Controller
             ->firstOrFail();
 
         $fieldKey = $request->input('field_key');
-        $imagePath = $section->additional_fields[$fieldKey] ?? null;
+        $index = $request->input('index');
+        $repeaterField = $request->input('repeater_field');
+        $tab = $request->input('tab');
+        $tabsField = $request->input('tabs_field');
+        $additionalFields = $section->additional_fields;
 
-        if ($imagePath && Storage::disk('public')->exists($imagePath)) {
-            Storage::disk('public')->delete($imagePath);
-            $additionalFields = $section->additional_fields;
-            $additionalFields[$fieldKey] = null;
-            $section->setAttribute('additional_fields', $additionalFields);
-            $section->save();
+        if ($index !== null && $repeaterField !== null) {
+            // Handle repeater field image deletion
+            if (isset($additionalFields[$repeaterField][$index][$fieldKey])) {
+                $imagePath = $additionalFields[$repeaterField][$index][$fieldKey] ?? null;
+                if ($imagePath && Storage::disk('public')->exists($imagePath)) {
+                    Storage::disk('public')->delete($imagePath);
+                }
+                // Remove the image from the repeater item
+                unset($additionalFields[$repeaterField][$index][$fieldKey]);
+            }
+        } elseif ($tab !== null && $tabsField !== null) {
+            // Handle tabs field image deletion
+            if (isset($additionalFields[$tabsField][$tab][$fieldKey])) {
+                $imagePath = $additionalFields[$tabsField][$tab][$fieldKey] ?? null;
+                if ($imagePath && Storage::disk('public')->exists($imagePath)) {
+                    Storage::disk('public')->delete($imagePath);
+                }
+                // Remove the image from the tabs field
+                unset($additionalFields[$tabsField][$tab][$fieldKey]);
+            }
+        } else {
+            // Handle main section field image deletion
+            $imagePath = $additionalFields[$fieldKey] ?? null;
+            if ($imagePath && Storage::disk('public')->exists($imagePath)) {
+                Storage::disk('public')->delete($imagePath);
+                $additionalFields[$fieldKey] = null;
+            }
         }
+
+        $section->setAttribute('additional_fields', $additionalFields);
+        $section->save();
 
         return response()->json(['success' => true]);
     }

@@ -25,7 +25,7 @@
                 <tr>
                     <td>{{ $message->id }}</td>
                     <td>{{ $message->email }}</td>
-                    <td>{{ $message->created_at->format('d/m/Y H:i') }}</td>
+                    <td>{{ $message->created_at->setTimezone('Asia/Tbilisi')->format('d/m/Y H:i') }}</td>
                     <td>
                         <a href="{{ route('admin.subscribe.show', $message->id) }}"
                            class="btn btn-info btn-sm">

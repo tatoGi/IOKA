@@ -543,7 +543,7 @@
         });
         document.getElementById('remove-og-image-btn')?.addEventListener('click', function() {
             if (confirm('Are you sure you want to remove the OG image?')) {
-                fetch('{{ route('admin.rental-resale.delete-og-image', ['rentalResale' => $rentalResale]) }}', {
+                fetch('{{ route('admin.rental_resale.delete-og-image', ['postype' => $rentalResale]) }}', {
                     method: 'DELETE',
                     headers: {
                         'X-CSRF-TOKEN': '{{ csrf_token() }}',
@@ -565,7 +565,7 @@
 
         document.getElementById('remove-twitter-image-btn')?.addEventListener('click', function() {
             if (confirm('Are you sure you want to remove the Twitter image?')) {
-                fetch('{{ route('admin.rental-resale.delete-twitter-image', ['rentalResale' => $rentalResale]) }}', {
+                fetch('{{ route('admin.rental_resale.delete-twitter-image', ['postype' => $rentalResale]) }}', {
                     method: 'DELETE',
                     headers: {
                         'X-CSRF-TOKEN': '{{ csrf_token() }}',
