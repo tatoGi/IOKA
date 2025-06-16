@@ -13,6 +13,7 @@ class PropertySearchController extends Controller
 {
     public function search(Request $request)
     {
+
         // Validate request parameters
         $request->validate([
             'type' => 'sometimes|string',

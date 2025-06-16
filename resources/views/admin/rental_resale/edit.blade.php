@@ -7,7 +7,7 @@
             @csrf
             @method('PUT')
             <input type="hidden" id="postId" value="{{ $rentalResale->id }}">
-            <input type="hidden" name="alt_texts[gallery_images]" id="gallery-alt-texts-input" value="{{ $rentalResale->alt_texts }}">
+            <input type="hidden" name="alt_texts[gallery_images]" id="gallery-alt-texts-input" value="{{ is_string($rentalResale->alt_texts) ? $rentalResale->alt_texts : json_encode($rentalResale->alt_texts) }}">
             @if ($errors->any())
                 <div class="alert alert-danger">
                     <ul>
@@ -226,12 +226,23 @@
                                     <label for="agent_photo" class="form-label">Agent Photo</label>
                                     @if ($rentalResale->agent_photo)
                                         <div class="mb-2">
-                                            <img src="{{ asset('storage/' . $rentalResale->agent_photo) }}" alt="agent_photo" style="max-width: 200px;">
-                                            <button type="button" class="btn btn-danger btn-sm" id="remove-qr-photo">Remove</button>
+                                            @php
+                                                $agentPhotos = is_array($rentalResale->agent_photo) ? $rentalResale->agent_photo : json_decode($rentalResale->agent_photo, true);
+                                            @endphp
+                                            @if(is_array($agentPhotos))
+                                                @foreach($agentPhotos as $photo)
+                                                    <div class="mb-2">
+                                                        <img src="{{ asset('storage/' . $photo) }}" alt="agent_photo" style="max-width: 200px;">
+                                                    </div>
+                                                @endforeach
+                                            @else
+                                                <img src="{{ asset('storage/' . $rentalResale->agent_photo) }}" alt="agent_photo" style="max-width: 200px;">
+                                            @endif
+                                            <button type="button" class="btn btn-danger btn-sm" id="remove-agent-photo">Remove</button>
                                         </div>
                                     @endif
-                                    <input type="file" class="form-control" id="agent_photo" name="agent_photo">
-                                    <input type="text" class="form-control mt-2" name="alt_texts[agent_photo]" value="{{ json_decode($rentalResale->alt_texts, true)['agent_photo'] ?? '' }}" placeholder="Alt text for agent photo">
+                                    <input type="file" class="form-control" id="agent_photo" name="agent_photo[]" multiple>
+                                    <input type="text" class="form-control mt-2" name="alt_texts[agent_photo]" value="{{ (is_array($rentalResale->alt_texts) ? $rentalResale->alt_texts : json_decode($rentalResale->alt_texts, true))['agent_photo'] ?? '' }}" placeholder="Alt text for agent photo">
                                 </div>
                             </div>
                             <div class="col-md-3">
@@ -445,7 +456,7 @@
                 <div class="modal-body">
                     <div class="container">
                         <div id="gallery-images" class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-3">
-                            @foreach (json_decode($rentalResale->gallery_images, true) as $index => $image)
+                            @foreach ((is_array($rentalResale->gallery_images) ? $rentalResale->gallery_images : json_decode($rentalResale->gallery_images, true)) as $index => $image)
                                 <div class="col gallery-image-wrapper position-relative">
                                     <button type="button" class="btn btn-danger btn-sm remove-gallery-image" data-image="{{ $image }}" style="position: absolute; top: 10px; left: 10px; z-index: 2;">
                                         <i class="fas fa-trash-alt"></i>
@@ -456,7 +467,7 @@
                                             <div class="mb-2">
                                                 <label class="form-label">Alt Text</label>
                                                 @php
-                                                    $altTexts = json_decode($rentalResale->alt_texts, true);
+                                                    $altTexts = is_array($rentalResale->alt_texts) ? $rentalResale->alt_texts : json_decode($rentalResale->alt_texts, true);
                                                     $galleryAltTexts = $altTexts['gallery_images'] ?? [];
                                                     $currentAltText = '';
 

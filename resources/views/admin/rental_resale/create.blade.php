@@ -72,10 +72,7 @@
                         <label for="subtitle" class="form-label">Subtitle<span class="text-danger">*</span></label>
                         <input type="text" class="form-control" id="subtitle" name="subtitle" required>
                     </div>
-                    <div class="form-group mb-3">
-                        <label for="title">Slug<span class="text-danger">*</span></label>
-                        <input type="text" name="slug" id="slug" class="form-control" required>
-                    </div>
+
                     <div class="container">
                         <div class="row">
                             <div class="col-md-3">
@@ -208,7 +205,7 @@
                             <div class="col-md-3">
                                 <div class="mb-3">
                                     <label for="agent_photo" class="form-label">Agent Photo<span class="text-danger">*</span></label>
-                                    <input type="file" class="form-control" id="agent_photo" name="agent_photo" multiple>
+                                    <input type="file" class="form-control" id="agent_photo" name="agent_photo[]" multiple>
                                     <input type="text" class="form-control mt-2" name="alt_texts[agent_photo]" placeholder="Alt text for agent photo">
                                 </div>
                             </div>
@@ -278,9 +275,7 @@
                 </div>
 
                 <!-- Meta Data Tab -->
-                <div class="tab-pane" id="metadata-tab" role="tabpanel">
-                    @include('components.metadata-tab')
-                </div>
+                @include('components.metadata-tab')
             </div>
 
             <div class="mt-4">

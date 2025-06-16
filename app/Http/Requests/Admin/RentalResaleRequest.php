@@ -17,7 +17,6 @@ class RentalResaleRequest extends FormRequest
             'property_type' => 'required|string|max:255',
             'title' => 'required|string|max:255',
             'subtitle' => 'required|string|max:255',
-            'slug' => 'required|string|max:255|unique:rental_resale,slug',
             'top' => 'nullable|boolean',
             'bathroom' => 'required|integer',
             'bedroom' => 'required|integer',
@@ -25,7 +24,10 @@ class RentalResaleRequest extends FormRequest
             'garage' => 'required|integer',
             'description' => 'required|string',
             'details' => 'required|array',
+            'details.*.title' => 'required|string',
+            'details.*.info' => 'required|string',
             'amenities' => 'required|array',
+            'amenities.*.amenity' => 'required|string',
             'agent_title' => 'required|string|max:255',
             'agent_status' => 'required|string|max:255',
             'agent_languages' => 'required|string|max:255',
@@ -36,14 +38,31 @@ class RentalResaleRequest extends FormRequest
             'reference' => 'required|string|max:255',
             'dld_permit_number' => 'required|string|max:255',
             'addresses' => 'required|array',
+            'addresses.*.address' => 'required|string',
             'amount' => 'required|numeric',
             'amount_dirhams' => 'required|numeric',
-            'gallery_images' => 'required|array',
+            'gallery_images' => 'nullable|array',
+            'gallery_images.*' => 'image',
             'tags' => 'required|array',
-            'languages' => 'required|array',
-            'agent_photo' => 'required|image',
+            'languages' => 'nullable|array',
+            'languages.*.languages' => 'required|string',
+            'agent_photo' => 'required|array|min:1',
+            'agent_photo.*' => 'image',
             'location_id' => 'nullable|array',
             'location_id.*' => 'exists:locations,id',
+            'alt_texts' => 'nullable|array',
+        ];
+    }
+
+    public function messages()
+    {
+        return [
+            'agent_photo.required' => 'Please select at least one agent photo.',
+            'agent_photo.*.image' => 'Each agent photo must be a valid image file.',
+            'details.required' => 'Please add at least one detail.',
+            'amenities.required' => 'Please add at least one amenity.',
+            'addresses.required' => 'Please add at least one address.',
+            'tags.required' => 'Please select at least one tag.',
         ];
     }
 }

@@ -37,43 +37,9 @@ class PostypeController extends Controller
         return view('admin.rental_resale.create', compact('locations'));
     }
 
-    public function rentalstore(Request $request)
+    public function rentalstore(RentalResaleRequest $request)
     {
         try {
-            $data = $request->validate(array_merge(
-                [
-                    'title' => 'required',
-                    'subtitle' => 'required',
-                    'slug' => 'required',
-                    'description' => 'required',
-                    'property_type' => 'required',
-                    'amount' => 'required',
-                    'amount_dirhams' => 'required',
-                    'bathroom' => 'required',
-                    'bedroom' => 'required',
-                    'garage' => 'required',
-                    'sq_ft' => 'required',
-                    'details' => 'required',
-                    'amenities' => 'required',
-                    'addresses' => 'required',
-                    'location_link' => 'required',
-                    'location_id' => 'required',
-                    'qr_photo' => 'required|image',
-                    'agent_title' => 'required',
-                    'agent_status' => 'required',
-                    'agent_languages' => 'required',
-                    'agent_call' => 'required',
-                    'agent_whatsapp' => 'required',
-                    'agent_photo' => 'required|image',
-                    'reference' => 'required',
-                    'dld_permit_number' => 'required',
-                    'top' => 'nullable',
-                    'gallery_images.*' => 'image',
-                    'tags' => 'required|array',
-                ],
-                $this->getMetadataValidationRules()
-            ));
-
             $rentalResale = $this->rentalResaleService->storeRentalResale($request);
 
             return redirect()->route('admin.postypes.rental.index')->with('success', 'Rental/Resale created successfully.');

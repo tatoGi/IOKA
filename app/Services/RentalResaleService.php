@@ -10,6 +10,7 @@ use App\Models\RentalResale;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class RentalResaleService
 {
@@ -28,7 +29,7 @@ class RentalResaleService
     public function storeRentalResale(RentalResaleRequest $request)
     {
         $validatedData = $request->validated();
-        $validatedData['slug'] = $this->generateUniqueSlug($request->input('slug'));
+        $validatedData['slug'] = $this->generateUniqueSlug($request->input('title'));
 
         // Handle QR photo upload
         if ($request->hasFile('qr_photo')) {
@@ -37,7 +38,11 @@ class RentalResaleService
 
         // Handle agent photo upload
         if ($request->hasFile('agent_photo')) {
-            $validatedData['agent_photo'] = $request->file('agent_photo')->store('agent_photo', 'public');
+            $agentPhotos = [];
+            foreach ($request->file('agent_photo') as $photo) {
+                $agentPhotos[] = $photo->store('agent_photo', 'public');
+            }
+            $validatedData['agent_photo'] = json_encode($agentPhotos);
         }
 
         // Handle gallery images upload
@@ -167,10 +172,20 @@ class RentalResaleService
 
         // Handle agent photo update
         if ($request->hasFile('agent_photo')) {
+            // Delete existing agent photos
             if ($rentalResale->agent_photo) {
-                Storage::delete($rentalResale->agent_photo);
+                $existingPhotos = is_array($rentalResale->agent_photo) ? $rentalResale->agent_photo : json_decode($rentalResale->agent_photo, true);
+                if (is_array($existingPhotos)) {
+                    foreach ($existingPhotos as $photo) {
+                        Storage::delete($photo);
+                    }
+                }
             }
-            $validatedData['agent_photo'] = $request->file('agent_photo')->store('agent_photo', 'public');
+            $agentPhotos = [];
+            foreach ($request->file('agent_photo') as $photo) {
+                $agentPhotos[] = $photo->store('agent_photo', 'public');
+            }
+            $validatedData['agent_photo'] = json_encode($agentPhotos);
         }
 
         // Handle gallery images update
@@ -187,7 +202,7 @@ class RentalResaleService
             $altTexts = $request->input('alt_texts');
             if (is_array($altTexts)) {
                 // Get existing alt texts
-                $existingAltTexts = json_decode($rentalResale->alt_texts, true) ?? [];
+                $existingAltTexts = is_array($rentalResale->alt_texts) ? $rentalResale->alt_texts : json_decode($rentalResale->alt_texts, true) ?? [];
 
                 // Handle gallery images alt texts
                 if (isset($altTexts['gallery_images'])) {
@@ -251,11 +266,8 @@ class RentalResaleService
 
     private function generateUniqueSlug(string $slug): string
     {
-        // Replace spaces with dashes
-        $slug = str_replace(' ', '-', $slug);
-
-        // Alternatively, use Laravel's helper for a cleaner slug
-        // $slug = \Illuminate\Support\Str::slug($slug);
+        // Use Laravel's helper for a cleaner slug
+        $slug = Str::slug($slug);
 
         $originalSlug = $slug;
         $counter = 1;

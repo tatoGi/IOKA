@@ -53,14 +53,7 @@
                                 @enderror
                             </div>
 
-                            <div class="mb-3">
-                                <label for="slug" class="form-label">Slug</label>
-                                <input type="text" class="form-control @error('slug') is-invalid @enderror" id="slug"
-                                    name="slug" value="{{ old('slug') }}" required>
-                                @error('slug')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
+
 
                             <div class="mb-3">
                                 <label for="body" class="form-label">Body</label>
