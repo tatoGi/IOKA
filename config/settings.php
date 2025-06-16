@@ -34,7 +34,7 @@
       'placeholder' => 'Your Email Address',
       'button_text' => 'Subscribe',
     ),
-    'copyright' => '©2024 Copyright Protected. All Rights Reserved.',
+    'copyright' => '©2024 Copyright Protected. All Rights Reserved. 1',
     'legal_links' => 
     array (
       0 => 
@@ -57,8 +57,8 @@
   'social' => 
   array (
     'facebook' => 'https://www.facebook.com/',
-    'twitter' => 'https://www.facebook.com/',
-    'instagram' => 'https://www.facebook.com/',
-    'youtube' => 'https://www.facebook.com/',
+    'twitter' => 'https://x.com/',
+    'instagram' => 'https://www.instagram.com/',
+    'youtube' => 'https://www.youtube.com/',
   ),
 );

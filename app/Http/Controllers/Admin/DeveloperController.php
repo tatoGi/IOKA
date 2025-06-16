@@ -103,7 +103,7 @@ class DeveloperController extends Controller
                     $developer->awards()->save($award);
 
                     // Save award photo alt text
-                    if (isset($awardData['photo_alt'])) {
+                    if (isset($awardData['photo_alt']) && $award->award_photo) {
                         $award->photoAlt()->create([
                             'photo_path' => $award->award_photo,
                             'alt_text' => $awardData['photo_alt']
@@ -235,10 +235,14 @@ class DeveloperController extends Controller
                         // Update award photo alt text
                         if (isset($awardData['photo_alt'])) {
                             if ($award->photoAlt) {
-                                $award->photoAlt->update([
-                                    'alt_text' => $awardData['photo_alt']
-                                ]);
-                            } else {
+                                if ($award->award_photo) {
+                                    $award->photoAlt->update([
+                                        'alt_text' => $awardData['photo_alt']
+                                    ]);
+                                } else {
+                                    $award->photoAlt->delete();
+                                }
+                            } else if ($award->award_photo) {
                                 $award->photoAlt()->create([
                                     'photo_path' => $award->award_photo,
                                     'alt_text' => $awardData['photo_alt']
@@ -263,7 +267,7 @@ class DeveloperController extends Controller
                         $developer->awards()->save($award);
 
                         // Save award photo alt text
-                        if (isset($awardData['photo_alt'])) {
+                        if (isset($awardData['photo_alt']) && $award->award_photo) {
                             $award->photoAlt()->create([
                                 'photo_path' => $award->award_photo,
                                 'alt_text' => $awardData['photo_alt']
