@@ -146,18 +146,10 @@
                        @php
                             $developerTags = $developer->tags ?? [];
                             if (is_string($developerTags)) {
-                                $developerTags = json_decode($developerTags, true) ?? [];
+                                $developerTags = is_array($developerTags) ? $developerTags : (json_decode($developerTags, true) ?? []);
                             }
                             if (!is_array($developerTags)) {
                                 $developerTags = [];
-                            }
-
-                            $rentalListingsArray = $developer->rental_listings ?? [];
-                            if (is_string($rentalListingsArray)) {
-                                $rentalListingsArray = json_decode($rentalListingsArray, true) ?? [];
-                            }
-                            if (!is_array($rentalListingsArray)) {
-                                $rentalListingsArray = [];
                             }
                         @endphp
                         <div class="mb-3">
@@ -173,7 +165,7 @@
                             <select name="rental_listings[]" id="rental_listings" class="form-control" multiple>
                                 @foreach ($rentalListings as $listing)
                                     <option value="{{ $listing->id }}"
-                                        {{ in_array($listing->id, $rentalListingsArray) ? 'selected' : '' }}>
+                                        {{ in_array($listing->id, $developer->rental_listings ?? []) ? 'selected' : '' }}>
                                         {{ $listing->title }}
                                     </option>
                                 @endforeach
@@ -184,7 +176,7 @@
                             <select name="offplan_listings[]" id="offplan_listings" class="form-control" multiple>
                                 @foreach ($offplanListings as $listing)
                                     <option value="{{ $listing->id }}"
-                                        {{ $developer->offplanListings->contains($listing->id) ? 'selected' : '' }}>
+                                        {{ in_array($listing->id, $developer->offplan_listings ?? []) ? 'selected' : '' }}>
                                         {{ $listing->title }}
                                     </option>
                                 @endforeach

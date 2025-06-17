@@ -122,7 +122,7 @@
                                             @php
                                                 $details = $rentalResale->details;
                                                 if (is_string($details)) {
-                                                    $details = json_decode($details, true) ?: [];
+                                                    $details = is_array($details) ? $details : (json_decode($details, true) ?: []);
                                                 }
                                                 if (!is_array($details)) {
                                                     $details = [];
@@ -169,7 +169,7 @@
                                             @php
                                                 $amenities = $rentalResale->amenities;
                                                 if (is_string($amenities)) {
-                                                    $amenities = json_decode($amenities, true);
+                                                    $amenities = is_array($amenities) ? $amenities : json_decode($amenities, true);
                                                 }
                                                 // If it's an array of strings, transform it.
                                                 if (!empty($amenities) && is_array($amenities) && !is_array(current($amenities))) {
@@ -205,7 +205,7 @@
                                             @php
                                                 $addresses = $rentalResale->addresses;
                                                 if (is_string($addresses)) {
-                                                    $addresses = json_decode($addresses, true);
+                                                    $addresses = is_array($addresses) ? $addresses : json_decode($addresses, true);
                                                 }
                                                 // If it's an array of strings, transform it.
                                                 if (!empty($addresses) && is_array($addresses) && !is_array(current($addresses))) {

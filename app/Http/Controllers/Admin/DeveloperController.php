@@ -52,8 +52,6 @@ class DeveloperController extends Controller
             'offplan_listings' => 'nullable|array',
             'offplan_listings.*' => 'exists:offplans,id',
             'awards' => 'nullable|array',
-            'name' => 'required|string|max:255',
-            'description' => 'required|string',
             'banner_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ], $this->getMetadataValidationRules()));
 
@@ -182,7 +180,7 @@ class DeveloperController extends Controller
         }
 
         // Handle multiple photo uploads with alt text
-        $photos = json_decode($developer->photo, true) ?? [];
+        $photos = is_array($developer->photo) ? $developer->photo : (json_decode($developer->photo, true) ?? []);
         if ($request->has('photo')) {
             $newPhotos = [];
             foreach ($request->photo as $index => $photo) {
@@ -293,6 +291,10 @@ class DeveloperController extends Controller
             'photo' => json_encode($photos),
         ]));
 
+        // Sync rental and off-plan listings
+        $developer->rentalResaleListings()->sync($request->input('rental_listings', []));
+        $developer->offplanListings()->sync($request->input('offplan_listings', []));
+
         // Handle metadata
         $this->handleMetadata($request, $developer);
 
@@ -353,7 +355,7 @@ class DeveloperController extends Controller
 
         // Update the database to remove the photo from the developer's data
         $developer = Developer::findOrFail($developerId);
-        $photos = json_decode($developer->photo, true) ?? [];
+        $photos = is_array($developer->photo) ? $developer->photo : (json_decode($developer->photo, true) ?? []);
 
         // Find and remove the photo from the array
         $photos = array_filter($photos, function ($photo) use ($photoPath) {
