@@ -64,3 +64,57 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+## Bulk Seeder Usage
+
+You can use the Bulk Seeder Artisan command to quickly create or remove large amounts of test data for BlogPost, Developer, RentalResale, and Offplan models.
+
+### Command Syntax
+
+```
+php artisan bulk:seed {type} [--count=NUMBER] [--remove] [--force]
+```
+
+- `{type}`: The type of records to manage. Options: `blog`, `developer`, `rental`, `offplan`, or `all` (for all models).
+- `--count=NUMBER`: Number of records to create (default: 10,000). Only used when creating records.
+- `--remove`: Remove all records of the specified type instead of creating them.
+- `--force`: Skip confirmation prompts (useful for scripting or automation).
+
+### Examples
+
+#### Create 10,000 Developers
+```
+php artisan bulk:seed developer --count=10000 --force
+```
+
+#### Create 5,000 Rental Resale records
+```
+php artisan bulk:seed rental --count=5000 --force
+```
+
+#### Create 10,000 Blog Posts
+```
+php artisan bulk:seed blog --count=10000 --force
+```
+
+#### Create 10,000 Offplan records
+```
+php artisan bulk:seed offplan --count=10000 --force
+```
+
+#### Create 2,000 records for all models
+```
+php artisan bulk:seed all --count=2000 --force
+```
+
+#### Remove all Developer records
+```
+php artisan bulk:seed developer --remove --force
+```
+
+#### Remove all records for all models
+```
+php artisan bulk:seed all --remove --force
+```
+
+> **Note:** Omit `--force` to receive a confirmation prompt before proceeding.
