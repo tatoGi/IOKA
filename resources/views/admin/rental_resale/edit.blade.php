@@ -117,24 +117,46 @@
                             <div class="col-md-4">
                                 <div class="mb-3">
                                     <label for="details" class="form-label">Details<span class="text-danger">*</span></label>
-                                    <div class="details-repeater">
+                                     <div class="details-repeater">
                                         <div data-repeater-list="details">
-                                            @if(isset($rentalResale->details))
-                                                @foreach ((array) $rentalResale->details as $index => $detail)
-                                                    <div data-repeater-item class="repeater-item mb-2">
-                                                        <input type="text" class="form-control mb-2" name="details[{{ $index }}][title]" value="{{ $detail['title'] }}" placeholder="Title" required>
-                                                        <input type="text" class="form-control mb-2" name="details[{{ $index }}][info]" value="{{ $detail['info'] }}" placeholder="Information" required>
-                                                        <button type="button" class="btn btn-danger" data-repeater-delete>
-                                                            <i class="fas fa-trash-alt"></i> Remove
-                                                        </button>
-                                                    </div>
-                                                @endforeach
-                                            @endif
+                                            @php
+                                                $details = $rentalResale->details;
+                                                if (is_string($details)) {
+                                                    $details = json_decode($details, true) ?: [];
+                                                }
+                                                if (!is_array($details)) {
+                                                    $details = [];
+                                                }
+
+                                                $normalized = [];
+                                                foreach ($details as $item) {
+                                                    if (is_array($item) && isset($item['title']) && isset($item['info'])) {
+                                                        $normalized[] = [
+                                                            'title' => is_scalar($item['title']) ? $item['title'] : '',
+                                                            'info' => is_scalar($item['info']) ? $item['info'] : ''
+                                                        ];
+                                                    }
+                                                }
+
+                                                $detailsData = old('details', $normalized);
+                                                if (empty($detailsData)) {
+                                                    $detailsData = [['title' => '', 'info' => '']];
+                                                }
+                                            @endphp
+                                            @foreach ($detailsData as $detail)
+                                                <div data-repeater-item class="repeater-item mb-2">
+                                                    <input type="text" name="title" class="form-control mb-2" value="{{ $detail['title'] ?? '' }}" placeholder="Title" required>
+                                                    <input type="text" name="info" class="form-control mb-2" value="{{ $detail['info'] ?? '' }}" placeholder="Information" required>
+                                                    <button type="button" class="btn btn-danger" data-repeater-delete>
+                                                        <i class="fas fa-trash-alt"></i> Remove
+                                                    </button>
+                                                </div>
+                                            @endforeach
                                         </div>
-                                        <button type="button" class="btn btn-primary mt-2" data-repeater-create>
-                                            <i class="fas fa-plus"></i> Add Detail
-                                        </button>
-                                    </div>
+                                         <button type="button" class="btn btn-primary mt-2" data-repeater-create>
+                                             <i class="fas fa-plus"></i> Add Detail
+                                         </button>
+                                     </div>
                                 </div>
                             </div>
 
@@ -142,23 +164,35 @@
                             <div class="col-md-4">
                                 <div class="mb-3">
                                     <label for="amenities" class="form-label">Amenities<span class="text-danger">*</span></label>
-                                    <div class="amenities-repeater">
+                                     <div class="amenities-repeater">
                                         <div data-repeater-list="amenities">
-                                            @if(isset($rentalResale->amenities))
-                                                @foreach ((is_array($rentalResale->amenities) ? $rentalResale->amenities : json_decode($rentalResale->amenities, true)) as $index => $amenity)
-                                                    <div data-repeater-item class="repeater-item mb-2">
-                                                        <input type="text" class="form-control mb-2" name="amenities[{{ $index }}]" value="{{ is_array($amenity) ? implode(', ', $amenity) : $amenity }}" placeholder="Amenity" required>
-                                                        <button type="button" class="btn btn-danger" data-repeater-delete>
-                                                            <i class="fas fa-trash-alt"></i> Remove
-                                                        </button>
-                                                    </div>
-                                                @endforeach
-                                            @endif
+                                            @php
+                                                $amenities = $rentalResale->amenities;
+                                                if (is_string($amenities)) {
+                                                    $amenities = json_decode($amenities, true);
+                                                }
+                                                // If it's an array of strings, transform it.
+                                                if (!empty($amenities) && is_array($amenities) && !is_array(current($amenities))) {
+                                                    $amenities = array_map(fn($v) => ['amenity' => $v], $amenities);
+                                                }
+                                                $amenitiesData = old('amenities', $amenities);
+                                                if (empty($amenitiesData)) {
+                                                    $amenitiesData = [['amenity' => '']];
+                                                }
+                                            @endphp
+                                            @foreach ($amenitiesData as $amenity)
+                                                <div data-repeater-item class="repeater-item mb-2">
+                                                    <input type="text" name="amenity" class="form-control mb-2" value="{{ $amenity['amenity'] ?? '' }}" placeholder="Amenity" required>
+                                                    <button type="button" class="btn btn-danger" data-repeater-delete>
+                                                        <i class="fas fa-trash-alt"></i> Remove
+                                                    </button>
+                                                </div>
+                                            @endforeach
                                         </div>
-                                        <button type="button" class="btn btn-primary mt-2" data-repeater-create>
-                                            <i class="fas fa-plus"></i> Add Amenity
-                                        </button>
-                                    </div>
+                                         <button type="button" class="btn btn-primary mt-2" data-repeater-create>
+                                             <i class="fas fa-plus"></i> Add Amenity
+                                         </button>
+                                     </div>
                                 </div>
                             </div>
 
@@ -166,23 +200,35 @@
                             <div class="col-md-4">
                                 <div class="mb-3">
                                     <label for="addresses" class="form-label">Addresses<span class="text-danger">*</span></label>
-                                    <div class="addresses-repeater">
+                                     <div class="addresses-repeater">
                                         <div data-repeater-list="addresses">
-                                            @if(isset($rentalResale->addresses))
-                                                @foreach ((is_array($rentalResale->addresses) ? $rentalResale->addresses : json_decode($rentalResale->addresses, true)) as $index => $address)
-                                                    <div data-repeater-item class="repeater-item mb-2">
-                                                        <input type="text" class="form-control mb-2" name="addresses[{{ $index }}]" value="{{ is_array($address) ? implode(', ', $address) : $address }}" placeholder="Address" required>
-                                                        <button type="button" class="btn btn-danger" data-repeater-delete>
-                                                            <i class="fas fa-trash-alt"></i> Remove
-                                                        </button>
-                                                    </div>
-                                                @endforeach
-                                            @endif
+                                            @php
+                                                $addresses = $rentalResale->addresses;
+                                                if (is_string($addresses)) {
+                                                    $addresses = json_decode($addresses, true);
+                                                }
+                                                // If it's an array of strings, transform it.
+                                                if (!empty($addresses) && is_array($addresses) && !is_array(current($addresses))) {
+                                                    $addresses = array_map(fn($v) => ['address' => $v], $addresses);
+                                                }
+                                                $addressesData = old('addresses', $addresses);
+                                                if (empty($addressesData)) {
+                                                    $addressesData = [['address' => '']];
+                                                }
+                                            @endphp
+                                            @foreach ($addressesData as $address)
+                                                <div data-repeater-item class="repeater-item mb-2">
+                                                    <input type="text" name="address" class="form-control mb-2" value="{{ $address['address'] ?? '' }}" placeholder="Address" required>
+                                                    <button type="button" class="btn btn-danger" data-repeater-delete>
+                                                        <i class="fas fa-trash-alt"></i> Remove
+                                                    </button>
+                                                </div>
+                                            @endforeach
                                         </div>
-                                        <button type="button" class="btn btn-primary mt-2" data-repeater-create>
-                                            <i class="fas fa-plus"></i> Add Address
-                                        </button>
-                                    </div>
+                                         <button type="button" class="btn btn-primary mt-2" data-repeater-create>
+                                             <i class="fas fa-plus"></i> Add Address
+                                         </button>
+                                     </div>
                                 </div>
                             </div>
                         </div>
@@ -501,58 +547,76 @@
         </div>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const postId = document.getElementById('postId').value;
-            const form = document.querySelector('form');
-            const modal = document.getElementById('galleryModal');
-            const saveChangesBtn = document.getElementById('save-gallery-changes');
-            const galleryAltTextsInput = document.getElementById('gallery-alt-texts-input');
+@endsection
 
-            // Handle save changes button click
-            saveChangesBtn.addEventListener('click', function() {
-                // Collect all alt texts from the modal
-                const altTexts = {
-                    gallery_images: {}
-                };
+@push('scripts')
+<script>
+    $(document).ready(function () {
+        const postId = document.getElementById('postId').value;
+        const form = document.querySelector('form');
+        const modal = document.getElementById('galleryModal');
+        const saveChangesBtn = document.getElementById('save-gallery-changes');
+        const galleryAltTextsInput = document.getElementById('gallery-alt-texts-input');
 
-                // Get existing alt texts
-                let existingAltTexts = {};
-                try {
-                    existingAltTexts = JSON.parse(galleryAltTextsInput.value || '{}');
-                } catch (e) {
-                    console.error('Error parsing existing alt texts:', e);
-                }
+        // Handle save changes button click
+        saveChangesBtn.addEventListener('click', function() {
+            // Collect all alt texts from the modal
+            const altTexts = {
+                gallery_images: {}
+            };
 
-                // Collect alt texts from the modal
-                document.querySelectorAll('.gallery-alt-text').forEach(input => {
-                    const name = input.getAttribute('name');
-                    const value = input.value;
-                    if (name && value) {
-                        // Extract the index from the name attribute
-                        const match = name.match(/\[(\d+)\]$/);
-                        if (match) {
-                            const index = match[1];
-                            altTexts.gallery_images[index] = value;
-                        }
+            // Get existing alt texts
+            let existingAltTexts = {};
+            try {
+                existingAltTexts = JSON.parse(galleryAltTextsInput.value || '{}');
+            } catch (e) {
+                console.error('Error parsing existing alt texts:', e);
+            }
+
+            // Collect alt texts from the modal
+            document.querySelectorAll('.gallery-alt-text').forEach(input => {
+                const name = input.getAttribute('name');
+                const value = input.value;
+                if (name && value) {
+                    // Extract the index from the name attribute
+                    const match = name.match(/\[(\d+)\]$/);
+                    if (match) {
+                        const index = match[1];
+                        altTexts.gallery_images[index] = value;
                     }
-                });
-
-                // Merge with existing alt texts
-                const mergedAltTexts = {
-                    ...existingAltTexts,
-                    gallery_images: altTexts.gallery_images
-                };
-
-                // Update the hidden input value
-                galleryAltTextsInput.value = JSON.stringify(mergedAltTexts);
-
-                // Close the modal
-                const modalInstance = bootstrap.Modal.getInstance(modal);
-                modalInstance.hide();
+                }
             });
+
+            // Merge with existing alt texts
+            const mergedAltTexts = {
+                ...existingAltTexts,
+                gallery_images: altTexts.gallery_images
+            };
+
+            // Update the hidden input value
+            galleryAltTextsInput.value = JSON.stringify(mergedAltTexts);
+
+            // Close the modal
+            const modalInstance = bootstrap.Modal.getInstance(modal);
+            modalInstance.hide();
         });
-        document.getElementById('remove-og-image-btn')?.addEventListener('click', function() {
+
+        // Initialize Repeaters
+        $('.details-repeater, .amenities-repeater, .addresses-repeater').repeater({
+            show: function () {
+                $(this).slideDown();
+            },
+            hide: function (deleteElement) {
+                if(confirm('Are you sure you want to delete this element?')) {
+                    $(this).slideUp(deleteElement);
+                }
+            },
+            ready: function (setIndexes) {
+                /* Not needed */
+            }
+        });
+
+        $('#remove-og-image-btn')?.on('click', function() {
             if (confirm('Are you sure you want to remove the OG image?')) {
                 fetch('{{ route('admin.rental_resale.delete-og-image', ['postype' => $rentalResale]) }}', {
                     method: 'DELETE',
@@ -574,7 +638,7 @@
             }
         });
 
-        document.getElementById('remove-twitter-image-btn')?.addEventListener('click', function() {
+        $('#remove-twitter-image-btn')?.on('click', function() {
             if (confirm('Are you sure you want to remove the Twitter image?')) {
                 fetch('{{ route('admin.rental_resale.delete-twitter-image', ['postype' => $rentalResale]) }}', {
                     method: 'DELETE',
@@ -596,8 +660,9 @@
                 .catch(error => console.error('Error:', error));
             }
         });
-    </script>
-@endsection
+    });
+</script>
+@endpush
 
 
 
