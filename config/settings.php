@@ -35,24 +35,7 @@
       'button_text' => 'Subscribe1',
     ),
     'copyright' => '©2024 Copyright Protected. All Rights Reserved.',
-    'legal_links' => 
-    array (
-      0 => 
-      array (
-        'title' => 'Terms of Service1',
-        'url' => 'terms1',
-      ),
-      1 => 
-      array (
-        'title' => 'Privacy Policy1',
-        'url' => 'privacy1',
-      ),
-      2 => 
-      array (
-        'title' => 'Cookie Policy1',
-        'url' => 'cookies1',
-      ),
-    ),
+   
   ),
   'social' => 
   array (

@@ -184,12 +184,7 @@
                                     <input type="text" class="form-control" id="agent_status" name="agent_status" required>
                                 </div>
                             </div>
-                            <div class="col-md-2">
-                                <div class="mb-3">
-                                    <label for="agent_languages" class="form-label">Agent Languages<span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="agent_languages" name="agent_languages" required>
-                                </div>
-                            </div>
+                           
                             <div class="col-md-2">
                                 <div class="mb-3">
                                     <label for="agent_call" class="form-label">Agent Call<span class="text-danger">*</span></label>
@@ -200,6 +195,12 @@
                                 <div class="mb-3">
                                     <label for="agent_whatsapp" class="form-label">Agent WhatsApp<span class="text-danger">*</span></label>
                                     <input type="text" class="form-control" id="agent_whatsapp" name="agent_whatsapp" required>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="mb-3">
+                                    <label for="agent_email" class="form-label">Agent Email</label>
+                                    <input type="email" class="form-control" id="agent_email" name="agent_email">
                                 </div>
                             </div>
                             <div class="col-md-3">

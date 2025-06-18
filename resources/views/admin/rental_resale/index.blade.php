@@ -43,5 +43,9 @@
             @endisset
         </tbody>
     </table>
+    <!-- Paginate Links -->
+    <div class="pagination">
+        {{ $rentalResales->links('admin.componenets.pagination') }} <!-- Use Bootstrap 4 pagination -->
+    </div>
 </div>
 @endsection

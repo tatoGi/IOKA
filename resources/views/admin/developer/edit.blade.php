@@ -67,12 +67,7 @@
                         <div class="form-group mb-3">
                             <label for="photo">Photos</label>
                             <div id="photo-container" class="row">
-                                @php
-                                    $photos = $developer->photo ?? [];
-                                    if (!is_array($photos)) {
-                                        $photos = []; // Ensure $photos is always an array
-                                    }
-                                @endphp
+
 
                                 @foreach ($photos as $photo)
                                     <div class="col-md-4 mb-3">

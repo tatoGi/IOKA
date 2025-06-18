@@ -102,6 +102,23 @@ class RentalResaleService
         $rentalResale->delete();
     }
 
+    public function removeAgentPhoto($id)
+    {
+        $rentalResale = RentalResale::findOrFail($id);
+        if ($rentalResale->agent_photo) {
+            $agentPhotos = is_array($rentalResale->agent_photo) ? $rentalResale->agent_photo : json_decode($rentalResale->agent_photo, true);
+            if(is_array($agentPhotos)){
+                foreach($agentPhotos as $photo){
+                    Storage::delete($photo);
+                }
+            } else {
+                Storage::delete($rentalResale->agent_photo);
+            }
+            $rentalResale->agent_photo = null;
+            $rentalResale->save();
+        }
+    }
+
     public function removeQrPhoto($id)
     {
         $rentalResale = RentalResale::findOrFail($id);
@@ -156,6 +173,9 @@ class RentalResaleService
     {
         $validatedData = $request->validated();
         $rentalResale = RentalResale::findOrFail($id);
+
+        // Handle the 'top' checkbox value.
+        $validatedData['top'] = $request->has('top');
 
         // Handle slug update
         if ($request->has('slug') && $request->input('slug') !== $rentalResale->slug) {
@@ -230,6 +250,17 @@ class RentalResaleService
 
                 $validatedData['alt_texts'] = json_encode($existingAltTexts);
             }
+        }
+
+        // Handle languages array
+        if ($request->has('languages')) {
+            $languagesInput = $request->input('languages');
+            $languages = collect($languagesInput)
+                ->pluck('language')
+                ->filter()
+                ->values()
+                ->all();
+            $validatedData['languages'] = $languages;
         }
 
         // Remove amount fields

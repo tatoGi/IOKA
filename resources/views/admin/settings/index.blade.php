@@ -342,45 +342,6 @@
                             </div>
                         </div>
 
-                        <!-- Legal Links -->
-                        <div class="mb-4">
-                            <h5 class="mb-3">Legal Links</h5>
-                            <div id="legal-links-container">
-                                @foreach(($settings['footer']['legal_links'] ?? []) as $index => $link)
-                                <div class="link-item mb-3 p-3 border rounded position-relative">
-                                    <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 m-2 remove-link"
-                                            data-index="{{ $index }}">
-                                        <i class="fas fa-times"></i>
-                                    </button>
-                                    <div class="row">
-                                        <div class="col-md-6 mb-2">
-                                            <label>Title</label>
-                                            <input type="text" class="form-control @error("footer.legal_links.$index.title") is-invalid @enderror"
-                                                   name="footer[legal_links][{{ $index }}][title]"
-                                                   value="{{ old("footer.legal_links.$index.title", $link['title'] ?? '') }}">
-                                            @error("footer.legal_links.$index.title")
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-                                        <div class="col-md-6 mb-2">
-                                            <label>URL</label>
-                                            <input type="text" class="form-control @error("footer.legal_links.$index.url") is-invalid @enderror"
-                                                   name="footer[legal_links][{{ $index }}][url]"
-                                                   value="{{ old("footer.legal_links.$index.url", $link['url'] ?? '') }}"
-                                                   placeholder="terms-of-service">
-                                            @error("footer.legal_links.$index.url")
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                            @enderror
-                                            <small class="text-muted">Enter URL as slug (e.g., terms-of-service)</small>
-                                        </div>
-                                    </div>
-                                </div>
-                                @endforeach
-                            </div>
-                            <button type="button" class="btn btn-sm btn-secondary mt-2" id="add-legal-link">
-                                <i class="fas fa-plus"></i> Add Legal Link
-                            </button>
-                        </div>
                     </div>
                 </div>
             </div>

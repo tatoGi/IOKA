@@ -234,6 +234,7 @@
                         </div>
                     </div>
 
+               
                     <!-- Agent Information -->
                     <div class="container">
                         <div class="row">
@@ -251,12 +252,6 @@
                             </div>
                             <div class="col-md-2">
                                 <div class="mb-3">
-                                    <label for="agent_languages" class="form-label">Agent Languages<span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="agent_languages" name="agent_languages" value="{{ $rentalResale->agent_languages }}" required>
-                                </div>
-                            </div>
-                            <div class="col-md-2">
-                                <div class="mb-3">
                                     <label for="agent_call" class="form-label">Agent Call<span class="text-danger">*</span></label>
                                     <input type="text" class="form-control" id="agent_call" name="agent_call" value="{{ $rentalResale->agent_call }}" required>
                                 </div>
@@ -265,6 +260,12 @@
                                 <div class="mb-3">
                                     <label for="agent_whatsapp" class="form-label">Agent WhatsApp<span class="text-danger">*</span></label>
                                     <input type="text" class="form-control" id="agent_whatsapp" name="agent_whatsapp" value="{{ $rentalResale->agent_whatsapp }}" required>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="mb-3">
+                                    <label for="agent_email" class="form-label">Agent Email</label>
+                                    <input type="email" class="form-control" id="agent_email" name="agent_email" value="{{ old('agent_email', $rentalResale->agent_email) }}">
                                 </div>
                             </div>
                             <div class="col-md-3">
@@ -293,22 +294,44 @@
                             </div>
                             <div class="col-md-3">
                                 <div class="mb-3">
-                                    <label for="languages" class="form-label">languages</label>
+                                    <label for="languages" class="form-label">Languages</label>
                                     <div class="languages-repeater">
                                         <div data-repeater-list="languages">
-                                            @if(isset($rentalResale->languages))
-                                                @foreach ((is_array($rentalResale->languages) ? $rentalResale->languages : json_decode($rentalResale->languages, true)) as $index => $language)
+                                            @php
+                                                $languages = $rentalResale->languages;
+                                                if (is_string($languages)) {
+                                                    $languages = json_decode($languages, true) ?: [];
+                                                }
+                                                if (!is_array($languages)) {
+                                                    $languages = [];
+                                                }
+                                                // If it's an array of strings, transform it to an array of arrays/objects.
+                                                if (!empty($languages) && is_array($languages) && is_string(current($languages))) {
+                                                    $languages = array_map(fn($v) => ['language' => $v], $languages);
+                                                }
+                                                $languagesData = old('languages', $languages);
+                                            @endphp
+
+                                            @if (!empty($languagesData))
+                                                @foreach ($languagesData as $languageItem)
                                                     <div data-repeater-item class="repeater-item mb-2">
-                                                        <input type="text" class="form-control mb-2" name="languages[{{ $index }}]" value="{{ is_array($language) ? implode(', ', $language) : $language }}" required>
+                                                        <input type="text" name="language" class="form-control mb-2" value="{{ $languageItem['language'] ?? '' }}" placeholder="Language">
                                                         <button type="button" class="btn btn-danger" data-repeater-delete>
                                                             <i class="fas fa-trash-alt"></i> Remove
                                                         </button>
                                                     </div>
                                                 @endforeach
+                                            @else
+                                                <div data-repeater-item class="repeater-item mb-2">
+                                                    <input type="text" name="language" class="form-control mb-2" placeholder="Language">
+                                                    <button type="button" class="btn btn-danger" data-repeater-delete>
+                                                        <i class="fas fa-trash-alt"></i> Remove
+                                                    </button>
+                                                </div>
                                             @endif
                                         </div>
                                         <button type="button" class="btn btn-primary mt-2" data-repeater-create>
-                                            <i class="fas fa-plus"></i> Add languages
+                                            <i class="fas fa-plus"></i> Add Language
                                         </button>
                                     </div>
                                 </div>
@@ -322,11 +345,12 @@
                         <input type="text" class="form-control" id="location_link" name="location_link" value="{{ $rentalResale->location_link }}" required>
                     </div>
                     <div class="mb-3">
+                    
                         <label for="location_id" class="form-label">Location<span class="text-danger">*</span></label>
                         <select name="location_id[]" id="location_id" class="form-control select2" required>
                             <option value="">Select Location</option>
                             @foreach($locations as $location)
-                                <option value="{{ $location->id }}" {{ $selectedLocations[0] == $location->id ? 'selected' : '' }}>
+                                <option value="{{ $location->id }}" {{ !empty($selectedLocations) && $selectedLocations[0] == $location->id ? 'selected' : '' }}>
                                     {{ $location->title }}
                                 </option>
                             @endforeach
@@ -352,11 +376,13 @@
                     </div>
                     <div class="mb-3">
                         <label for="top" class="form-label">Mark as Top Listing<span class="text-danger">*</span></label>
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input" id="top" name="top" value="1" {{ $rentalResale->top ? 'checked' : '' }}>
-                            <label class="form-check-label" for="is_top">Check this box to mark the property as a top listing</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="top" name="top" value="1" {{ old('top', $rentalResale->top) ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="top">
+                                        Mark as Top Listing
+                                    </label>
+                                </div>
                         </div>
-                    </div>
                     <div class="mb-3">
                         <label for="gallery" class="form-label">Gallery</label>
                         <input type="file" class="form-control" id="gallery" name="gallery_images[]" multiple>
@@ -602,18 +628,17 @@
         });
 
         // Initialize Repeaters
-        $('.details-repeater, .amenities-repeater, .addresses-repeater').repeater({
-            show: function () {
-                $(this).slideDown();
-            },
-            hide: function (deleteElement) {
-                if(confirm('Are you sure you want to delete this element?')) {
-                    $(this).slideUp(deleteElement);
+        $(document).ready(function() {
+            $('.details-repeater, .amenities-repeater, .languages-repeater').repeater({
+                show: function() {
+                    $(this).slideDown();
+                },
+                hide: function(deleteElement) {
+                    if (confirm('Are you sure you want to delete this element?')) {
+                        $(this).slideUp(deleteElement);
+                    }
                 }
-            },
-            ready: function (setIndexes) {
-                /* Not needed */
-            }
+            });
         });
 
         $('#remove-og-image-btn')?.on('click', function() {
@@ -655,6 +680,87 @@
                         location.reload();
                     } else {
                         alert('Failed to remove Twitter image.');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            }
+        });
+
+        // Handle gallery image deletion
+        $('.remove-gallery-image').on('click', function() {
+            if (confirm('Are you sure you want to remove this image?')) {
+                const imagePath = $(this).data('image-path');
+                const postId = {{ $rentalResale->id }};
+                const container = $(this).closest('.gallery-image-item');
+
+                fetch(`{{ route('admin.postypes.rental_resale.removeGalleryImage', ['postype' => $rentalResale->id]) }}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ image: imagePath })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Image removed successfully.');
+                        container.remove();
+                    } else {
+                        alert('Failed to remove image: ' + (data.message || 'Unknown error'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while removing the image.');
+                });
+            }
+        });
+
+        // Handle agent photo deletion
+        $('#remove-agent-photo').on('click', function() {
+            if (confirm('Are you sure you want to remove the agent photo?')) {
+                const postId = {{ $rentalResale->id }};
+
+                fetch(`{{ route('admin.postypes.rental_resale.removeAgentPhoto', ['postype' => $rentalResale->id]) }}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Agent photo removed successfully.');
+                        location.reload();
+                    } else {
+                        alert('Failed to remove agent photo.');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            }
+        });
+
+        // Handle QR photo deletion
+        $('#remove-qr-photo').on('click', function() {
+            if (confirm('Are you sure you want to remove the QR photo?')) {
+                const postId = {{ $rentalResale->id }};
+
+                fetch(`{{ route('admin.postypes.rental_resale.removeQrPhoto', ['postype' => $rentalResale->id]) }}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('QR photo removed successfully.');
+                        location.reload();
+                    } else {
+                        alert('Failed to remove QR photo.');
                     }
                 })
                 .catch(error => console.error('Error:', error));

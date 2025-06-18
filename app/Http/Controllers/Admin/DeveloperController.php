@@ -125,7 +125,7 @@ class DeveloperController extends Controller
         $rentalListings = RentalResale::all(); // Fetch all rental listings
         $awards = $developer->awards; // Fetch all awards associated with the developer
         // Get the arrays directly from the model since they're already cast
-        $photos = $developer->photo ?? [];
+        $photos = json_decode($developer->photo, true) ?? [];
         $tags = $developer->tags ?? [];
         $rentalListingsArray = $developer->rental_listings ?? []; // Get rental_listings array directly
 

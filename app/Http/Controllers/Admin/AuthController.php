@@ -24,22 +24,25 @@ class AuthController extends Controller
         // Get the validated data
         $validated = $request->validated();
 
-        // Verify the reCAPTCHA response
-        $secretKey = env('RECAPTCHA_SECRET');
+        // Verify the reCAPTCHA response if not in local environment
+        if (env('APP_ENV') !== 'local') {
+            $secretKey = env('RECAPTCHA_SECRET');
 
-        $response = Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
-            'secret' => $secretKey,
-        ]);
+            $response = Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
+                'secret' => $secretKey,
+                'response' => $request->input('g-recaptcha-response'),
+            ]);
 
-        $recaptchaData = $response->json();
+            $recaptchaData = $response->json();
 
-        // Log failed login attempt for invalid CAPTCHA
-        if (! $recaptchaData['success']) {
-            $this->logLoginActivity($validated['name'], 'failed');
+            // Log failed login attempt for invalid CAPTCHA
+            if (! $recaptchaData['success']) {
+                $this->logLoginActivity($validated['name'], 'failed');
 
-            return redirect()->route('admin.login')
-                ->withErrors(['g-recaptcha-response' => 'CAPTCHA verification failed. Please try again.'])
-                ->withInput();
+                return redirect()->route('admin.login')
+                    ->withErrors(['g-recaptcha-response' => 'CAPTCHA verification failed. Please try again.'])
+                    ->withInput();
+            }
         }
 
         // Check user credentials

@@ -25,9 +25,9 @@ class RentalResale extends Model
         'amenities',
         'agent_title',
         'agent_status',
-        'agent_languages',
         'agent_call',
         'agent_whatsapp',
+        'agent_email',
         'agent_photo',
         'location_link',
         'qr_photo',
@@ -51,6 +51,7 @@ class RentalResale extends Model
         'addresses' => 'array',
         'gallery_images' => 'array',
         'tags' => 'array',
+        'top' => 'boolean',
         'languages' => 'array', // Ensuring JSON is handled properly
         'alt_texts' => 'array',
     ];

@@ -75,6 +75,13 @@ class PostypeController extends Controller
         return redirect()->route('admin.postypes.rental.index')->with('success', 'Rental Resale Post deleted successfully.');
     }
 
+    public function removeAgentPhoto($id)
+    {
+        $this->rentalResaleService->removeAgentPhoto($id);
+
+        return response()->json(['success' => true]);
+    }
+
     public function removeQrPhoto($id)
     {
         $this->rentalResaleService->removeQrPhoto($id);
