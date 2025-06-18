@@ -11,6 +11,7 @@ use App\Models\RentalResale;
 use App\Models\Section;
 use App\Models\Location;
 use App\Models\MetaData;
+use Illuminate\Support\Facades\Schema;
 
 class PageService
 {
@@ -256,21 +257,29 @@ class PageService
 
     public function search($query)
     {
-        $blogs = BlogPost::with('metadata')->where('title', 'like', "%$query%")
-            ->orWhere('body', 'like', "%$query%")
-            ->get();
+        $searchInModel = function ($modelClass, $query) {
+            $model = new $modelClass();
+            $queryBuilder = $modelClass::query();
+            $table = $model->getTable();
+            $columns = Schema::getColumnListing($table);
 
-        $developers = Developer::with('metadata')->where('title', 'like', "%$query%")
-            ->orWhere('paragraph', 'like', "%$query%")
-            ->get();
+            $queryBuilder->where(function ($q) use ($columns, $query, $table) {
+                foreach ($columns as $column) {
+                    $q->orWhere($table . '.' . $column, 'like', "%{$query}%");
+                }
+            });
 
-        $offplans = Offplan::with('metadata')->where('title', 'like', "%$query%")
-            ->orWhere('description', 'like', "%$query%")
-            ->get();
+            if (method_exists($model, 'metadata')) {
+                $queryBuilder->with('metadata');
+            }
 
-        $rentalResales = RentalResale::with('metadata')->where('title', 'like', "%$query%")
-            ->orWhere('description', 'like', "%$query%")
-            ->get();
+            return $queryBuilder->paginate(50);
+        };
+
+        $blogs = $searchInModel(BlogPost::class, $query);
+        $developers = $searchInModel(Developer::class, $query);
+        $offplans = $searchInModel(Offplan::class, $query);
+        $rentalResales = $searchInModel(RentalResale::class, $query);
 
         return [
             'blogs' => $blogs,

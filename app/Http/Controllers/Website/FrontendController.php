@@ -201,16 +201,26 @@ class FrontendController extends Controller
 
     public function search(Request $request): JsonResponse
     {
-
         $query = $request->input('query');
 
-        if (!$query) {
-            return response()->json(['error' => 'Search query is required'], 400);
+        if (! $query) {
+            return response()->json(['error' => 'Query parameter is missing'], 400);
         }
 
         $results = $this->pageService->search($query);
 
-        return response()->json($results);
+        $formattedResults = [];
+        foreach ($results as $key => $paginator) {
+            $formattedResults[$key] = [
+                'data' => $paginator->items(),
+                'current_page' => $paginator->currentPage(),
+                'last_page' => $paginator->lastPage(),
+                'per_page' => $paginator->perPage(),
+                'total' => $paginator->total(),
+            ];
+        }
+
+        return response()->json($formattedResults);
     }
     public function filter_offplan(Request $request)
     {
