@@ -84,9 +84,9 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="mt-4">
-                    {{ $blogPosts->links() }}
-                </div>
+                <div class="pagination">
+        {{ $blogPosts->links('admin.componenets.pagination') }} <!-- Use Bootstrap 4 pagination -->
+    </div>
             </div>
         </div>
     </div>
