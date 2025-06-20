@@ -63,19 +63,22 @@ class RentalResaleSeeder extends Seeder
                     ]),
                     'agent_title' => substr($faker->name, 0, 255),
                     'agent_status' => $faker->randomElement(['Available', 'Busy', 'Online']),
-                    'agent_languages' => json_encode($faker->randomElements(['English', 'Arabic', 'French', 'Spanish', 'German'], $faker->numberBetween(1, 3))),
                     'agent_call' => substr($faker->phoneNumber, 0, 20),
                     'agent_whatsapp' => substr($faker->phoneNumber, 0, 20),
-                    'agent_photo' => $faker->imageUrl(200, 200, 'people', true),
+                    'agent_photo' => 'storage/photos/default.jpg', // Use a real image from storage/app/public/sample_images/agent1.jpg
                     'location_link' => substr($faker->url, 0, 255),
-                    'qr_photo' => $faker->imageUrl(200, 200, 'business', true),
+                    'qr_photo' => 'storage/photos/default.jpg', // Use a real image from storage/app/public/sample_images/qr1.jpg
                     'reference' => $faker->uuid,
                     'dld_permit_number' => $faker->uuid,
                     'addresses' => json_encode([
                         'address1' => substr($faker->address, 0, 255),
                         'address2' => substr($faker->address, 0, 255),
                     ]),
-                    'gallery_images' => json_encode([]), // Empty array for now
+                    'gallery_images' => json_encode([
+                        'storage/photos/default.jpg', // Default image
+                        'storage/photos/default.jpg',
+                        'storage/photos/default.jpg',
+                    ]), // Example gallery images
                     'tags' => json_encode([
                         'tag1' => substr($faker->word, 0, 255),
                         'tag2' => substr($faker->word, 0, 255),
@@ -167,7 +170,9 @@ class RentalResaleSeeder extends Seeder
             $this->command->info("Removing {$count} rental resale records...");
         }
 
-        $deleted = RentalResale::limit($count)->delete();
+        // Fetch IDs to delete, then delete by IDs
+        $ids = RentalResale::orderBy('id')->limit($count)->pluck('id');
+        $deleted = RentalResale::whereIn('id', $ids)->delete();
 
         if (method_exists($this, 'command') && $this->command) {
             $this->command->info("Successfully removed {$deleted} rental resale records!");

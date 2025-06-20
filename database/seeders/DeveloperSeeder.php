@@ -51,22 +51,9 @@ class DeveloperSeeder extends Seeder
                     'paragraph' => $faker->paragraph(5),
                     'phone' => substr($faker->phoneNumber, 0, 20),
                     'whatsapp' => substr($faker->phoneNumber, 0, 20),
-                    'logo' => $faker->imageUrl(200, 100, 'business', true),
+                    'logo' => 'storage/photos/default.jpg',
                     'logo_alt' => substr($faker->sentence(3), 0, 255),
-                    'photo' => json_encode([
-                        [
-                            'file' => $faker->imageUrl(640, 480, 'business', true),
-                            'alt' => substr($faker->sentence(3), 0, 255),
-                        ],
-                        [
-                            'file' => $faker->imageUrl(640, 480, 'business', true),
-                            'alt' => substr($faker->sentence(3), 0, 255),
-                        ],
-                        [
-                            'file' => $faker->imageUrl(640, 480, 'business', true),
-                            'alt' => substr($faker->sentence(3), 0, 255),
-                        ],
-                    ]),
+
                     'tags' => json_encode($faker->words(5)),
                     'rental_listings' => json_encode([]), // Will be populated later if needed
                     'offplan_listings' => json_encode([]), // Will be populated later if needed
