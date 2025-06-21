@@ -52,17 +52,15 @@ return [
                     'default' => 'Dubai - Your partner for accelerated growth',
                     'required' => true,
                 ],
-                'title_2' => [
-                    'type' => 'text',
-                    'label' => 'Title 2',
+                'description' => [
+                    'type' => 'description',
+                    'label' => 'Description',
                     'default' => 'Search for potential matches? from studio apartments to penthouses - select, your layout to see whats available',
                     'required' => true,
                 ],
                 'slider_images' => [
                     'type' => 'repeater',
                     'label' => 'Image Slider',
-                    'min_items' => 1,
-                    'max_items' => 3,
                     'fields' => [
                         'image' => [
                             'type' => 'image',
@@ -84,23 +82,20 @@ return [
                 'rolling_numbers' => [
                     'type' => 'repeater',
                     'label' => 'Rolling Numbers',
-                    'min_items' => 2,
-                    'max_items' => 2,
                     'fields' => [
                         'number' => [
                             'type' => 'number',
                             'label' => 'Number',
-                            'required' => true,
                         ],
                         'suffix' => [
                             'type' => 'text',
                             'label' => 'Suffix',
-                            'required' => true,
+                            'wrapper' => false
                         ],
                         'title' => [
                             'type' => 'text',
                             'label' => 'Title',
-                            'required' => true,
+                            'wrapper' => false
                         ],
                     ],
                 ],

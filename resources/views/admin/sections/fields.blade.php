@@ -33,6 +33,11 @@
                         name="fields[{{ $fieldKey }}]" {{ isset($field['required']) && $field['required'] ? 'required' : '' }}>{{ getSafeValue($additionalFields[$fieldKey] ?? ($field['default'] ?? '')) }}</textarea>
                 @break
 
+                @case('description')
+                    <textarea class="editor form-control @error($fieldKey) is-invalid @enderror" id="{{ $fieldKey }}"
+                        name="{{ $fieldKey }}" {{ isset($field['required']) && $field['required'] ? 'required' : '' }}>{{ getSafeValue($additionalFields[$fieldKey] ?? ($field['default'] ?? '')) }}</textarea>
+                @break
+
                 @case('image')
                     @if (isset($additionalFields[$fieldKey]))
                         <div class="mb-2">
@@ -98,6 +103,13 @@
                                                         @break
 
                                                         @case('textarea')
+                                                            <textarea class="editor form-control"
+                                                                name="fields[{{ $fieldKey }}][{{ $index }}][{{ $repeaterFieldKey }}]"
+                                                                {{ isset($repeaterField['required']) && $repeaterField['required'] ? 'required' : '' }}
+                                                                placeholder="{{ $repeaterField['placeholder'] ?? '' }}">{{ getSafeValue($item[$repeaterFieldKey] ?? '') }}</textarea>
+                                                        @break
+
+                                                        @case('description')
                                                             <textarea class="editor form-control"
                                                                 name="fields[{{ $fieldKey }}][{{ $index }}][{{ $repeaterFieldKey }}]"
                                                                 {{ isset($repeaterField['required']) && $repeaterField['required'] ? 'required' : '' }}
@@ -204,6 +216,12 @@
                                                 @break
 
                                                 @case('textarea')
+                                                    <textarea class="editor form-control" name="fields[{{ $fieldKey }}][__INDEX__][{{ $repeaterFieldKey }}]"
+                                                        {{ isset($repeaterField['required']) && $repeaterField['required'] ? 'required' : '' }}
+                                                        placeholder="{{ $repeaterField['placeholder'] ?? '' }}"></textarea>
+                                                @break
+
+                                                @case('description')
                                                     <textarea class="editor form-control" name="fields[{{ $fieldKey }}][__INDEX__][{{ $repeaterFieldKey }}]"
                                                         {{ isset($repeaterField['required']) && $repeaterField['required'] ? 'required' : '' }}
                                                         placeholder="{{ $repeaterField['placeholder'] ?? '' }}"></textarea>
@@ -376,6 +394,12 @@
                                                                                         @break
 
                                                                                         @case('textarea')
+                                                                                            <textarea class="editor form-control" name="fields[{{ $fieldKey }}][{{ $tabKey }}][{{ $tabFieldKey }}][{{ $index }}][{{ $repeaterFieldKey }}]"
+                                                                                                {{ isset($repeaterField['required']) && $repeaterField['required'] ? 'required' : '' }}
+                                                                                                placeholder="{{ $repeaterField['placeholder'] ?? '' }}"></textarea>
+                                                                                        @break
+                                                                                        
+                                                                                        @case('description')
                                                                                             <textarea class="editor form-control" name="fields[{{ $fieldKey }}][{{ $tabKey }}][{{ $tabFieldKey }}][{{ $index }}][{{ $repeaterFieldKey }}]"
                                                                                                 {{ isset($repeaterField['required']) && $repeaterField['required'] ? 'required' : '' }}
                                                                                                 placeholder="{{ $repeaterField['placeholder'] ?? '' }}"></textarea>
