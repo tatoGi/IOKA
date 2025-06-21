@@ -244,7 +244,19 @@ class PageService
     }
     public function partners()
     {
-        return Partner::orderBy('created_at', 'desc')->get();
+        return Partner::orderBy('created_at', 'desc')
+            ->get()
+            ->map(function ($partner) {
+                return [
+                    'id'         => $partner->id,
+                    'title'      => $partner->title,
+                    'image'      => $partner->image ? asset('storage/'.$partner->image) : null,
+                    'url'        => $partner->url,
+                    'alt'        => $partner->alt,
+                    'created_at' => $partner->created_at,
+                    'updated_at' => $partner->updated_at,
+                ];
+            });
     }
     public function aboutpage($id)
     {

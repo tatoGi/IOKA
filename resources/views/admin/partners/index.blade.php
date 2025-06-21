@@ -24,9 +24,10 @@
                         @foreach ($partners as $partner)
                             <tr>
                                 <td>{{ $partner->title }}</td>
+                               
                                 <td>
-                                    @if ($partner->image && Storage::exists($partner->image))
-                                        <img src="{{ Storage::url($partner->image) }}" alt="{{ $partner->title }}"
+                                    @if ($partner->image && Storage::disk('public')->exists($partner->image))
+                                        <img src="{{ Storage::disk('public')->url($partner->image) }}" alt="{{ $partner->title }}"
                                             class="img-fluid rounded-3" style="max-width: 100px;">
                                     @else
                                         <!-- Display the fallback icon if no image exists -->
@@ -50,8 +51,8 @@
                         @endforeach
                     </tbody>
                 </table>
-                <div class="d-flex justify-content-center mt-4">
-                    {{ $partners->links() }}
+                <div class="pagination">
+                    {{ $partners->links('admin.componenets.pagination') }} <!-- Use Bootstrap 4 pagination -->
                 </div>
             </div>
         </div>

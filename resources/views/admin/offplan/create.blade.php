@@ -37,12 +37,7 @@
                                     <input type="text" class="form-control" id="title" name="title" required>
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="subtitle" class="form-label">Subtitle</label>
-                                    <input type="text" class="form-control" id="subtitle" name="subtitle">
-                                </div>
-                            </div>
+                           
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="slug" class="form-label">slug</label>
@@ -272,6 +267,14 @@
                             </div>
                         </div>
                         <div class="row">
+                            <div class="col-md-2">
+                                <div class="form-group mt-3">
+                                    <label for="agent_email">Agent Email</label>
+                                    <input type="email" class="form-control" id="agent_email" name="agent_email">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
                             <div class="col-md-12">
                                 <div class="mb-3">
                                     <label for="agent_image" class="form-label">Agent Image</label>
@@ -299,8 +302,8 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="mb-3">
-                                    <label for="location_id" class="form-label">Location<span class="text-danger">*</span></label>
-                                    <select class="form-control select2" id="location_id" name="location_id" required>
+                                    <label for="location_id" class="form-label">Location</label>
+                                    <select class="form-control select2" id="location_id" name="location_id">
                                         @foreach($locations as $location)
                                             <option value="{{ $location->id }}">{{ $location->title }}</option>
                                         @endforeach
@@ -308,14 +311,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-md-2">
-                                <div class="form-group mt-3">
-                                    <label for="agent_email">Agent Email</label>
-                                    <input type="email" class="form-control" id="agent_email" name="agent_email">
-                                </div>
-                            </div>
-                        </div>
+                       
                     </div>
                 </div>
 
@@ -348,7 +344,7 @@
                     fileDiv.classList.add('uploaded-file');
                     fileDiv.innerHTML = `
                         <img src="${e.target.result}" alt="Property ${file.name}" class="img-thumbnail" style="max-width: 100px;">
-                        <input type="text" class="form-control mt-2" name="${hiddenInputId}[]" placeholder="Alt text for ${file.name}">
+                       
                         <button type="button" class="btn btn-danger btn-sm remove-file" onclick="removeFile('${previewId}', ${i})">Remove</button>
                     `;
                     preview.appendChild(fileDiv);

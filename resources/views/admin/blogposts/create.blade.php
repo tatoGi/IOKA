@@ -44,14 +44,6 @@
                                 @enderror
                             </div>
 
-                            <div class="mb-3">
-                                <label for="subtitle" class="form-label">Subtitle</label>
-                                <input type="text" class="form-control @error('subtitle') is-invalid @enderror" id="subtitle"
-                                    name="subtitle" value="{{ old('subtitle') }}">
-                                @error('subtitle')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
 
 
 

@@ -605,6 +605,12 @@
     }
 
     function initializeRepeaterHandlers() {
+        // Prevent multiple initializations which can lead to duplicate event listeners
+        if (window.repeaterHandlersInitialized) {
+            console.log('Repeater handlers already initialized, skipping...');
+            return;
+        }
+        window.repeaterHandlersInitialized = true;
         console.log('Initializing repeater handlers...');
 
         // Handle add repeater item
@@ -1013,4 +1019,29 @@
         initializeRepeaterHandlers();
         initializeSelect2();
     }
+</script>
+
+{{-- Auto-switch to the correct tab when an invalid hidden input is detected --}}
+<script>
+(function () {
+    // Use capture phase so we run before the browser shows its own message
+    document.addEventListener('invalid', function (event) {
+        const input = event.target;
+
+        // Find enclosing tab pane, if any
+        const pane = input.closest('.tab-pane');
+        if (pane && !pane.classList.contains('show')) {
+            // Locate the tab button that toggles this pane
+            const tabTrigger = document.querySelector(`button[data-bs-target="#${pane.id}"]`);
+            if (tabTrigger) {
+                // Activate the tab so the field becomes visible / focusable
+                const tabObj = bootstrap.Tab.getOrCreateInstance(tabTrigger);
+                tabObj.show();
+
+                // Small timeout to allow the pane to become visible before focusing
+                setTimeout(() => input.focus(), 100);
+            }
+        }
+    }, true); // capture
+})();
 </script>

@@ -12,7 +12,6 @@ class BlogPost extends Model
     protected $fillable = [
         'title',
         'slug',
-        'subtitle',
         'body',
         'date',
         'show_on_main_page',

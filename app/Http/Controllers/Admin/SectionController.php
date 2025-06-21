@@ -407,12 +407,20 @@ class SectionController extends Controller
             }
         }
 
-        // Add any existing items that weren't in the form and aren't marked for deletion
-        foreach ($existingData as $index => $existingItem) {
-            if (!array_key_exists($index, $repeaterData) && !in_array($index, $deletedIndexes, true)) {
-                $processed[] = $existingItem;
-            }
-        }
+        // Previously, any existing repeater items that were not sent back from the
+        // form (and not explicitly marked as deleted) were automatically re-added
+        // here. This caused two issues:
+        // 1. When the user deleted a repeater item in the UI it came back after save.
+        // 2. When the user added new items and the JS re-indexed existing ones, the
+        //    stale items were appended; this looked like the new item was added
+        //    twice.
+        //
+        // The correct behaviour is: if an item is missing from the submitted form
+        // data we treat it as deleted (unless it is explicitly preserved via the
+        // hidden "old_*" inputs handled earlier). Therefore we simply remove this
+        // block so that only the items present in $repeaterData make it into the
+        // final $processed list.
+
 
         // Reset array keys
         $processed = array_values($processed);

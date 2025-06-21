@@ -16,7 +16,6 @@ class StoreOffplanRequest extends FormRequest
         return [
             'title' => 'required|string|max:255',
             'slug' => 'required|string|max:255',
-            'subtitle' => 'nullable|string|max:255',
             'amount' => 'required|numeric',
             'amount_dirhams' => 'nullable|numeric',
             'description' => 'required',
@@ -48,7 +47,7 @@ class StoreOffplanRequest extends FormRequest
             'agent_linkedin' => 'nullable|string|max:255',
             'agent_email' => 'nullable|email|max:255',
             'location' => 'nullable|string|max:255',
-            'location_id' => 'required|exists:locations,id',
+            'location_id' => 'nullable|exists:locations,id',
             'agent_languages' => 'nullable|array',
             'agent_languages.*' => 'string',
             // Alt text validation rules

@@ -58,8 +58,7 @@ class BlogPostSeeder extends Seeder
                 $records[] = [
                     'title' => $title,
                     'slug' => $slug,
-                    'subtitle' => substr($faker->sentence(6), 0, 255),
-                    'body' => $this->generateBlogContent($faker),
+                                        'body' => $this->generateBlogContent($faker),
                     'show_on_main_page' => $faker->boolean(20), // 20% chance to show on main page
                     'date' => $faker->dateTimeBetween('-2 years', 'now')->format('Y-m-d'),
                     'image' => null, // Will be handled separately if needed

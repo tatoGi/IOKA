@@ -13,7 +13,6 @@ class OffplanFactory extends Factory
     {
         return [
             'title' => $this->faker->sentence,
-            'subtitle' => $this->faker->sentence,
             'amount' => $this->faker->numberBetween(50000, 200000),
             'amount_dirhams' => $this->faker->numberBetween(183500, 734000),
             'description' => $this->faker->paragraph,

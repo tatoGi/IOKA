@@ -35,8 +35,7 @@ class BlogPostController extends Controller
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
-            'subtitle' => 'nullable|string|max:255',
-            'slug' => 'required|string|max:255|unique:blog_posts',
+                        'slug' => 'required|string|max:255|unique:blog_posts',
             'body' => 'required|string',
             'date' => 'required|date',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
@@ -107,8 +106,7 @@ class BlogPostController extends Controller
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
-            'subtitle' => 'nullable|string|max:255',
-            'body' => 'required',
+                        'body' => 'required',
             'slug' => 'required|string|max:255|unique:blog_posts,slug,'.$blogPost->id,
             'date' => 'required|date',
             'show_on_main_page' => 'sometimes|boolean',

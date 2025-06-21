@@ -12,7 +12,6 @@ class Offplan extends Model
 
     protected $fillable = [
         'title',
-        'subtitle',
         'slug',
         'amount',
         'amount_dirhams',

@@ -37,10 +37,6 @@
                             <input type="text" class="form-control" id="title" name="title" value="{{ $offplan->title }}"
                                 required>
                         </div>
-                        <div class="form-group">
-                            <label for="subtitle">Subtitle</label>
-                            <input type="text" class="form-control" id="subtitle" name="subtitle" value="{{ $offplan->subtitle }}">
-                        </div>
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="slug" class="form-label">slug</label>

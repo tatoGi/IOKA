@@ -8,7 +8,6 @@
         <thead>
             <tr>
                 <th>Title</th>
-                <th>Subtitle</th>
                 <th>Amount $</th>
                 <th>Amount Dirham</th>
                 <th>Description</th>
@@ -20,7 +19,6 @@
             @foreach($offplans as $offplan)
             <tr>
                 <td>{{ $offplan->title }}</td>
-                <td>{{ $offplan->subtitle }}</td>
                 <td>{{ $offplan->amount }}</td>
                 <td>{{ $offplan->amount_dirhams }}</td>
                 <td>{!! Str::limit($offplan->description, 50) !!}...</td> <!-- Limit description to 100 chars -->
