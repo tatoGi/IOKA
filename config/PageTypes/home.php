@@ -168,8 +168,6 @@ return [
                                 'properties' => [
                                     'type' => 'repeater',
                                     'label' => 'Properties',
-                                    'min_items' => 2,
-                                    'max_items' => 2,
                                     'fields' => [
                                         'title' => [
                                             'type' => 'text',
@@ -234,8 +232,6 @@ return [
                               'properties' => [
                                     'type' => 'repeater',
                                     'label' => 'Properties',
-                                    'min_items' => 2,
-                                    'max_items' => 2,
                                     'fields' => [
                                         'title' => [
                                             'type' => 'text',
@@ -300,8 +296,6 @@ return [
                                'properties' => [
                                     'type' => 'repeater',
                                     'label' => 'Properties',
-                                    'min_items' => 2,
-                                    'max_items' => 2,
                                     'fields' => [
                                         'title' => [
                                             'type' => 'text',
