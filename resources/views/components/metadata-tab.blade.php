@@ -70,7 +70,7 @@
                             </div>
                             <input type="hidden" name="metadata[remove_og_image]" id="remove_og_image_hidden_input" value="0">
                         @else
-                            <input type="hidden" name="metadata[remove_og_image]" value="0">
+                            <input type="hidden" name="metadata[remove_og_image]" id="remove_og_image_hidden_input" value="0">
                         @endif
                     </div>
 
@@ -111,7 +111,7 @@
                             </div>
                             <input type="hidden" name="metadata[remove_twitter_image]" id="remove_twitter_image_hidden_input" value="0">
                         @else
-                             <input type="hidden" name="metadata[remove_twitter_image]" value="0">
+                             <input type="hidden" name="metadata[remove_twitter_image]" id="remove_twitter_image_hidden_input" value="0">
                         @endif
                     </div>
 
@@ -158,6 +158,8 @@
                                 fetch(`/admin/blogposts/{{ $model->id }}/delete-${imageType}-image`, {
                             @elseif($model->getTable() === 'offplans')
                                 fetch(`/admin/offplan/{{ $model->id }}/delete-${imageType}-image`, {
+                            @elseif($model->getTable() === 'pages')
+                                fetch(`/admin/pages/{{ $model->id }}/delete-${imageType}-image`, {
                             @else
                                 // Default fallback
                                 fetch(`/admin/developer/{{ $model->id }}/delete-${imageType}-image`, {

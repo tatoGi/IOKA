@@ -15,6 +15,7 @@
 
 @endphp
 @if ($sectionConfig && isset($sectionConfig['fields']))
+    @include('admin.components.form-errors')
     @foreach ($sectionConfig['fields'] as $fieldKey => $field)
         <div class="mb-3">
             <label for="{{ $fieldKey }}" class="form-label">{{ $field['label'] }}</label>

@@ -182,4 +182,50 @@ class PageController extends Controller
         // Redirect with a success message
         return redirect()->route('menu.index')->with('success', 'Page deleted successfully.');
     }
+
+    /**
+     * Delete a meta image (OG or Twitter) for a page
+     * 
+     * @param int $page Page ID
+     * @param string $type Type of image ('og' or 'twitter')
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function deleteMetaImage($page, $type)
+    {
+        if (!in_array($type, ['og', 'twitter'])) {
+            return response()->json(['success' => false, 'message' => 'Invalid image type'], 400);
+        }
+
+        $page = $this->pageRepository->findPageById($page);
+        
+        if (!$page) {
+            return response()->json(['success' => false, 'message' => 'Page not found'], 404);
+        }
+
+        if (!$page->metadata) {
+            return response()->json(['success' => false, 'message' => 'No metadata found for this page'], 404);
+        }
+
+        // Determine which image field to update based on the type
+        $imageField = $type . '_image';
+        
+        // Check if the image exists
+        if (!$page->metadata->$imageField) {
+            return response()->json(['success' => false, 'message' => 'Image not found'], 404);
+        }
+
+        // Delete the image file from storage
+        $deleted = Storage::disk('public')->delete($page->metadata->$imageField);
+        
+        if (!$deleted) {
+            return response()->json(['success' => false, 'message' => 'Failed to delete the image file'], 500);
+        }
+
+        // Update metadata to remove the image reference
+        $metadata = $page->metadata->toArray();
+        $metadata[$imageField] = null;
+        $page->updateMetadata($metadata);
+
+        return response()->json(['success' => true, 'message' => 'Image deleted successfully']);
+    }
 }
