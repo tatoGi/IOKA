@@ -194,6 +194,16 @@ class BlogPostController extends Controller
             $blogPost->update(['banner_image' => null, 'banner_image_alt' => null]);
         }
 
+        if ($type === 'og_image' && $blogPost->metadata && $blogPost->metadata->og_image) {
+            Storage::disk('public')->delete($blogPost->metadata->og_image);
+            $blogPost->metadata->update(['og_image' => null]);
+        }
+
+        if ($type === 'twitter_image' && $blogPost->metadata && $blogPost->metadata->twitter_image) {
+            Storage::disk('public')->delete($blogPost->metadata->twitter_image);
+            $blogPost->metadata->update(['twitter_image' => null]);
+        }
+
         return response()->json(['success' => true, 'message' => ucfirst(str_replace('_', ' ', $type)).' removed successfully.']);
     }
 

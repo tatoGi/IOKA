@@ -274,7 +274,7 @@
 @push('scripts')
     <script src="{{ asset('storage/admin/assets/blogpost.js') }}"></script>
     <script>
-        document.getElementById('remove-image-btn').addEventListener('click', function() {
+        document.getElementById('remove-image-btn')?.addEventListener('click', function() {
             if (confirm('Are you sure you want to remove the image?')) {
                 fetch('{{ route('blogposts.removeImage', ['blogPost' => $blogPost]) }}', {
                     method: 'DELETE',
@@ -297,7 +297,7 @@
             }
         });
 
-        document.getElementById('remove-banner-image-btn').addEventListener('click', function() {
+        document.getElementById('remove-banner-image-btn')?.addEventListener('click', function() {
             if (confirm('Are you sure you want to remove the banner image?')) {
                 fetch('{{ route('blogposts.removeImage', ['blogPost' => $blogPost]) }}', {
                     method: 'DELETE',
@@ -322,7 +322,7 @@
 
         document.getElementById('remove-og-image-btn')?.addEventListener('click', function() {
             if (confirm('Are you sure you want to remove the OG image?')) {
-                fetch('{{ route('admin.blogposts.delete-og-image', ['blogpost' => $blogPost]) }}', {
+                fetch('{{ route("admin.blogposts.delete-og-image", ["blogpost" => $blogPost]) }}', {
                     method: 'DELETE',
                     headers: {
                         'X-CSRF-TOKEN': '{{ csrf_token() }}',
@@ -330,9 +330,9 @@
                     }
                 })
                 .then(response => response.json())
-                .then(data => {
+                .then(data => { 
                     if (data.success) {
-                        alert('OG image removed successfully.');
+                        alert('OG image removed successfully');
                         location.reload();
                     } else {
                         alert('Failed to remove OG image.');
@@ -344,18 +344,17 @@
 
         document.getElementById('remove-twitter-image-btn')?.addEventListener('click', function() {
             if (confirm('Are you sure you want to remove the Twitter image?')) {
-                fetch('{{ route('blogposts.removeImage', ['blogPost' => $blogPost]) }}', {
+                fetch('{{ route("admin.blogposts.delete-twitter-image", ["blogpost" => $blogPost]) }}', {
                     method: 'DELETE',
                     headers: {
                         'X-CSRF-TOKEN': '{{ csrf_token() }}',
                         'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ type: 'twitter_image' })
+                    }
                 })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        alert(data.message);
+                        alert('Twitter image removed successfully');
                         location.reload();
                     } else {
                         alert('Failed to remove Twitter image.');

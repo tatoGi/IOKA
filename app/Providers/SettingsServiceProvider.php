@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Schema;
 use App\Models\Setting;
 
 class SettingsServiceProvider extends ServiceProvider
@@ -36,11 +37,21 @@ class SettingsServiceProvider extends ServiceProvider
 
     public function boot()
     {
-        // Merge DB settings with config defaults
-        $settings = Setting::all()->mapWithKeys(function ($item) {
-            return [$item->key => $item->value];
-        })->toArray();
+        // Check if settings table exists before trying to access it
+        // This prevents errors during migrations
+        try {
+            if (\Schema::hasTable('settings')) {
+                // Merge DB settings with config defaults
+                $settings = Setting::all()->mapWithKeys(function ($item) {
+                    return [$item->key => $item->value];
+                })->toArray();
 
-        config()->set('settings.db', $settings);
+                config()->set('settings.db', $settings);
+            }
+        } catch (\Exception $e) {
+            // Table doesn't exist yet, likely during migration
+            // Just set empty settings
+            config()->set('settings.db', []);
+        }
     }
 }
