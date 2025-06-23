@@ -8,6 +8,7 @@
     "require": {
         "php": "^8.2",
         "binarytorch/larecipe": "^2.8",
+        "firebase/php-jwt": "^6.11",
         "jenssegers/agent": "^2.6",
         "laravel/framework": "^11.31",
         "laravel/sanctum": "^4.0",

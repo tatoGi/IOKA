@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -15,9 +16,11 @@
     <link rel="stylesheet" href="{{ asset('storage/admin/assets/style.css') }}">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <!-- TinyMCE CSS is loaded automatically -->
 
     @yield('styles')
 </head>
+
 <body>
     <!-- Side-Nav -->
     @include('admin.componenets.sidebar')
@@ -38,67 +41,10 @@
     <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ asset('storage/admin/assets/main.js') }}"></script>
-    <script src="https://cdn.ckeditor.com/ckeditor5/27.0.0/classic/ckeditor.js"></script>
-    <script src="https://cdn.ckeditor.com/ckeditor5/27.0.0/classic/translations/en.js"></script>
-    <script>
-        var allEditors = document.querySelectorAll('.editor');
-        const editorInstances = new Map();
-
-        for (var i = 0; i < allEditors.length; ++i) {
-            const editorElement = allEditors[i];
-            const editorId = editorElement.id || `editor-${i}`;
-
-            ClassicEditor
-                .create(editorElement, {
-                    toolbar: [
-                        'heading', '|',
-                        'bold', 'italic', 'link', 'bulletedList', 'numberedList', '|',
-                        'fontColor', 'fontBackgroundColor', '|',
-                        'outdent', 'indent', '|',
-                        'blockQuote', 'insertTable', 'undo', 'redo'
-                    ],
-                    fontColor: {
-                        colors: [
-                            { color: 'rgb(0, 0, 0)', label: 'Black' },
-                            { color: 'rgb(255, 255, 255)', label: 'White' },
-                            { color: 'rgb(255, 0, 0)', label: 'Red' },
-                            { color: 'rgb(0, 255, 0)', label: 'Green' },
-                            { color: 'rgb(0, 0, 255)', label: 'Blue' },
-                            { color: 'rgb(255, 255, 0)', label: 'Yellow' },
-                            { color: 'rgb(255, 0, 255)', label: 'Magenta' },
-                            { color: 'rgb(0, 255, 255)', label: 'Cyan' }
-                        ]
-                    },
-                    fontBackgroundColor: {
-                        colors: [
-                            { color: 'rgb(0, 0, 0)', label: 'Black' },
-                            { color: 'rgb(255, 255, 255)', label: 'White' },
-                            { color: 'rgb(255, 0, 0)', label: 'Red' },
-                            { color: 'rgb(0, 255, 0)', label: 'Green' },
-                            { color: 'rgb(0, 0, 255)', label: 'Blue' },
-                            { color: 'rgb(255, 255, 0)', label: 'Yellow' },
-                            { color: 'rgb(255, 0, 255)', label: 'Magenta' },
-                            { color: 'rgb(0, 255, 255)', label: 'Cyan' }
-                        ]
-                    }
-                })
-                .then(editor => {
-                    // Store the editor instance in the Map
-                    editorInstances.set(editorId, editor);
-
-                    // Update the hidden textarea when the editor content changes
-                    editor.model.document.on('change:data', () => {
-                        const textarea = document.querySelector(`#${editorId}`);
-                        if (textarea) {
-                            textarea.value = editor.getData();
-                        }
-                    });
-                })
-                .catch(error => {
-                    console.error(error);
-                });
-        }
-    </script>
+    <!-- TinyMCE Editor (Self-hosted version to avoid API key issues) -->
+    <script src="https://cdn.jsdelivr.net/npm/tinymce@6.7.2/tinymce.min.js" referrerpolicy="origin"></script>
+    <script src="{{ asset('admin/assets/tinymce-init.js') }}"></script>
     @stack('scripts')
 </body>
+
 </html>
