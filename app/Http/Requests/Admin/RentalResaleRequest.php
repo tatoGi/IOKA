@@ -48,8 +48,6 @@ class RentalResaleRequest extends FormRequest
             'languages.*.languages' => 'required|string',
             'agent_photo' => 'required|array|min:1',
             'agent_photo.*' => 'image',
-            'location_id' => 'nullable|array',
-            'location_id.*' => 'exists:locations,id',
             'alt_texts' => 'nullable|array',
         ];
     }

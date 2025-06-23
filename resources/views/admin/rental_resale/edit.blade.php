@@ -346,8 +346,8 @@
                     </div>
                     <div class="mb-3">
                     
-                        <label for="location_id" class="form-label">Location<span class="text-danger">*</span></label>
-                        <select name="location_id[]" id="location_id" class="form-control select2" required>
+                        <label for="location_id" class="form-label">Location</label>
+                        <select name="location_id[]" id="location_id" class="form-control select2" >
                             <option value="">Select Location</option>
                             @foreach($locations as $location)
                                 <option value="{{ $location->id }}" {{ !empty($selectedLocations) && $selectedLocations[0] == $location->id ? 'selected' : '' }}>

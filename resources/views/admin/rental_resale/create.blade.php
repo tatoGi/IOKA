@@ -236,8 +236,8 @@
                     </div>
                     <div class="row">
                         <div class="mb-3">
-                            <label for="location_id" class="form-label">Location<span class="text-danger">*</span></label>
-                            <select class="form-control select2" id="location_id" name="location_id[]" required>
+                            <label for="location_id" class="form-label">Location</label>
+                            <select class="form-control select2" id="location_id" name="location_id[]" >
                                 <option value="">Select Location</option>
                                 @foreach($locations as $location)
                                     <option value="{{ $location->id }}">{{ $location->title }}</option>
