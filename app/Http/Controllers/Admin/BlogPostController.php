@@ -111,8 +111,8 @@ class BlogPostController extends Controller
             'date' => 'required|date',
             'show_on_main_page' => 'sometimes|boolean',
             'tags' => 'array',
-            'image' => 'nullable|image|max:2048',
-            'banner_image' => 'nullable|image|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'banner_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'image_alt' => 'nullable|string|max:255',
             'banner_image_alt' => 'nullable|string|max:255',
             // Metadata validation
