@@ -38,8 +38,8 @@ class BlogPostController extends Controller
                         'slug' => 'required|string|max:255|unique:blog_posts',
             'body' => 'required|string',
             'date' => 'required|date',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'banner_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'banner_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'banner_image_alt' => 'nullable|string|max:255',
             'image_alt' => 'nullable|string|max:255',
             'show_on_main_page' => 'nullable|boolean',
@@ -51,11 +51,11 @@ class BlogPostController extends Controller
             'metadata.meta_keywords' => 'nullable|string',
             'metadata.og_title' => 'nullable|string|max:255',
             'metadata.og_description' => 'nullable|string',
-            'metadata.og_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'metadata.og_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'metadata.twitter_card' => 'nullable|string|in:summary,summary_large_image',
             'metadata.twitter_title' => 'nullable|string|max:255',
             'metadata.twitter_description' => 'nullable|string',
-            'metadata.twitter_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'metadata.twitter_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
         // Handle file uploads for the blog post
