@@ -18,24 +18,26 @@
   ),
   'footer' => 
   array (
-    'logo' => NULL,
+    'logo' => '',
     'description' => '<p>Specializes in providing high-class tours for those in need</p>',
     'contact' => 
     array (
       'address' => 'tbilisi 1',
       'phone' => '2221',
-      'email' => 'ioka@mail.net',
+      'email' => 'hello@ioka.ae',
       'working_hours' => 'Mon-Fri: 9AM - 1PM',
     ),
     'newsletter' => 
     array (
       'title' => 'Newsletter1',
       'description' => '<p>Your Weekly/Monthly Dose of Knowledge and Inspiration1</p>',
-      'placeholder' => 'Your Email Address1',
-      'button_text' => 'Subscribe1',
+      'placeholder' => 'Your Email Address',
+      'button_text' => 'Subscribe',
     ),
     'copyright' => '©2024 Copyright Protected. All Rights Reserved.',
-   
+    'legal_links' => 
+    array (
+    ),
   ),
   'social' => 
   array (
