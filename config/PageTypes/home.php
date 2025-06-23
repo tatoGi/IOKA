@@ -8,14 +8,9 @@ return [
         'section_one' => [
             'label' => 'Section One - Background Slider',
             'fields' => [
-                'subtitle' => [
-                    'type' => 'text',
-                    'label' => 'Small Title (Subtitle)',
-                    'required' => true,
-                ],
                 'title' => [
                     'type' => 'text',
-                    'label' => 'Main Title',
+                    'label' => 'Title',
                     'required' => true,
                 ],
                 'slider_images' => [
@@ -25,6 +20,16 @@ return [
                         'image' => [
                             'type' => 'image',
                             'label' => 'Photo',
+                            'required' => true,
+                        ],
+                        'title' => [
+                            'type' => 'text',
+                            'label' => 'Image Title',
+                            'required' => true,
+                        ],
+                        'description' => [
+                            'type' => 'text',
+                            'label' => 'Image Description',
                             'required' => true,
                         ],
                         'alt_text' => [
