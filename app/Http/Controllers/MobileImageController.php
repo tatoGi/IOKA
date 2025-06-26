@@ -56,8 +56,8 @@ class MobileImageController extends Controller
             // Convert to JPEG with specified quality
             $img = $img->toJpeg($quality);
 
-            // Ensure the uploads directory exists in public/storage
-            $uploadDir = public_path('storage/uploads');
+            // Ensure the sections directory exists in public/storage
+            $uploadDir = public_path('storage/sections');
             if (!file_exists($uploadDir)) {
                 mkdir($uploadDir, 0755, true);
             }
@@ -65,7 +65,7 @@ class MobileImageController extends Controller
             // Generate a unique filename
             $filename = 'mobile_' . Str::uuid() . '.jpg';
             $fullPath = $uploadDir . '/' . $filename;
-            $relativePath = 'uploads/' . $filename;
+            $relativePath = 'sections/' . $filename;
             
             // Save the image directly to the public storage path
             file_put_contents($fullPath, (string) $img);

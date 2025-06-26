@@ -171,7 +171,7 @@
                 @break
                 
                 @case('mobile_image')
-                    @if (isset($additionalFields[$fieldKey]))
+                    @if (isset($additionalFields[$fieldKey]) && !empty($additionalFields[$fieldKey]))
                         <div class="mb-2">
                             <img src="{{ Storage::url($additionalFields[$fieldKey]) }}" alt="Current Image"
                                 class="img-thumbnail" style="max-height: 200px;">
@@ -523,9 +523,11 @@
                                                                 
                                                                 <div class="d-flex justify-content-between">
                                                                     <button type="button" class="btn btn-secondary btn-sm cancel-compression" 
-                                                                        onclick="cancelCompression('{{ $fieldKey }}-__INDEX__-{{ $repeaterFieldKey }}')">Cancel</button>
+                                                                        data-field-key="{{ $fieldKey }}" data-field-repeater-key="{{ $repeaterFieldKey }}">
+                                                                        Cancel</button>
                                                                     <button type="button" class="btn btn-primary btn-sm apply-compression" 
-                                                                        onclick="applyCompression('{{ $fieldKey }}-__INDEX__-{{ $repeaterFieldKey }}')">Apply & Upload</button>
+                                                                        data-field-key="{{ $fieldKey }}" data-field-repeater-key="{{ $repeaterFieldKey }}">
+                                                                        Apply & Upload</button>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -634,7 +636,72 @@
                                                         name="fields[{{ $fieldKey }}][{{ $tabKey }}][{{ $tabFieldKey }}]"
                                                         accept="image/*">
                                                 @break
-
+                                                @case('mobile_image')
+                                                @if (isset($additionalFields[$fieldKey][$tabKey][$tabFieldKey]) && !empty($additionalFields[$fieldKey][$tabKey][$tabFieldKey]))
+                                                    <div class="mb-2">
+                                                        <img src="{{ Storage::url($additionalFields[$fieldKey][$tabKey][$tabFieldKey]) }}" alt="Current Image"
+                                                            class="img-thumbnail" style="max-height: 200px;">
+                                                        <button type="button" class="btn btn-danger btn-sm delete-image" data-field="{{ $tabFieldKey }}" data-tab="{{ $tabKey }}" data-tabs-field="{{ $fieldKey }}">
+                                                            Delete Image
+                                                        </button>
+                                                    </div>
+                                                    <input type="hidden" name="old_{{ $fieldKey }}_{{ $tabKey }}_{{ $tabFieldKey }}" value="{{ $additionalFields[$fieldKey][$tabKey][$tabFieldKey] }}">
+                                                @endif
+                                                
+                                                <div class="mobile-image-upload" id="mobile-upload-{{ $fieldKey }}_{{ $tabKey }}_{{ $tabFieldKey }}">
+                                                    <div class="mb-2">
+                                                        <div class="d-flex align-items-center">
+                                                            <input type="file" class="form-control mobile-image-input @error($fieldKey) is-invalid @enderror" 
+                                                                id="input-{{ $fieldKey }}_{{ $tabKey }}_{{ $tabFieldKey }}" accept="image/*"
+                                                                {{ isset($tabField['required']) && $tabField['required'] ? 'required' : '' }}
+                                                                data-field="{{ $fieldKey }}_{{ $tabKey }}_{{ $tabFieldKey }}"
+                                                                onchange="handleMobileImageSelect(this)">
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <div class="compression-options mb-2 d-none">
+                                                        <div class="card p-3">
+                                                            <div class="mb-2">
+                                                                <label class="form-label">Image Quality</label>
+                                                                <input type="range" class="form-range quality-slider" min="10" max="100" value="70" 
+                                                                    id="quality-{{ $fieldKey }}_{{ $tabKey }}_{{ $tabFieldKey }}" data-field="{{ $fieldKey }}_{{ $tabKey }}_{{ $tabFieldKey }}">
+                                                                <div class="d-flex justify-content-between">
+                                                                    <small>Lower (Smaller File)</small>
+                                                                    <small class="quality-value">70%</small>
+                                                                    <small>Higher (Better Quality)</small>
+                                                                </div>
+                                                            </div>
+                                                            
+                                                            <div class="mb-2">
+                                                                <label class="form-label">Max Width</label>
+                                                                <select class="form-select max-width" id="max-width-{{ $fieldKey }}_{{ $tabKey }}_{{ $tabFieldKey }}" data-field="{{ $fieldKey }}_{{ $tabKey }}_{{ $tabFieldKey }}" style="display: block !important; width: 100%;">
+                                                                    <option value="800">Small (800px)</option>
+                                                                    <option value="1200" selected>Medium (1200px)</option>
+                                                                    <option value="1600">Large (1600px)</option>
+                                                                    <option value="0">Original Size</option>
+                                                                </select>
+                                                            </div>
+                                                            
+                                                            <div class="image-preview-container mb-2 d-none">
+                                                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                                                    <label class="form-label mb-0">Preview</label>
+                                                                    <div class="file-info small text-muted"></div>
+                                                                </div>
+                                                                <img src="" class="img-fluid img-thumbnail preview-image" style="max-height: 200px;">
+                                                            </div>
+                                                            
+                                                            <div class="d-flex justify-content-between">
+                                                                <button type="button" class="btn btn-secondary btn-sm cancel-compression" 
+                                                                    onclick="cancelCompression('{{ $fieldKey }}_{{ $tabKey }}_{{ $tabFieldKey }}')">Cancel</button>
+                                                                <button type="button" class="btn btn-primary btn-sm apply-compression" 
+                                                                    onclick="applyCompression('{{ $fieldKey }}_{{ $tabKey }}_{{ $tabFieldKey }}')">Apply & Upload</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <input type="hidden" name="fields[{{ $fieldKey }}][{{ $tabKey }}][{{ $tabFieldKey }}]" id="compressed-{{ $fieldKey }}_{{ $tabKey }}_{{ $tabFieldKey }}" class="compressed-image-data">
+                                                </div>
+                                            @break
                                                 @case('photo')
                                                     @if (isset($additionalFields[$fieldKey][$tabKey][$tabFieldKey]))
                                                         <div class="mb-2">
@@ -651,7 +718,7 @@
                                                         name="fields[{{ $fieldKey }}][{{ $tabKey }}][{{ $tabFieldKey }}]"
                                                         accept="image/*">
                                                 @break
-
+                                                        
                                                 @case('repeater')
 
                                                     <div class="repeater-container" data-field="{{ $tabFieldKey }}">
@@ -908,17 +975,24 @@
 
     function initializeSelect2() {
         if (typeof jQuery !== 'undefined') {
+            // First, destroy any existing select2 instances to prevent duplicates
+            jQuery('select.select2-hidden-accessible').select2('destroy');
+            
+            // Then initialize only non-max-width selects
             jQuery('select').each(function() {
-                if (!jQuery(this).hasClass('select2-hidden-accessible')) {
-                    const $select = jQuery(this);
-                    const isMultiple = $select.attr('multiple') !== undefined;
-
-                    $select.select2({
-                        placeholder: isMultiple ? "Select options..." : "Select an option...",
-                        allowClear: true,
-                        width: '100%'
-                    });
+                // Skip max-width selects entirely
+                if (jQuery(this).hasClass('max-width')) {
+                    return;
                 }
+                
+                const $select = jQuery(this);
+                const isMultiple = $select.attr('multiple') !== undefined;
+                
+                $select.select2({
+                    placeholder: isMultiple ? "Select options..." : "Select an option...",
+                    allowClear: true,
+                    width: '100%'
+                });
             });
         }
     }
@@ -968,7 +1042,7 @@
                 // Reinitialize select2 for new elements
                 if (typeof jQuery !== 'undefined') {
                     jQuery(repeaterItem).find('select').each(function() {
-                        if (!jQuery(this).hasClass('select2-hidden-accessible')) {
+                        if (!jQuery(this).hasClass('select2-hidden-accessible') && !jQuery(this).hasClass('max-width')) {
                             jQuery(this).select2({
                                 placeholder: "Select an option...",
                                 allowClear: true,
@@ -977,6 +1051,77 @@
                         }
                     });
                 }
+                
+                // Initialize mobile image uploads for new repeater items
+                const mobileImageInputs = repeaterItem.querySelectorAll('.mobile-image-input');
+                console.log('Found', mobileImageInputs.length, 'mobile image inputs in new repeater item');
+                
+                mobileImageInputs.forEach(input => {
+                    // Remove existing event listeners by cloning
+                    const newInput = input.cloneNode(true);
+                    input.parentNode.replaceChild(newInput, input);
+                    
+                    // Replace __INDEX__ placeholder in IDs and data attributes
+                    const itemIndex = repeaterItem.getAttribute('data-index');
+                    newInput.id = newInput.id.replace('__INDEX__', itemIndex);
+                    newInput.setAttribute('data-field', newInput.getAttribute('data-field').replace('__INDEX__', itemIndex));
+                    
+                    // Attach new event listener
+                    newInput.addEventListener('change', function() {
+                        handleMobileImageSelect(this);
+                    });
+                    
+                    console.log('Initialized mobile image input:', newInput.id);
+                    
+                    // Find and update IDs and attributes for related elements
+                    const uploadContainer = newInput.closest('.mobile-image-upload');
+                    if (uploadContainer) {
+                        uploadContainer.id = uploadContainer.id.replace('__INDEX__', itemIndex);
+                        
+                        // Update quality slider
+                        const qualitySlider = uploadContainer.querySelector('.quality-slider');
+                        if (qualitySlider) {
+                            qualitySlider.id = qualitySlider.id.replace('__INDEX__', itemIndex);
+                            qualitySlider.setAttribute('data-field', qualitySlider.getAttribute('data-field').replace('__INDEX__', itemIndex));
+                        }
+                        
+                        // Update max width select
+                        const maxWidthSelect = uploadContainer.querySelector('.max-width');
+                        if (maxWidthSelect) {
+                            maxWidthSelect.id = maxWidthSelect.id.replace('__INDEX__', itemIndex);
+                            maxWidthSelect.setAttribute('data-field', maxWidthSelect.getAttribute('data-field').replace('__INDEX__', itemIndex));
+                        }
+                        
+                        // Update compressed hidden input
+                        const hiddenInput = uploadContainer.querySelector('.compressed-image-data');
+                        if (hiddenInput) {
+                            hiddenInput.id = hiddenInput.id.replace('__INDEX__', itemIndex);
+                            hiddenInput.name = hiddenInput.name.replace('__INDEX__', itemIndex);
+                        }
+                    }
+                });
+                
+                // Attach event handlers to compression buttons
+                const cancelButtons = repeaterItem.querySelectorAll('.cancel-compression');
+                const applyButtons = repeaterItem.querySelectorAll('.apply-compression');
+                
+                cancelButtons.forEach(button => {
+                    button.addEventListener('click', function() {
+                        const fieldKey = this.getAttribute('data-field-key');
+                        const repeaterKey = this.getAttribute('data-field-repeater-key');
+                        const itemIndex = repeaterItem.getAttribute('data-index');
+                        cancelCompression(`${fieldKey}-${itemIndex}-${repeaterKey}`);
+                    });
+                });
+                
+                applyButtons.forEach(button => {
+                    button.addEventListener('click', function() {
+                        const fieldKey = this.getAttribute('data-field-key');
+                        const repeaterKey = this.getAttribute('data-field-repeater-key');
+                        const itemIndex = repeaterItem.getAttribute('data-index');
+                        applyCompression(`${fieldKey}-${itemIndex}-${repeaterKey}`);
+                    });
+                });
 
                 reindexRepeaterItems(container);
             }
@@ -1204,6 +1349,11 @@
             requestBody.tabs_field = tabsField;
         }
 
+        // Show confirmation dialog
+        if (!confirm('Are you sure you want to delete this image? Click OK and then refresh the page after deletion completes.')) {
+            return;
+        }
+
         fetch(url, {
             method: 'DELETE',
             headers: {
@@ -1215,19 +1365,37 @@
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                // Clear hidden input
+                // Instead of removing just the container, insert a placeholder or message
                 let hiddenInputName = '';
                 if (index !== null && repeaterField !== null) {
-                    hiddenInputName = `old_${fieldKey}_${index}`;
+                    // For repeater fields, we need to create a hidden field that preserves null explicitly
+                    hiddenInputName = `fields[${repeaterField}][${index}][${fieldKey}]`;
+                    
+                    // Create or update hidden input to store null value explicitly
+                    let hiddenInput = document.querySelector(`input[name="${hiddenInputName}"]`);
+                    if (!hiddenInput) {
+                        hiddenInput = document.createElement('input');
+                        hiddenInput.type = 'hidden';
+                        hiddenInput.name = hiddenInputName;
+                        const container = deleteButton.closest('.mb-3');
+                        if (container) {
+                            container.appendChild(hiddenInput);
+                        }
+                    }
+                    // Set to explicit null by making it empty
+                    hiddenInput.value = '';
                 } else if (tab !== null && tabsField !== null) {
                     hiddenInputName = `old_${tab}_${fieldKey}`;
+                    const hiddenInput = document.querySelector(`input[name="${hiddenInputName}"]`);
+                    if (hiddenInput) {
+                        hiddenInput.value = '';
+                    }
                 } else {
                     hiddenInputName = `old_${fieldKey}`;
-                }
-
-                const hiddenInput = document.querySelector(`input[name="${hiddenInputName}"]`);
-                if (hiddenInput) {
-                    hiddenInput.value = '';
+                    const hiddenInput = document.querySelector(`input[name="${hiddenInputName}"]`);
+                    if (hiddenInput) {
+                        hiddenInput.value = '';
+                    }
                 }
 
                 // Remove the image container
@@ -1235,12 +1403,18 @@
                 if (imageContainer) {
                     imageContainer.remove();
                 }
+                
+                // Show success message
+              
+                
             } else {
                 console.error('Delete image failed:', data.message || 'Unknown error');
+                alert('Failed to delete image: ' + (data.message || 'Unknown error'));
             }
         })
         .catch(error => {
             console.error('Error deleting image:', error);
+            alert('Error deleting image. Please try again.');
         });
     });
 
@@ -1331,12 +1505,18 @@
         document.addEventListener('DOMContentLoaded', function() {
             console.log('DOM loaded, initializing...');
             initializeRepeaterHandlers();
-            initializeSelect2();
+            // Add slight delay to ensure DOM is fully processed
+            setTimeout(function() {
+                initializeSelect2();
+            }, 100);
         });
     } else {
         console.log('DOM already loaded, initializing immediately...');
         initializeRepeaterHandlers();
-        initializeSelect2();
+        // Add slight delay to ensure DOM is fully processed
+        setTimeout(function() {
+            initializeSelect2();
+        }, 100);
     }
 </script>
 
@@ -1347,11 +1527,25 @@
         display: block !important;
         visibility: visible !important;
         opacity: 1 !important;
+        width: 100% !important;
+        height: auto !important;
+        padding: .375rem .75rem !important;
+        font-size: 1rem !important;
+        font-weight: 400 !important;
+        line-height: 1.5 !important;
+        appearance: auto !important;
+        -webkit-appearance: menulist !important;
+        -moz-appearance: menulist !important;
     }
     .form-select.max-width option {
         display: block !important;
         visibility: visible !important;
         opacity: 1 !important;
+    }
+    /* Hide any select2 containers that might be created for max-width selects */
+    .select2-container--default[aria-hidden="true"] + .form-select.max-width {
+        display: block !important;
+        visibility: visible !important;
     }
 </style>
 
@@ -1429,7 +1623,13 @@
         // Update quality display when slider changes
         const qualitySlider = document.getElementById('quality-' + fieldIdentifier);
         const qualityValue = qualitySlider.parentElement.querySelector('.quality-value');
-        qualitySlider.addEventListener('input', function() {
+        
+        // Remove existing event listeners to prevent duplicates
+        const newQualitySlider = qualitySlider.cloneNode(true);
+        qualitySlider.parentNode.replaceChild(newQualitySlider, qualitySlider);
+        
+        // Add event listener to the new element
+        newQualitySlider.addEventListener('input', function() {
             qualityValue.textContent = this.value + '%';
             previewCompressedImage(fieldIdentifier);
         });
@@ -1439,10 +1639,31 @@
         
         // Ensure select is properly initialized and visible
         if (widthSelect) {
+            // Clone the select element to remove any existing event listeners
+            const newWidthSelect = widthSelect.cloneNode(true);
+            widthSelect.parentNode.replaceChild(newWidthSelect, widthSelect);
+            
+            // Force show the select element
+            newWidthSelect.style.display = 'block';
+            newWidthSelect.style.visibility = 'visible';
+            newWidthSelect.style.opacity = '1';
+            newWidthSelect.style.position = 'static';
+            
+            // Make sure there's only one select element showing
+            const parentDiv = newWidthSelect.closest('.mb-2');
+            if (parentDiv) {
+                // Remove any duplicate selects that might have been created
+                const extraSelects = parentDiv.querySelectorAll('.max-width:not(#max-width-' + fieldIdentifier + ')');
+                extraSelects.forEach(el => el.remove());
+            }
+            
             // Simple change event listener without custom dropdown behavior
-            widthSelect.addEventListener('change', function() {
+            newWidthSelect.addEventListener('change', function() {
+                console.log('Width changed to:', this.value);
                 previewCompressedImage(fieldIdentifier);
             });
+        } else {
+            console.error('Width select not found for field:', fieldIdentifier);
         }
         
         // Generate initial preview
@@ -1623,16 +1844,25 @@
                                 hiddenInput.name = expectedName;
                             }
                             
-                            // Important: Make sure we're not affecting other repeater items
-                            // This ensures each slider item maintains its own image
-                            const allHiddenInputs = document.querySelectorAll('.compressed-image-data');
-                            allHiddenInputs.forEach(input => {
-                                // Only process inputs that are NOT this one but are in the same repeater
-                                if (input.id !== hiddenInput.id && 
-                                    input.getAttribute('data-repeater') === 'true' && 
-                                    input.getAttribute('data-repeater-key') === repeaterKey) {
+                            // Make the hidden input visible to debugging (temporary)
+                            console.log('Hidden input value set to:', data.path);
+                            console.log('Hidden input name:', hiddenInput.name);
+                            
+                            // Ensure we don't have duplicate hidden inputs for the same field
+                            const duplicateInputs = document.querySelectorAll(`input[name="${expectedName}"]`);
+                            duplicateInputs.forEach(input => {
+                                if (input.id !== hiddenInput.id) {
+                                    console.log('Removing duplicate hidden input:', input.id);
+                                    input.parentNode.removeChild(input);
                                 }
                             });
+                            
+                            // If the hidden input is not in the form, add it
+                            const form = document.querySelector('form');
+                            if (!hiddenInput.parentNode) {
+                                console.log('Adding hidden input to form');
+                                form.appendChild(hiddenInput);
+                            }
                         }
                         
                         // Disable the file input to prevent double submission
@@ -1665,7 +1895,6 @@
         reader.readAsDataURL(file);
     }
     
-    // Cancel compression and reset the upload field
     function cancelCompression(fieldIdentifier) {
         const container = document.getElementById('mobile-upload-' + fieldIdentifier);
         const options = container.querySelector('.compression-options');

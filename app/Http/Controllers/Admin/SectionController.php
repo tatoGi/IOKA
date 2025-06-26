@@ -102,11 +102,7 @@ class SectionController extends Controller
     public function update(Request $request, $pageId, $sectionKey)
     {
         try {
-            Log::info('Section update started', [
-                'pageId' => $pageId,
-                'sectionKey' => $sectionKey,
-                'requestData' => $request->all()
-            ]);
+           
 
             $section = Section::where('page_id', $pageId)
                 ->where('section_key', $sectionKey)
@@ -127,22 +123,13 @@ class SectionController extends Controller
             // Process fields
             $fields = $request->fields ?? [];
             $processedFields = $this->processFields($request, $fields, $sectionConfig['fields']);
-
-            Log::info('Fields processed successfully', [
-                'processedFields' => $processedFields
-            ]);
-
+           
             // Update section
             $section->title = $processedFields['title'] ?? $section->title;
             $section->slug = Str::slug($processedFields['title'].'-'.time());
             $section->description = $request->input('description', $section->description);
             $section->additional_fields = $processedFields;
             $section->save();
-
-            Log::info('Section updated successfully', [
-                'sectionId' => $section->id,
-                'newTitle' => $section->title
-            ]);
 
             return redirect()
                 ->route('admin.sections.edit', ['pageId' => $pageId, 'sectionKey' => $sectionKey])
@@ -292,12 +279,13 @@ class SectionController extends Controller
                 }
             }
         }
-
+       
         // Then process the fields that are being updated
         foreach ($configFields as $key => $config) {
             switch ($config['type']) {
                 case 'repeater':
                     if (isset($fields[$key])) {
+                       
                         // Check if this is an empty field (hidden input with empty value)
                         if (is_string($fields[$key]) && $fields[$key] === '') {
                             $processedFields[$key] = [];
@@ -314,6 +302,37 @@ class SectionController extends Controller
                 case 'image':
                 case 'photo':
                     if (isset($fields[$key]) && $fields[$key] instanceof \Illuminate\Http\UploadedFile) {
+                        $processedFields[$key] = $fields[$key]->store('sections', 'public');
+                    } else {
+                        // Keep existing image if no new one uploaded
+                        $processedFields[$key] = $request->input("old_{$key}") ??
+                            ($request->section->additional_fields[$key] ?? null);
+                    }
+                    break;
+
+                case 'mobile_image':
+                    // For mobile image, check if it's base64 encoded data
+                    if (isset($fields[$key]) && is_string($fields[$key]) && strpos($fields[$key], 'data:image') === 0) {
+                        // Handle base64 encoded image
+                        $imageData = $fields[$key];
+                        
+                        // Extract the pure base64 data
+                        $imageData = explode(',', $imageData)[1] ?? '';
+                        if (!empty($imageData)) {
+                            $imageData = base64_decode($imageData);
+                            if ($imageData) {
+                                // Generate a unique filename
+                                $filename = 'mobile_' . Str::random(10) . '.jpg';
+                                $path = 'sections/' . $filename;
+                                
+                                // Store the image
+                                if (Storage::disk('public')->put($path, $imageData)) {
+                                    $processedFields[$key] = $path;
+                                }
+                            }
+                        }
+                    } else if (isset($fields[$key]) && $fields[$key] instanceof \Illuminate\Http\UploadedFile) {
+                        // Handle regular file upload
                         $processedFields[$key] = $fields[$key]->store('sections', 'public');
                     } else {
                         // Keep existing image if no new one uploaded
@@ -340,11 +359,9 @@ class SectionController extends Controller
 
     protected function processRepeaterField(Request $request, array $repeaterData, array $config, string $fieldKey)
     {
-        Log::info("Processing repeater field: {$fieldKey}", [
-            'repeaterData' => $repeaterData,
-            'config' => $config,
-            'request_all' => $request->all()
-        ]);
+        // Debug log - show what repeater data is coming in
+        \Illuminate\Support\Facades\Log::debug('Processing repeater field: ' . $fieldKey);
+        \Illuminate\Support\Facades\Log::debug('Repeater data:', $repeaterData);
 
         $processed = [];
 
@@ -355,12 +372,6 @@ class SectionController extends Controller
         // Get existing data to handle file uploads
         $existingData = $request->section ? ($request->section->additional_fields[$fieldKey] ?? []) : [];
 
-        Log::info("Repeater processing details", [
-            'fieldKey' => $fieldKey,
-            'deletedIndexes' => $deletedIndexes,
-            'existingData' => $existingData,
-            'repeaterDataCount' => count($repeaterData)
-        ]);
 
         // Process submitted data
         foreach ($repeaterData as $index => $item) {
@@ -377,14 +388,51 @@ class SectionController extends Controller
                 $value = $item[$repeaterFieldKey] ?? null;
 
                 // Handle file uploads
-                if (in_array($fieldConfig['type'], ['image', 'photo'], true)) {
+                if (in_array($fieldConfig['type'], ['image', 'photo', 'mobile_image'], true)) {
+                    // Debug logging for mobile_image fields
+                    if ($fieldConfig['type'] === 'mobile_image') {
+                        \Illuminate\Support\Facades\Log::debug("Processing mobile_image: {$repeaterFieldKey} in repeater {$fieldKey} at index {$index}");
+                        \Illuminate\Support\Facades\Log::debug("Mobile image value:", ['value' => $value, 'type' => gettype($value)]);
+                    }
                     if ($value instanceof \Illuminate\Http\UploadedFile) {
                         $processedItem[$repeaterFieldKey] = $value->store('sections', 'public');
+                        $hasValue = true;
+                    } elseif ($fieldConfig['type'] === 'mobile_image' && is_string($value) && strpos($value, 'data:image') === 0) {
+                        \Illuminate\Support\Facades\Log::debug("Found base64 encoded mobile image in repeater {$fieldKey}");
+                        // Handle base64 encoded image for mobile_image
+                        $imageData = explode(',', $value)[1] ?? '';
+                        if (!empty($imageData)) {
+                            $imageData = base64_decode($imageData);
+                            if ($imageData) {
+                                // Generate a unique filename
+                                $filename = 'mobile_' . Str::random(10) . '.jpg';
+                                $path = 'sections/' . $filename;
+                                
+                                // Store the image
+                                if (Storage::disk('public')->put($path, $imageData)) {
+                                    $processedItem[$repeaterFieldKey] = $path;
+                                    $hasValue = true;
+                                }
+                            }
+                        }
+                    } elseif ($fieldConfig['type'] === 'mobile_image' && is_string($value) && !empty($value) && strpos($value, 'sections/') === 0) {
+                        // Handle pre-processed mobile image paths (from hidden inputs)
+                        \Illuminate\Support\Facades\Log::debug("Found pre-processed mobile image path: {$value}");
+                        $processedItem[$repeaterFieldKey] = $value;
                         $hasValue = true;
                     } else {
                         // Keep existing file if exists
                         $oldImageKey = "old_{$fieldKey}_{$repeaterFieldKey}_{$index}";
                         $existingValue = $request->input($oldImageKey);
+                        
+                        // Debug existing values
+                        if ($fieldConfig['type'] === 'mobile_image') {
+                            \Illuminate\Support\Facades\Log::debug("Looking for existing mobile image with key: {$oldImageKey}");
+                            \Illuminate\Support\Facades\Log::debug("Existing value found: " . ($existingValue ? 'Yes' : 'No'));
+                            if (isset($existingData[$index][$repeaterFieldKey])) {
+                                \Illuminate\Support\Facades\Log::debug("Found in existingData: {$existingData[$index][$repeaterFieldKey]}");
+                            }
+                        }
 
                         if ($existingValue) {
                             $processedItem[$repeaterFieldKey] = $existingValue;
@@ -449,22 +497,93 @@ class SectionController extends Controller
     protected function processTabsField(Request $request, array $tabsData, array $config)
     {
         $processed = [];
+        // Get existing data for tabs
+        $existingData = $request->section ? ($request->section->additional_fields ?? []) : [];
+        
+        \Illuminate\Support\Facades\Log::debug('Processing tabs field with data:', ['tabsData' => $tabsData]);
+        \Illuminate\Support\Facades\Log::debug('Existing section data:', ['existingData' => $existingData]);
 
         foreach ($config['tabs'] as $tabKey => $tabConfig) {
             if (isset($tabConfig['fields'])) {
                 $processed[$tabKey] = [];
                 foreach ($tabConfig['fields'] as $fieldKey => $fieldConfig) {
-                    if (
-                        $fieldConfig['type'] === 'image' &&
-                        isset($tabsData[$tabKey][$fieldKey]) &&
+                    // Log which field we're processing
+                    \Illuminate\Support\Facades\Log::debug("Processing tab field: {$tabKey}.{$fieldKey}", [
+                        'type' => $fieldConfig['type'],
+                        'hasData' => isset($tabsData[$tabKey][$fieldKey]),
+                        'valueType' => isset($tabsData[$tabKey][$fieldKey]) ? gettype($tabsData[$tabKey][$fieldKey]) : 'null'
+                    ]);
+                    
+                    // Handle image uploads
+                    if ($fieldConfig['type'] === 'image' && 
+                        isset($tabsData[$tabKey][$fieldKey]) && 
                         $tabsData[$tabKey][$fieldKey] instanceof \Illuminate\Http\UploadedFile
                     ) {
                         $processed[$tabKey][$fieldKey] = $tabsData[$tabKey][$fieldKey]->store('sections', 'public');
-                    } elseif ($fieldConfig['type'] === 'image') {
-                        // Keep existing image if no new one uploaded
-                        $processed[$tabKey][$fieldKey] = $request->input("old_{$tabKey}_{$fieldKey}") ??
-                            ($request->section->additional_fields[$tabKey][$fieldKey] ?? null);
-                    } else {
+                    } 
+                    // Handle mobile_image uploads - file upload case
+                    elseif ($fieldConfig['type'] === 'mobile_image' && 
+                             isset($tabsData[$tabKey][$fieldKey]) && 
+                             $tabsData[$tabKey][$fieldKey] instanceof \Illuminate\Http\UploadedFile
+                    ) {
+                        \Illuminate\Support\Facades\Log::debug("Processing mobile_image file upload in tab: {$tabKey}.{$fieldKey}");
+                        $processed[$tabKey][$fieldKey] = $tabsData[$tabKey][$fieldKey]->store('sections', 'public');
+                    }
+                    // Handle mobile_image uploads - base64 encoded data case
+                    elseif ($fieldConfig['type'] === 'mobile_image' && 
+                             isset($tabsData[$tabKey][$fieldKey]) && 
+                             is_string($tabsData[$tabKey][$fieldKey]) && 
+                             strpos($tabsData[$tabKey][$fieldKey], 'data:image') === 0
+                    ) {
+                        \Illuminate\Support\Facades\Log::debug("Processing base64 mobile_image in tab: {$tabKey}.{$fieldKey}");
+                        
+                        // Handle base64 encoded image
+                        $imageData = explode(',', $tabsData[$tabKey][$fieldKey])[1] ?? '';
+                        if (!empty($imageData)) {
+                            $imageData = base64_decode($imageData);
+                            if ($imageData) {
+                                // Generate a unique filename
+                                $filename = 'mobile_' . \Illuminate\Support\Str::random(10) . '.jpg';
+                                $path = 'sections/' . $filename;
+                                
+                                // Store the image
+                                if (\Illuminate\Support\Facades\Storage::disk('public')->put($path, $imageData)) {
+                                    $processed[$tabKey][$fieldKey] = $path;
+                                }
+                            }
+                        }
+                    }
+                    // Handle mobile_image - pre-processed path
+                    elseif ($fieldConfig['type'] === 'mobile_image' && 
+                             isset($tabsData[$tabKey][$fieldKey]) && 
+                             is_string($tabsData[$tabKey][$fieldKey]) && 
+                             !empty($tabsData[$tabKey][$fieldKey]) && 
+                             (strpos($tabsData[$tabKey][$fieldKey], 'sections/') === 0 || strpos($tabsData[$tabKey][$fieldKey], 'uploads/') === 0)
+                    ) {
+                        \Illuminate\Support\Facades\Log::debug("Found pre-processed mobile image path in tab: {$tabsData[$tabKey][$fieldKey]}");
+                        $processed[$tabKey][$fieldKey] = $tabsData[$tabKey][$fieldKey];
+                    }
+                    // Keep existing image/mobile_image if no new one uploaded
+                    elseif ($fieldConfig['type'] === 'image' || $fieldConfig['type'] === 'mobile_image') {
+                        $oldFieldKey = "old_{$tabKey}_{$fieldKey}";
+                        $existingValue = $request->input($oldFieldKey);
+                        
+                        \Illuminate\Support\Facades\Log::debug("Looking for existing {$fieldConfig['type']} with key: {$oldFieldKey}", [
+                            'found' => !is_null($existingValue),
+                            'existingValue' => $existingValue,
+                            'existingInData' => $existingData[$tabKey][$fieldKey] ?? 'not set'
+                        ]);
+                        
+                        if (!is_null($existingValue)) {
+                            $processed[$tabKey][$fieldKey] = $existingValue;
+                        } elseif (isset($existingData[$tabKey]) && isset($existingData[$tabKey][$fieldKey])) {
+                            $processed[$tabKey][$fieldKey] = $existingData[$tabKey][$fieldKey];
+                        } else {
+                            $processed[$tabKey][$fieldKey] = null;
+                        }
+                    } 
+                    // For all other field types
+                    else {
                         $processed[$tabKey][$fieldKey] = $tabsData[$tabKey][$fieldKey] ?? null;
                     }
                 }
@@ -486,21 +605,45 @@ class SectionController extends Controller
             ->firstOrFail();
 
         $fieldKey = $request->input('field_key');
-        $index = $request->input('index');
+        $index = $request->has('index') ? (int)$request->input('index') : null; // Cast to integer
         $repeaterField = $request->input('repeater_field');
         $tab = $request->input('tab');
+      
         $tabsField = $request->input('tabs_field');
         $additionalFields = $section->additional_fields;
-
+        
+        // Store the deleted image path to return in the response
+        $deletedImagePath = null;
+        
+       
+        
         if ($index !== null && $repeaterField !== null) {
             // Handle repeater field image deletion
+            // Keep original structure for reference
+            $originalStructure = $additionalFields[$repeaterField] ?? [];
+            
+            // Check if the field exists before trying to delete
             if (isset($additionalFields[$repeaterField][$index][$fieldKey])) {
                 $imagePath = $additionalFields[$repeaterField][$index][$fieldKey] ?? null;
+                $deletedImagePath = $imagePath; // Store the deleted path for response
+          
                 if ($imagePath && Storage::disk('public')->exists($imagePath)) {
                     Storage::disk('public')->delete($imagePath);
                 }
-                // Remove the image from the repeater item
+                
+                // Remove just this specific image field but keep the rest of the item intact
                 unset($additionalFields[$repeaterField][$index][$fieldKey]);
+                
+                // Log the structure after deletion
+                Log::info('After deletion', [
+                    'repeaterStructureAfter' => $additionalFields[$repeaterField]
+                ]);
+            } else {
+                Log::info('Image field not found', [
+                    'index' => $index,
+                    'fieldKey' => $fieldKey,
+                    'availableKeys' => array_keys($additionalFields[$repeaterField] ?? [])
+                ]);
             }
         } elseif ($tab !== null && $tabsField !== null) {
             // Handle tabs field image deletion
@@ -521,9 +664,26 @@ class SectionController extends Controller
             }
         }
 
+        // Log final structure before save
+        Log::info('Final structure', [
+            'repeaterFieldFinal' => $additionalFields[$repeaterField] ?? 'not set'
+        ]);
+        
         $section->setAttribute('additional_fields', $additionalFields);
         $section->save();
 
-        return response()->json(['success' => true]);
+        // Return a more detailed response with the current state
+        return response()->json([
+            'success' => true,
+            'deleted' => [
+                'field_key' => $fieldKey,
+                'index' => $index,
+                'repeater_field' => $repeaterField,
+                'image_path' => $deletedImagePath
+            ],
+            'section_data' => $section->only(['id', 'additional_fields']),
+            'message' => 'Image deleted successfully',
+            'warning' => 'To preserve other images, refresh the page before further edits'
+        ]);
     }
 }

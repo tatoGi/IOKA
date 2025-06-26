@@ -207,9 +207,9 @@ return [
                                     'label' => 'Image Field',
                                     'required' => true,
                                 ],
-                                'mobile_image_field' => [
+                                'mobile_image' => [
                                     'type' => 'mobile_image',
-                                    'label' => 'Mobile Image Field',
+                                    'label' => 'Mobile Photo',
                                     'required' => false,
                                 ],
                                 'alt_text' => [
@@ -276,9 +276,9 @@ return [
                                     'label' => 'Image Field',
                                     'required' => true,
                                 ],
-                                'mobile_image_field' => [
+                                'mobile_image' => [
                                     'type' => 'mobile_image',
-                                    'label' => 'Mobile Image Field',
+                                    'label' => 'Mobile Photo',
                                     'required' => false,
                                 ],
                                 'alt_text' => [
