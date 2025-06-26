@@ -14,6 +14,11 @@
     }
 
 @endphp
+
+<!-- CSS and JS fixes for select dropdown options display -->
+<link rel="stylesheet" href="{{ asset('css/form-select-fix.css') }}">
+<script src="{{ asset('js/form-select-fix.js') }}"></script>
+
 @if ($sectionConfig && isset($sectionConfig['fields']))
     @include('admin.components.form-errors')
     @foreach ($sectionConfig['fields'] as $fieldKey => $field)
@@ -50,9 +55,52 @@
                         </div>
                         <input type="hidden" name="old_{{ $fieldKey }}" value="{{ $additionalFields[$fieldKey] }}">
                     @endif
-                    <input type="file" class="form-control @error($fieldKey) is-invalid @enderror" id="{{ $fieldKey }}"
-                        name="fields[{{ $fieldKey }}]" accept="image/*"
-                        {{ isset($field['required']) && $field['required'] ? 'required' : '' }}>
+                    
+                    <div class="mobile-image-upload" id="mobile-upload-{{ $fieldKey }}">
+                        <div class="mb-2">
+                            <div class="d-flex align-items-center">
+                                <input type="file" class="form-control mobile-image-input @error($fieldKey) is-invalid @enderror" 
+                                    id="input-{{ $fieldKey }}" accept="image/*"
+                                    {{ isset($field['required']) && $field['required'] ? 'required' : '' }}
+                                    data-field="{{ $fieldKey }}"
+                                    onchange="handleMobileImageSelect(this)">
+                            </div>
+                        </div>
+                        
+                        <div class="compression-options mb-2 d-none">
+                            <div class="card p-3">
+                                <div class="mb-2">
+                                    <label class="form-label">Image Quality</label>
+                                    <input type="range" class="form-range quality-slider" min="10" max="100" value="70" 
+                                        id="quality-{{ $fieldKey }}" data-field="{{ $fieldKey }}">
+                                    <div class="d-flex justify-content-between">
+                                        <small>Lower (Smaller File)</small>
+                                        <small class="quality-value">70%</small>
+                                        <small>Higher (Better Quality)</small>
+                                    </div>
+                                </div>
+                                
+                               
+                                
+                                <div class="image-preview-container mb-2 d-none">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <label class="form-label mb-0">Preview</label>
+                                        <div class="file-info small text-muted"></div>
+                                    </div>
+                                    <img src="" class="img-fluid img-thumbnail preview-image" style="max-height: 200px;">
+                                </div>
+                                
+                                <div class="d-flex justify-content-between">
+                                    <button type="button" class="btn btn-secondary btn-sm cancel-compression" 
+                                        onclick="cancelCompression('{{ $fieldKey }}')">Cancel</button>
+                                    <button type="button" class="btn btn-primary btn-sm apply-compression" 
+                                        onclick="applyCompression('{{ $fieldKey }}')">Apply & Upload</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <input type="hidden" name="fields[{{ $fieldKey }}]" id="compressed-{{ $fieldKey }}" class="compressed-image-data">
+                    </div>
                 @break
 
                 @case('photo')
@@ -66,9 +114,127 @@
                         </div>
                         <input type="hidden" name="old_{{ $fieldKey }}" value="{{ $additionalFields[$fieldKey] }}">
                     @endif
-                    <input type="file" class="form-control @error($fieldKey) is-invalid @enderror" id="{{ $fieldKey }}"
-                        name="fields[{{ $fieldKey }}]" accept="image/*"
-                        {{ isset($field['required']) && $field['required'] ? 'required' : '' }}>
+                    
+                    <div class="mobile-image-upload" id="mobile-upload-{{ $fieldKey }}">
+                        <div class="mb-2">
+                            <div class="d-flex align-items-center">
+                                <input type="file" class="form-control mobile-image-input @error($fieldKey) is-invalid @enderror" 
+                                    id="input-{{ $fieldKey }}" accept="image/*"
+                                    {{ isset($field['required']) && $field['required'] ? 'required' : '' }}
+                                    data-field="{{ $fieldKey }}"
+                                    onchange="handleMobileImageSelect(this)">
+                            </div>
+                        </div>
+                        
+                        <div class="compression-options mb-2 d-none">
+                            <div class="card p-3">
+                                <div class="mb-2">
+                                    <label class="form-label">Image Quality</label>
+                                    <input type="range" class="form-range quality-slider" min="10" max="100" value="70" 
+                                        id="quality-{{ $fieldKey }}" data-field="{{ $fieldKey }}">
+                                    <div class="d-flex justify-content-between">
+                                        <small>Lower (Smaller File)</small>
+                                        <small class="quality-value">70%</small>
+                                        <small>Higher (Better Quality)</small>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-2">
+                                    <label class="form-label">Max Width</label>
+                                    <select class="form-select max-width" id="max-width-{{ $fieldKey }}" data-field="{{ $fieldKey }}" style="display: block !important; width: 100%;">
+                                        <option value="800">Small (800px)</option>
+                                        <option value="1200" selected>Medium (1200px)</option>
+                                        <option value="1600">Large (1600px)</option>
+                                        <option value="0">Original Size</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="image-preview-container mb-2 d-none">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <label class="form-label mb-0">Preview</label>
+                                        <div class="file-info small text-muted"></div>
+                                    </div>
+                                    <img src="" class="img-fluid img-thumbnail preview-image" style="max-height: 200px;">
+                                </div>
+                                
+                                <div class="d-flex justify-content-between">
+                                    <button type="button" class="btn btn-secondary btn-sm cancel-compression" 
+                                        onclick="cancelCompression('{{ $fieldKey }}')">Cancel</button>
+                                    <button type="button" class="btn btn-primary btn-sm apply-compression" 
+                                        onclick="applyCompression('{{ $fieldKey }}')">Apply & Upload</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <input type="hidden" name="fields[{{ $fieldKey }}]" id="compressed-{{ $fieldKey }}" class="compressed-image-data">
+                    </div>
+                @break
+                
+                @case('mobile_image')
+                    @if (isset($additionalFields[$fieldKey]))
+                        <div class="mb-2">
+                            <img src="{{ Storage::url($additionalFields[$fieldKey]) }}" alt="Current Image"
+                                class="img-thumbnail" style="max-height: 200px;">
+                            <button type="button" class="btn btn-danger btn-sm delete-image" data-field="{{ $fieldKey }}">
+                                Delete Image
+                            </button>
+                        </div>
+                        <input type="hidden" name="old_{{ $fieldKey }}" value="{{ $additionalFields[$fieldKey] }}">
+                    @endif
+                    
+                    <div class="mobile-image-upload" id="mobile-upload-{{ $fieldKey }}">
+                        <div class="mb-2">
+                            <div class="d-flex align-items-center">
+                                <input type="file" class="form-control mobile-image-input @error($fieldKey) is-invalid @enderror" 
+                                    id="input-{{ $fieldKey }}" accept="image/*"
+                                    {{ isset($field['required']) && $field['required'] ? 'required' : '' }}
+                                    data-field="{{ $fieldKey }}"
+                                    onchange="handleMobileImageSelect(this)">
+                            </div>
+                        </div>
+                        
+                        <div class="compression-options mb-2 d-none">
+                            <div class="card p-3">
+                                <div class="mb-2">
+                                    <label class="form-label">Image Quality</label>
+                                    <input type="range" class="form-range quality-slider" min="10" max="100" value="70" 
+                                        id="quality-{{ $fieldKey }}" data-field="{{ $fieldKey }}">
+                                    <div class="d-flex justify-content-between">
+                                        <small>Lower (Smaller File)</small>
+                                        <small class="quality-value">70%</small>
+                                        <small>Higher (Better Quality)</small>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-2">
+                                    <label class="form-label">Max Width</label>
+                                    <select class="form-select max-width" id="max-width-{{ $fieldKey }}" data-field="{{ $fieldKey }}" style="display: block !important; width: 100%;">
+                                        <option value="800">Small (800px)</option>
+                                        <option value="1200" selected>Medium (1200px)</option>
+                                        <option value="1600">Large (1600px)</option>
+                                        <option value="0">Original Size</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="image-preview-container mb-2 d-none">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <label class="form-label mb-0">Preview</label>
+                                        <div class="file-info small text-muted"></div>
+                                    </div>
+                                    <img src="" class="img-fluid img-thumbnail preview-image" style="max-height: 200px;">
+                                </div>
+                                
+                                <div class="d-flex justify-content-between">
+                                    <button type="button" class="btn btn-secondary btn-sm cancel-compression" 
+                                        onclick="cancelCompression('{{ $fieldKey }}')">Cancel</button>
+                                    <button type="button" class="btn btn-primary btn-sm apply-compression" 
+                                        onclick="applyCompression('{{ $fieldKey }}')">Apply & Upload</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <input type="hidden" name="fields[{{ $fieldKey }}]" id="compressed-{{ $fieldKey }}" class="compressed-image-data">
+                    </div>
                 @break
 
                 @case('repeater')
@@ -154,6 +320,78 @@
                                                                 name="fields[{{ $fieldKey }}][{{ $index }}][{{ $repeaterFieldKey }}]"
                                                                 accept="image/*">
                                                         @break
+                                                        
+                                                        @case('mobile_image')
+                                                            @if (isset($item[$repeaterFieldKey]))
+                                                                <div class="mb-2">
+                                                                    <img src="{{ Storage::url($item[$repeaterFieldKey]) }}"
+                                                                        alt="Current Image" class="img-thumbnail"
+                                                                        style="max-height: 200px;">
+                                                                    <button type="button" class="btn btn-danger btn-sm delete-image" data-field="{{ $repeaterFieldKey }}" data-index="{{ $index }}" data-repeater-field="{{ $fieldKey }}">
+                                                                        Delete Image
+                                                                    </button>
+                                                                </div>
+                                                                <input type="hidden"
+                                                                    name="old_{{ $repeaterFieldKey }}_{{ $index }}"
+                                                                    value="{{ $item[$repeaterFieldKey] }}">
+                                                            @endif
+                                                            <div class="mobile-image-upload" id="mobile-upload-{{ $fieldKey }}-{{ $index }}-{{ $repeaterFieldKey }}">
+                                                                <div class="mb-2">
+                                                                    <div class="d-flex align-items-center">
+                                                                        <input type="file" class="form-control mobile-image-input" 
+                                                                            id="input-{{ $fieldKey }}-{{ $index }}-{{ $repeaterFieldKey }}" accept="image/*"
+                                                                            {{ isset($repeaterField['required']) && $repeaterField['required'] ? 'required' : '' }}
+                                                                            data-field="{{ $fieldKey }}-{{ $index }}-{{ $repeaterFieldKey }}"
+                                                                            data-repeater="true"
+                                                                            data-repeater-index="{{ $index }}"
+                                                                            data-repeater-key="{{ $repeaterFieldKey }}"
+                                                                            onchange="handleMobileImageSelect(this)">
+                                                                    </div>
+                                                                </div>
+                                                                
+                                                                <div class="compression-options mb-2 d-none">
+                                                                    <div class="card p-3">
+                                                                        <div class="mb-2">
+                                                                            <label class="form-label">Image Quality</label>
+                                                                            <input type="range" class="form-range quality-slider" min="10" max="100" value="70" 
+                                                                                id="quality-{{ $fieldKey }}-{{ $index }}-{{ $repeaterFieldKey }}" data-field="{{ $fieldKey }}-{{ $index }}-{{ $repeaterFieldKey }}">
+                                                                            <div class="d-flex justify-content-between">
+                                                                                <small>Lower (Smaller File)</small>
+                                                                                <small class="quality-value">70%</small>
+                                                                                <small>Higher (Better Quality)</small>
+                                                                            </div>
+                                                                        </div>
+                                                                        
+                                                                        <div class="mb-2">
+                                                                            <label class="form-label">Max Width</label>
+                                                                            <select class="form-select max-width" id="max-width-{{ $fieldKey }}-{{ $index }}-{{ $repeaterFieldKey }}" data-field="{{ $fieldKey }}-{{ $index }}-{{ $repeaterFieldKey }}" style="display: block !important; width: 100%;">
+                                                                                <option value="800">Small (800px)</option>
+                                                                                <option value="1200" selected>Medium (1200px)</option>
+                                                                                <option value="1600">Large (1600px)</option>
+                                                                                <option value="0">Original Size</option>
+                                                                            </select>
+                                                                        </div>
+                                                                        
+                                                                        <div class="image-preview-container mb-2 d-none">
+                                                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                                                <label class="form-label mb-0">Preview</label>
+                                                                                <div class="file-info small text-muted"></div>
+                                                                            </div>
+                                                                            <img src="" class="img-fluid img-thumbnail preview-image" style="max-height: 200px;">
+                                                                        </div>
+                                                                        
+                                                                        <div class="d-flex justify-content-between">
+                                                                            <button type="button" class="btn btn-secondary btn-sm cancel-compression" 
+                                                                                onclick="cancelCompression('{{ $fieldKey }}-{{ $index }}-{{ $repeaterFieldKey }}')">Cancel</button>
+                                                                            <button type="button" class="btn btn-primary btn-sm apply-compression" 
+                                                                                onclick="applyCompression('{{ $fieldKey }}-{{ $index }}-{{ $repeaterFieldKey }}')">Apply & Upload</button>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                
+                                                                <input type="hidden" name="fields[{{ $fieldKey }}][{{ $index }}][{{ $repeaterFieldKey }}]" id="compressed-{{ $fieldKey }}-{{ $index }}-{{ $repeaterFieldKey }}" class="compressed-image-data" data-repeater="true" data-repeater-index="{{ $index }}" data-repeater-key="{{ $repeaterFieldKey }}">
+                                                            </div>
+                                                        @break
 
                                                         @case('select')
                                                             <select class="form-control select2"
@@ -238,6 +476,62 @@
                                                     <input type="file" class="form-control"
                                                         name="fields[{{ $fieldKey }}][__INDEX__][{{ $repeaterFieldKey }}]"
                                                         accept="image/*">
+                                                @break
+                                                
+                                                @case('mobile_image')
+                                                    <div class="mobile-image-upload" id="mobile-upload-{{ $fieldKey }}-__INDEX__-{{ $repeaterFieldKey }}">
+                                                        <div class="mb-2">
+                                                            <div class="d-flex align-items-center">
+                                                                <input type="file" class="form-control mobile-image-input" 
+                                                                    id="input-{{ $fieldKey }}-__INDEX__-{{ $repeaterFieldKey }}" accept="image/*"
+                                                                    {{ isset($repeaterField['required']) && $repeaterField['required'] ? 'required' : '' }}
+                                                                    data-field="{{ $fieldKey }}-__INDEX__-{{ $repeaterFieldKey }}"
+                                                                    onchange="handleMobileImageSelect(this)">
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <div class="compression-options mb-2 d-none">
+                                                            <div class="card p-3">
+                                                                <div class="mb-2">
+                                                                    <label class="form-label">Image Quality</label>
+                                                                    <input type="range" class="form-range quality-slider" min="10" max="100" value="70" 
+                                                                        id="quality-{{ $fieldKey }}-__INDEX__-{{ $repeaterFieldKey }}" data-field="{{ $fieldKey }}-__INDEX__-{{ $repeaterFieldKey }}">
+                                                                    <div class="d-flex justify-content-between">
+                                                                        <small>Lower (Smaller File)</small>
+                                                                        <small class="quality-value">70%</small>
+                                                                        <small>Higher (Better Quality)</small>
+                                                                    </div>
+                                                                </div>
+                                                                
+                                                                <div class="mb-2">
+                                                                    <label class="form-label">Max Width</label>
+                                                                    <select class="form-select max-width" id="max-width-{{ $fieldKey }}-__INDEX__-{{ $repeaterFieldKey }}" data-field="{{ $fieldKey }}-__INDEX__-{{ $repeaterFieldKey }}">
+                                                                        <option value="800">Small (800px)</option>
+                                                                        <option value="1200" selected>Medium (1200px)</option>
+                                                                        <option value="1600">Large (1600px)</option>
+                                                                        <option value="0">Original Size</option>
+                                                                    </select>
+                                                                </div>
+                                                                
+                                                                <div class="image-preview-container mb-2 d-none">
+                                                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                                                        <label class="form-label mb-0">Preview</label>
+                                                                        <div class="file-info small text-muted"></div>
+                                                                    </div>
+                                                                    <img src="" class="img-fluid img-thumbnail preview-image" style="max-height: 200px;">
+                                                                </div>
+                                                                
+                                                                <div class="d-flex justify-content-between">
+                                                                    <button type="button" class="btn btn-secondary btn-sm cancel-compression" 
+                                                                        onclick="cancelCompression('{{ $fieldKey }}-__INDEX__-{{ $repeaterFieldKey }}')">Cancel</button>
+                                                                    <button type="button" class="btn btn-primary btn-sm apply-compression" 
+                                                                        onclick="applyCompression('{{ $fieldKey }}-__INDEX__-{{ $repeaterFieldKey }}')">Apply & Upload</button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <input type="hidden" name="fields[{{ $fieldKey }}][__INDEX__][{{ $repeaterFieldKey }}]" id="compressed-{{ $fieldKey }}-__INDEX__-{{ $repeaterFieldKey }}" class="compressed-image-data">
+                                                    </div>
                                                 @break
 
                                                 @case('select')
@@ -1043,6 +1337,346 @@
         console.log('DOM already loaded, initializing immediately...');
         initializeRepeaterHandlers();
         initializeSelect2();
+    }
+</script>
+
+{{-- Fix for mobile image upload select dropdowns --}}
+<style>
+    /* Fix for select dropdowns in mobile image upload */
+    .form-select.max-width {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+    .form-select.max-width option {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+</style>
+
+{{-- Mobile Image Upload Compression Script --}}
+<script>
+    // Global object to store original files
+    const originalFiles = {};
+    
+    // Initialize all mobile image fields when the page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Initializing mobile image fields');
+        
+        // Initialize all mobile image inputs
+        const mobileImageInputs = document.querySelectorAll('.mobile-image-input');
+        console.log('Found', mobileImageInputs.length, 'mobile image inputs');
+        
+        mobileImageInputs.forEach(input => {
+            // Make sure each input has a unique ID and data-field attribute
+            const fieldIdentifier = input.getAttribute('data-field');
+            console.log('Initializing mobile image field:', fieldIdentifier);
+            
+            // Make sure the corresponding elements exist
+            const container = document.getElementById('mobile-upload-' + fieldIdentifier);
+            const hiddenInput = document.getElementById('compressed-' + fieldIdentifier);
+            
+            if (container && hiddenInput) {
+                console.log('Field elements found for:', fieldIdentifier);
+            } else {
+                console.error('Missing elements for field:', fieldIdentifier);
+            }
+        });
+    });
+    
+    // Handle mobile image file selection
+    function handleMobileImageSelect(input) {
+        const inputId = input.id;
+        const file = input.files[0];
+        
+        if (!file) return;
+        
+        // Parse the input ID to determine if it's a repeater field or standalone field
+        // Format: input-fieldKey or input-fieldKey-index-repeaterFieldKey
+        const parts = inputId.split('-');
+        let fieldIdentifier;
+        
+        if (parts.length >= 4) {
+            // This is a repeater field
+            // fieldKey-index-repeaterFieldKey
+            fieldIdentifier = parts.slice(1).join('-');
+            console.log('Repeater field detected:', fieldIdentifier);
+        } else {
+            // This is a standalone field
+            fieldIdentifier = parts[1];
+            console.log('Standalone field detected:', fieldIdentifier);
+        }
+        
+        // Store original file for later use - use a unique key for each field
+        // This ensures each slider item has its own file storage
+        originalFiles[fieldIdentifier] = file;
+        console.log('Stored file for field:', fieldIdentifier, 'File name:', file.name);
+        
+        // Verify the hidden input exists
+        const hiddenInput = document.getElementById('compressed-' + fieldIdentifier);
+        if (!hiddenInput) {
+            console.error('Hidden input not found for field:', fieldIdentifier);
+        } else {
+            console.log('Hidden input found for field:', fieldIdentifier, 'ID:', hiddenInput.id);
+        }
+        
+        // Show compression options
+        const container = document.getElementById('mobile-upload-' + fieldIdentifier);
+        const options = container.querySelector('.compression-options');
+        options.classList.remove('d-none');
+        
+        // Update quality display when slider changes
+        const qualitySlider = document.getElementById('quality-' + fieldIdentifier);
+        const qualityValue = qualitySlider.parentElement.querySelector('.quality-value');
+        qualitySlider.addEventListener('input', function() {
+            qualityValue.textContent = this.value + '%';
+            previewCompressedImage(fieldIdentifier);
+        });
+        
+        // Update preview when width changes
+        const widthSelect = document.getElementById('max-width-' + fieldIdentifier);
+        
+        // Ensure select is properly initialized and visible
+        if (widthSelect) {
+            // Simple change event listener without custom dropdown behavior
+            widthSelect.addEventListener('change', function() {
+                previewCompressedImage(fieldIdentifier);
+            });
+        }
+        
+        // Generate initial preview
+        previewCompressedImage(fieldIdentifier);
+    }
+    
+    // Preview the compressed image with current settings
+    function previewCompressedImage(fieldIdentifier) {
+        const file = originalFiles[fieldIdentifier];
+        if (!file) return;
+        
+        const container = document.getElementById('mobile-upload-' + fieldIdentifier);
+        const qualitySlider = document.getElementById('quality-' + fieldIdentifier);
+        const widthSelect = document.getElementById('max-width-' + fieldIdentifier);
+        const previewContainer = container.querySelector('.image-preview-container');
+        const previewImage = container.querySelector('.preview-image');
+        const fileInfo = container.querySelector('.file-info');
+        
+        // Show preview container
+        previewContainer.classList.remove('d-none');
+        
+        // Get settings
+        const quality = parseInt(qualitySlider.value) / 100;
+        const maxWidth = parseInt(widthSelect.value);
+        
+        // Create a FileReader to read the image
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            // Create an image element to get dimensions
+            const img = new Image();
+            img.onload = function() {
+                // Calculate new dimensions while maintaining aspect ratio
+                let newWidth = img.width;
+                let newHeight = img.height;
+                
+                if (maxWidth > 0 && img.width > maxWidth) {
+                    newWidth = maxWidth;
+                    newHeight = (img.height * maxWidth) / img.width;
+                }
+                
+                // Create canvas for compression
+                const canvas = document.createElement('canvas');
+                canvas.width = newWidth;
+                canvas.height = newHeight;
+                
+                // Draw and compress image
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, newWidth, newHeight);
+                
+                // Get compressed image as data URL
+                const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+                
+                // Update preview
+                previewImage.src = compressedDataUrl;
+                
+                // Calculate and display file size information
+                const originalSizeKB = Math.round(file.size / 1024);
+                
+                // Estimate compressed size from data URL
+                const base64 = compressedDataUrl.split(',')[1];
+                const compressedSizeKB = Math.round((base64.length * 3/4) / 1024);
+                
+                const savedPercent = Math.round((1 - (compressedSizeKB / originalSizeKB)) * 100);
+                
+                fileInfo.textContent = `Original: ${originalSizeKB}KB → Compressed: ~${compressedSizeKB}KB (${savedPercent}% saved)`;
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+    
+    // Apply compression and store in hidden field for form submission
+    function applyCompression(fieldIdentifier) {
+        const file = originalFiles[fieldIdentifier];
+        if (!file) {
+            console.error('No file found for field:', fieldIdentifier);
+            return;
+        }
+        
+        console.log('Applying compression for field:', fieldIdentifier);
+        
+        // Get the file input element
+        const fileInput = document.getElementById('input-' + fieldIdentifier);
+        if (!fileInput) {
+            console.error('File input not found for field:', fieldIdentifier);
+            return;
+        }
+        
+        // Check if this is a repeater field
+        const isRepeater = fileInput.getAttribute('data-repeater') === 'true';
+        const repeaterIndex = isRepeater ? fileInput.getAttribute('data-repeater-index') : null;
+        const repeaterKey = isRepeater ? fileInput.getAttribute('data-repeater-key') : null;
+        
+        if (isRepeater) {
+            console.log('Processing repeater field:', fieldIdentifier, 'Index:', repeaterIndex, 'Key:', repeaterKey);
+        }
+        
+        // Get all the necessary elements for this specific field
+        const container = document.getElementById('mobile-upload-' + fieldIdentifier);
+        const qualitySlider = document.getElementById('quality-' + fieldIdentifier);
+        const widthSelect = document.getElementById('max-width-' + fieldIdentifier);
+        const hiddenInput = document.getElementById('compressed-' + fieldIdentifier);
+        const options = container.querySelector('.compression-options');
+        
+    
+        if (!container || !qualitySlider || !widthSelect || !hiddenInput || !fileInput || !options) {
+            console.error('Missing elements for field:', fieldIdentifier);
+            console.log('Container:', container);
+            console.log('Quality slider:', qualitySlider);
+            console.log('Width select:', widthSelect);
+            console.log('Hidden input:', hiddenInput);
+            console.log('File input:', fileInput);
+            console.log('Options:', options);
+            return;
+        }
+        
+        // Get settings
+        const quality = parseInt(qualitySlider.value);
+        const maxWidth = parseInt(widthSelect.value);
+        
+        console.log('Compression settings for', fieldIdentifier, '- Quality:', quality, 'Max width:', maxWidth);
+        
+        // Show processing message
+        options.innerHTML = '<div class="alert alert-info">Processing image... Please wait.</div>';
+        
+        // Create a FileReader to read the image
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            // Create an image element to get dimensions
+            const img = new Image();
+            img.onload = function() {
+                // Calculate new dimensions while maintaining aspect ratio
+                let newWidth = img.width;
+                let newHeight = img.height;
+                
+                if (maxWidth > 0 && img.width > maxWidth) {
+                    newWidth = maxWidth;
+                    newHeight = (img.height * maxWidth) / img.width;
+                }
+                
+                // Create canvas for compression
+                const canvas = document.createElement('canvas');
+                canvas.width = newWidth;
+                canvas.height = newHeight;
+                
+                // Draw and compress image
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, newWidth, newHeight);
+                
+                // Get compressed image as data URL
+                const compressedDataUrl = canvas.toDataURL('image/jpeg', quality / 100);
+                
+                // Send to server for additional optimization
+                fetch('{{ route("mobile.image.upload") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        image: compressedDataUrl,
+                        quality: quality,
+                        maxWidth: maxWidth
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Store the server-optimized image path in hidden input
+                        hiddenInput.value = data.path;
+                        
+                        // For repeater fields, make sure the name attribute is correctly set
+                        if (isRepeater && repeaterIndex !== null && repeaterKey !== null) {
+                            // Double check that the hidden input has the correct name attribute for the repeater field
+                            const expectedName = `fields[${fieldIdentifier.split('-')[0]}][${repeaterIndex}][${repeaterKey}]`;
+                            if (hiddenInput.name !== expectedName) {
+                                console.log('Fixing hidden input name from', hiddenInput.name, 'to', expectedName);
+                                hiddenInput.name = expectedName;
+                            }
+                            
+                            // Important: Make sure we're not affecting other repeater items
+                            // This ensures each slider item maintains its own image
+                            const allHiddenInputs = document.querySelectorAll('.compressed-image-data');
+                            allHiddenInputs.forEach(input => {
+                                // Only process inputs that are NOT this one but are in the same repeater
+                                if (input.id !== hiddenInput.id && 
+                                    input.getAttribute('data-repeater') === 'true' && 
+                                    input.getAttribute('data-repeater-key') === repeaterKey) {
+                                }
+                            });
+                        }
+                        
+                        // Disable the file input to prevent double submission
+                        fileInput.disabled = true;
+                        
+                        // Show success message with server-side optimization details
+                        options.innerHTML = `
+                            <div class="alert alert-success">
+                                <strong>Image optimized successfully!</strong><br>
+                                Data usage has been optimized for mobile networks.<br>
+                                <img src="${data.url}" class="img-fluid img-thumbnail mt-2" style="max-height: 200px;">
+                            </div>
+                        `;
+                    } else {
+                        console.error('Server error for field:', fieldIdentifier, data.message);
+                        // Show error message
+                        options.innerHTML = `<div class="alert alert-danger">Server error: ${data.message}</div>`;
+                        // Re-enable file input
+                        fileInput.disabled = false;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error uploading image:', error);
+                    options.innerHTML = '<div class="alert alert-danger">Error uploading image. Please try again.</div>';
+                    fileInput.disabled = false;
+                });
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+    
+    // Cancel compression and reset the upload field
+    function cancelCompression(fieldIdentifier) {
+        const container = document.getElementById('mobile-upload-' + fieldIdentifier);
+        const options = container.querySelector('.compression-options');
+        const fileInput = document.getElementById('input-' + fieldIdentifier);
+        const hiddenInput = document.getElementById('compressed-' + fieldIdentifier);
+        
+        // Reset everything
+        options.classList.add('d-none');
+        fileInput.value = '';
+        hiddenInput.value = '';
+        delete originalFiles[fieldIdentifier];
     }
 </script>
 

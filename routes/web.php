@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\OffplanController;
 use App\Http\Controllers\Admin\PartnerController;
 use App\Http\Controllers\Admin\SettingsController;
+use App\Http\Controllers\MobileImageController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Artisan;
 Route::get('/', function () {
@@ -70,3 +71,6 @@ Route::delete('admin/blogposts/{blogpost}/delete-twitter-image', [App\Http\Contr
 // Rental/Resale metadata image routes
 Route::delete('admin/rental_resale/{postype}/delete-og-image', [App\Http\Controllers\Admin\PostypeController::class, 'deleteOgImage'])->name('admin.rental_resale.delete-og-image');
 Route::delete('admin/rental_resale/{postype}/delete-twitter-image', [App\Http\Controllers\Admin\PostypeController::class, 'deleteTwitterImage'])->name('admin.rental_resale.delete-twitter-image');
+
+// Mobile image upload route
+Route::post('/api/mobile-image-upload', [MobileImageController::class, 'upload'])->name('mobile.image.upload');

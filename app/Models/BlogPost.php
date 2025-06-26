@@ -18,7 +18,12 @@ class BlogPost extends Model
         'image',
         'image_alt',
         'banner_image',
+        'banner_title',
         'banner_image_alt',
+        'mobile_image',
+        'mobile_image_alt',
+        'mobile_banner_image',
+        'mobile_banner_image_alt',
     ];
     protected $casts = [
         'show_on_main_page' => 'boolean',

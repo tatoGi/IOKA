@@ -20,7 +20,12 @@ return [
                         'image' => [
                             'type' => 'image',
                             'label' => 'Photo',
-                            'required' => true,
+                            'required' => false,
+                        ],
+                        'mobile_image' => [
+                            'type' => 'mobile_image',
+                            'label' => 'Mobile Photo',
+                            'required' => false,
                         ],
                         'title' => [
                             'type' => 'text',
@@ -82,6 +87,11 @@ return [
                             'label' => 'Link URL',
                             'required' => true,
                         ],
+                        'mobile_image' => [
+                            'type' => 'mobile_image',
+                            'label' => 'Mobile Image',
+                            'required' => false,
+                        ],
                     ],
                 ],
                 'rolling_numbers' => [
@@ -127,6 +137,11 @@ return [
                                     'type' => 'image',
                                     'label' => 'Image Field',
                                     'required' => true,
+                                ],
+                                'mobile_image' => [
+                                    'type' => 'mobile_image',
+                                    'label' => 'Mobile Photo',
+                                    'required' => false,
                                 ],
                                 'alt_text' => [
                                     'type' => 'text',
@@ -192,6 +207,11 @@ return [
                                     'label' => 'Image Field',
                                     'required' => true,
                                 ],
+                                'mobile_image_field' => [
+                                    'type' => 'mobile_image',
+                                    'label' => 'Mobile Image Field',
+                                    'required' => false,
+                                ],
                                 'alt_text' => [
                                     'type' => 'text',
                                     'label' => 'Image Alt Text',
@@ -255,6 +275,11 @@ return [
                                     'type' => 'image',
                                     'label' => 'Image Field',
                                     'required' => true,
+                                ],
+                                'mobile_image_field' => [
+                                    'type' => 'mobile_image',
+                                    'label' => 'Mobile Image Field',
+                                    'required' => false,
                                 ],
                                 'alt_text' => [
                                     'type' => 'text',
@@ -346,6 +371,11 @@ return [
                     'label' => 'Image',
                     'required' => true,
                 ],
+                'mobile_image' => [
+                    'type' => 'mobile_image',
+                    'label' => 'Mobile Image',
+                    'required' => false,
+                ],
                 'alt_text' => [
                     'type' => 'text',
                     'label' => 'Image Alt Text',
@@ -388,6 +418,11 @@ return [
                             'type' => 'image',
                             'label' => 'Team Member Photo',
                             'required' => true,
+                        ],
+                        'mobile_image' => [
+                            'type' => 'mobile_image',
+                            'label' => 'Mobile Team Member Photo',
+                            'required' => false,
                         ],
                         'alt_text' => [
                             'type' => 'text',

@@ -24,6 +24,12 @@ class Developer extends Model
         'offplan_listings',
         'tags',
         'banner_image',
+        'mobile_photo',
+        'mobile_photo_alt',
+        'mobile_logo',
+        'mobile_logo_alt',
+        'mobile_banner_image',
+        'mobile_banner_image_alt',
     ];
 
     protected $casts = [

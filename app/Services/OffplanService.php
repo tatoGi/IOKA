@@ -6,6 +6,7 @@ use App\Models\Offplan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class OffplanService
 {
@@ -68,6 +69,46 @@ class OffplanService
             }
             if ($request->has('agent_image_alt')) {
                 $altTexts['agent_image'] = $request->input('agent_image_alt');
+            }
+            
+            // Handle mobile main photo and its alt text
+            if ($request->has('mobile_main_photo_compressed') && $request->input('mobile_main_photo_compressed') !== '') {
+                // Process base64 image data
+                $imageData = $request->input('mobile_main_photo_compressed');
+                $imageData = substr($imageData, strpos($imageData, ',') + 1);
+                $imageData = base64_decode($imageData);
+                
+                // Generate a unique filename
+                $filename = 'mobile_main_photo_' . time() . '.jpg';
+                $path = 'offplan_mobile_photos/' . $filename;
+                
+                // Store the image
+                if (Storage::disk('public')->put($path, $imageData)) {
+                    $data['mobile_main_photo'] = $path;
+                }
+            }
+            if ($request->has('mobile_main_photo_alt')) {
+                $altTexts['mobile_main_photo'] = $request->input('mobile_main_photo_alt');
+            }
+            
+            // Handle mobile banner photo and its alt text
+            if ($request->has('mobile_banner_photo_compressed') && $request->input('mobile_banner_photo_compressed') !== '') {
+                // Process base64 image data
+                $imageData = $request->input('mobile_banner_photo_compressed');
+                $imageData = substr($imageData, strpos($imageData, ',') + 1);
+                $imageData = base64_decode($imageData);
+                
+                // Generate a unique filename
+                $filename = 'mobile_banner_photo_' . time() . '.jpg';
+                $path = 'offplan_mobile_banners/' . $filename;
+                
+                // Store the image
+                if (Storage::disk('public')->put($path, $imageData)) {
+                    $data['mobile_banner_photo'] = $path;
+                }
+            }
+            if ($request->has('mobile_banner_photo_alt')) {
+                $altTexts['mobile_banner_photo'] = $request->input('mobile_banner_photo_alt');
             }
 
             // Store alt texts in the data array if we have any

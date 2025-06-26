@@ -9,6 +9,7 @@ use App\Models\Offplan;
 use App\Models\RentalResale;
 use App\Traits\HandlesMetaData;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
@@ -53,6 +54,12 @@ class DeveloperController extends Controller
             'offplan_listings.*' => 'exists:offplans,id',
             'awards' => 'nullable|array',
             'banner_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'mobile_photo_compressed' => 'nullable|string',
+            'mobile_photo_alt' => 'nullable|string|max:255',
+            'mobile_logo_compressed' => 'nullable|string',
+            'mobile_logo_alt' => 'nullable|string|max:255',
+            'mobile_banner_image_compressed' => 'nullable|string',
+            'mobile_banner_image_alt' => 'nullable|string|max:255',
         ], $this->getMetadataValidationRules()));
 
         if ($request->hasFile('logo')) {
@@ -61,6 +68,66 @@ class DeveloperController extends Controller
 
         if ($request->hasFile('banner_image')) {
             $validatedData['banner_image'] = $request->file('banner_image')->store('developer_banners', 'public');
+        }
+        
+        // Handle mobile photo upload (base64 encoded)
+        if ($request->has('mobile_photo_compressed') && $request->input('mobile_photo_compressed') !== '') {
+            // Process base64 image data
+            $imageData = $request->input('mobile_photo_compressed');
+            $imageData = substr($imageData, strpos($imageData, ',') + 1);
+            $imageData = base64_decode($imageData);
+            
+            // Generate a unique filename
+            $filename = 'mobile_photo_' . time() . '.jpg';
+            $path = 'developer_mobile_photos/' . $filename;
+            
+            // Store the image
+            if (Storage::disk('public')->put($path, $imageData)) {
+                $validatedData['mobile_photo'] = $path;
+                if ($request->has('mobile_photo_alt')) {
+                    $validatedData['mobile_photo_alt'] = $request->input('mobile_photo_alt');
+                }
+            }
+        }
+        
+        // Handle mobile logo upload (base64 encoded)
+        if ($request->has('mobile_logo_compressed') && $request->input('mobile_logo_compressed') !== '') {
+            // Process base64 image data
+            $imageData = $request->input('mobile_logo_compressed');
+            $imageData = substr($imageData, strpos($imageData, ',') + 1);
+            $imageData = base64_decode($imageData);
+            
+            // Generate a unique filename
+            $filename = 'mobile_logo_' . time() . '.jpg';
+            $path = 'developer_mobile_logos/' . $filename;
+            
+            // Store the image
+            if (Storage::disk('public')->put($path, $imageData)) {
+                $validatedData['mobile_logo'] = $path;
+                if ($request->has('mobile_logo_alt')) {
+                    $validatedData['mobile_logo_alt'] = $request->input('mobile_logo_alt');
+                }
+            }
+        }
+        
+        // Handle mobile banner image upload (base64 encoded)
+        if ($request->has('mobile_banner_image_compressed') && $request->input('mobile_banner_image_compressed') !== '') {
+            // Process base64 image data
+            $imageData = $request->input('mobile_banner_image_compressed');
+            $imageData = substr($imageData, strpos($imageData, ',') + 1);
+            $imageData = base64_decode($imageData);
+            
+            // Generate a unique filename
+            $filename = 'mobile_banner_' . time() . '.jpg';
+            $path = 'developer_mobile_banners/' . $filename;
+            
+            // Store the image
+            if (Storage::disk('public')->put($path, $imageData)) {
+                $validatedData['mobile_banner_image'] = $path;
+                if ($request->has('mobile_banner_image_alt')) {
+                    $validatedData['mobile_banner_image_alt'] = $request->input('mobile_banner_image_alt');
+                }
+            }
         }
 
         // Handle multiple photo uploads with alt text
@@ -174,6 +241,12 @@ class DeveloperController extends Controller
             'offplan_listings.*' => 'exists:offplans,id',
             'awards' => 'nullable|array',
             'banner_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'mobile_photo_compressed' => 'nullable|string',
+            'mobile_photo_alt' => 'nullable|string|max:255',
+            'mobile_logo_compressed' => 'nullable|string',
+            'mobile_logo_alt' => 'nullable|string|max:255',
+            'mobile_banner_image_compressed' => 'nullable|string',
+            'mobile_banner_image_alt' => 'nullable|string|max:255',
         ], $this->getMetadataValidationRules()));
 
         if ($request->hasFile('logo')) {
@@ -188,6 +261,120 @@ class DeveloperController extends Controller
                 Storage::disk('public')->delete($developer->banner_image);
             }
             $validatedData['banner_image'] = $request->file('banner_image')->store('developer_banners', 'public');
+        }
+        
+        // Handle mobile photo upload (base64 encoded)
+        if ($request->has('mobile_photo_compressed') && $request->input('mobile_photo_compressed') !== '') {
+            // Process base64 image data
+            $imageData = $request->input('mobile_photo_compressed');
+            
+            // Check if the string contains the data URI scheme
+            if (strpos($imageData, 'data:image') !== false) {
+                $imageData = substr($imageData, strpos($imageData, ',') + 1);
+            }
+            
+            $imageData = base64_decode($imageData);
+            
+            if ($imageData !== false) {
+                // Generate a unique filename
+                $filename = 'mobile_photo_' . time() . '.jpg';
+                $path = 'developer_mobile_photos/' . $filename;
+                
+                // Delete old mobile photo if exists
+                if ($developer->mobile_photo) {
+                    Storage::disk('public')->delete($developer->mobile_photo);
+                }
+                
+                // Store the image
+                if (Storage::disk('public')->put($path, $imageData)) {
+                    $validatedData['mobile_photo'] = $path;
+                    if ($request->has('mobile_photo_alt')) {
+                        $validatedData['mobile_photo_alt'] = $request->input('mobile_photo_alt');
+                    }
+                } else {
+                    // Log the error
+                    Log::error('Failed to store mobile photo for developer ID: ' . $developer->id);
+                }
+            } else {
+                // Log the error
+                Log::error('Failed to decode base64 data for mobile photo, developer ID: ' . $developer->id);
+            }
+        }
+        
+        // Handle mobile logo upload (base64 encoded)
+        if ($request->has('mobile_logo_compressed') && $request->input('mobile_logo_compressed') !== '') {
+            // Process base64 image data
+            $imageData = $request->input('mobile_logo_compressed');
+            
+            // Check if the string contains the data URI scheme
+            if (strpos($imageData, 'data:image') !== false) {
+                $imageData = substr($imageData, strpos($imageData, ',') + 1);
+            }
+            
+            $imageData = base64_decode($imageData);
+            
+            if ($imageData !== false) {
+                // Generate a unique filename
+                $filename = 'mobile_logo_' . time() . '.jpg';
+                $path = 'developer_mobile_logos/' . $filename;
+                
+                // Delete old mobile logo if exists
+                if ($developer->mobile_logo) {
+                    Storage::disk('public')->delete($developer->mobile_logo);
+                }
+                
+                // Store the image
+                if (Storage::disk('public')->put($path, $imageData)) {
+                    $validatedData['mobile_logo'] = $path;
+                    if ($request->has('mobile_logo_alt')) {
+                        $validatedData['mobile_logo_alt'] = $request->input('mobile_logo_alt');
+                    }
+                } else {
+                    // Log the error
+                    Log::error('Failed to store mobile logo for developer ID: ' . $developer->id);
+                }
+            } else {
+                // Log the error
+                Log::error('Failed to decode base64 data for mobile logo, developer ID: ' . $developer->id);
+            }
+        }
+        
+        // Handle mobile banner image upload (base64 encoded)
+        if ($request->has('mobile_banner_image_compressed') && $request->input('mobile_banner_image_compressed') !== '') {
+            // Process base64 image data
+            $imageData = $request->input('mobile_banner_image_compressed');
+            
+            // Check if the string contains the data URI scheme
+            if (strpos($imageData, 'data:image') !== false) {
+                $imageData = substr($imageData, strpos($imageData, ',') + 1);
+            }
+            
+            $imageData = base64_decode($imageData);
+            
+            if ($imageData !== false) {
+                // Generate a unique filename
+                $filename = 'mobile_banner_' . time() . '.jpg';
+                $path = 'developer_mobile_banners/' . $filename;
+                
+                // Delete old mobile banner image if exists
+                if ($developer->mobile_banner_image) {
+                    Storage::disk('public')->delete($developer->mobile_banner_image);
+                }
+                
+                // Store the image
+                if (Storage::disk('public')->put($path, $imageData)) {
+                    $validatedData['mobile_banner_image'] = $path;
+                    if ($request->has('mobile_banner_image_alt')) {
+                        $validatedData['mobile_banner_image_alt'] = $request->input('mobile_banner_image_alt');
+                    }
+                } else {
+                    // Log the error
+                    Log::error('Failed to store mobile banner image for developer ID: ' . $developer->id);
+                }
+            } else {
+                // Log the error
+                Log::error('Failed to decode base64 data for mobile banner image, developer ID: ' . $developer->id);
+            }
         }
 
         // Handle multiple photo uploads with alt text
@@ -425,5 +612,55 @@ class DeveloperController extends Controller
             return response()->json(['success' => true]);
         }
         return response()->json(['success' => false, 'message' => 'No Twitter image found.'], 404);
+    }
+    
+    /**
+     * Delete the mobile photo for the specified developer.
+     */
+    public function deleteMobilePhoto($id)
+    {
+        $developer = Developer::findOrFail($id);
+        
+        if ($developer->mobile_photo) {
+            Storage::disk('public')->delete($developer->mobile_photo);
+            $developer->update([
+                'mobile_photo' => null,
+                'mobile_photo_alt' => null
+            ]);
+            return response()->json(['success' => true]);
+        }
+        return response()->json(['success' => false, 'message' => 'No mobile photo found.']);
+    }
+    
+    /**
+     * Delete the mobile logo for the specified developer.
+     */
+    public function deleteMobileLogo(Developer $developer)
+    {
+        if ($developer->mobile_logo) {
+            Storage::disk('public')->delete($developer->mobile_logo);
+            $developer->update([
+                'mobile_logo' => null,
+                'mobile_logo_alt' => null
+            ]);
+            return response()->json(['success' => true]);
+        }
+        return response()->json(['success' => false, 'message' => 'No mobile logo found.'], 404);
+    }
+    
+    /**
+     * Delete the mobile banner image for the specified developer.
+     */
+    public function deleteMobileBannerImage(Developer $developer)
+    {
+        if ($developer->mobile_banner_image) {
+            Storage::disk('public')->delete($developer->mobile_banner_image);
+            $developer->update([
+                'mobile_banner_image' => null,
+                'mobile_banner_image_alt' => null
+            ]);
+            return response()->json(['success' => true]);
+        }
+        return response()->json(['success' => false, 'message' => 'No mobile banner image found.'], 404);
     }
 }

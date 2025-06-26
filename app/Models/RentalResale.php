@@ -43,6 +43,11 @@ class RentalResale extends Model
         'languages',
         'subtitle',
         'alt_texts',
+        'mobile_agent_photo',
+        'mobile_agent_photo_alt',
+        'mobile_qr_photo',
+        'mobile_qr_photo_alt',
+        'mobile_gallery_images',
     ];
 
     protected $casts = [
@@ -54,6 +59,7 @@ class RentalResale extends Model
         'top' => 'boolean',
         'languages' => 'array', // Ensuring JSON is handled properly
         'alt_texts' => 'array',
+        'mobile_gallery_images' => 'array',
     ];
 
     public function amount()

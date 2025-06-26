@@ -22,6 +22,7 @@ class Offplan extends Model
         'near_by',
         'main_photo',
         'banner_photo',
+        'banner_title',
         'exterior_gallery',
         'interior_gallery',
         'property_type',
@@ -44,6 +45,10 @@ class Offplan extends Model
         'location',
         'developer_id',
         'alt_texts',
+        'mobile_main_photo',
+        'mobile_main_photo_alt',
+        'mobile_banner_photo',
+        'mobile_banner_photo_alt',
     ];
 
     protected $casts = [

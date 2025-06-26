@@ -95,6 +95,107 @@
                                 <img src="{{ asset('storage/' . $developer->logo) }}" class="mt-2" width="100" alt="{{ $developer->logo_alt ?? '' }}">
                             @endif
                         </div>
+                        
+                        <div class="form-group mb-3">
+                            <label for="mobile_photo">Mobile Photo (optimized for mobile)</label>
+                            <input type="file" name="mobile_photo" id="mobile_photo" class="form-control" accept="image/*" capture="environment">
+                            <input type="text" name="mobile_photo_alt" class="form-control mt-2" value="{{ $developer->mobile_photo_alt ?? '' }}" placeholder="Alt text for mobile photo">
+                            
+                            <div class="row mt-2">
+                                <div class="col-md-6">
+                                    <label>Compression Quality: <span id="mobile_photo_quality_value">80</span>%</label>
+                                    <input type="range" id="mobile_photo_quality" class="form-range" min="10" max="100" value="80">
+                                </div>
+                                <div class="col-md-6">
+                                    <label>Max Width: <span id="mobile_photo_max_width_value">1200</span>px</label>
+                                    <select id="mobile_photo_max_width" class="form-select">
+                                        <option value="800">800px</option>
+                                        <option value="1000">1000px</option>
+                                        <option value="1200" selected>1200px</option>
+                                        <option value="1500">1500px</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div id="mobile_photo_preview" class="mt-2">
+                                @if (isset($developer) && $developer->mobile_photo)
+                                    <img src="{{ asset('storage/' . $developer->mobile_photo) }}" class="img-thumbnail" style="max-height: 150px;" alt="{{ $developer->mobile_photo_alt ?? '' }}">
+                                    <button type="button" class="btn btn-sm btn-danger mt-1" onclick="deleteMobilePhoto({{ $developer->id }})">Remove Mobile Photo</button>
+                                @endif
+                            </div>
+                            
+                            <input type="hidden" name="mobile_photo_compressed" id="mobile_photo_compressed">
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label for="mobile_logo">Mobile Logo (optimized for mobile)</label>
+                            <input type="file" name="mobile_logo" id="mobile_logo" class="form-control" accept="image/*" capture="environment">
+                            <input type="text" name="mobile_logo_alt" class="form-control mt-2" value="{{ $developer->mobile_logo_alt ?? '' }}" placeholder="Alt text for mobile logo">
+                            
+                            <div class="row mt-2">
+                                <div class="col-md-6">
+                                    <label>Compression Quality: <span id="mobile_logo_quality_value">80</span>%</label>
+                                    <input type="range" id="mobile_logo_quality" class="form-range" min="10" max="100" value="80">
+                                </div>
+                                <div class="col-md-6">
+                                    <label>Max Width: <span id="mobile_logo_max_width_value">800</span>px</label>
+                                    <select id="mobile_logo_max_width" class="form-select">
+                                        <option value="400">400px</option>
+                                        <option value="600">600px</option>
+                                        <option value="800" selected>800px</option>
+                                        <option value="1000">1000px</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div id="mobile_logo_preview" class="mt-2">
+                                @if (isset($developer) && $developer->mobile_logo)
+                                    <img src="{{ asset('storage/' . $developer->mobile_logo) }}" class="img-thumbnail" style="max-height: 150px;" alt="{{ $developer->mobile_logo_alt ?? '' }}">
+                                    <button type="button" class="btn btn-sm btn-danger mt-1" onclick="deleteMobileLogo({{ $developer->id }})">Remove Mobile Logo</button>
+                                @endif
+                            </div>
+                            
+                            <input type="hidden" name="mobile_logo_compressed" id="mobile_logo_compressed">
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label for="banner_image">Banner Image</label>
+                            <input type="file" name="banner_image" id="banner_image" class="form-control">
+                            @if (isset($developer) && $developer->banner_image)
+                                <img src="{{ asset('storage/' . $developer->banner_image) }}" class="mt-2" width="200" alt="Banner Image">
+                            @endif
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label for="mobile_banner_image">Mobile Banner Image (optimized for mobile)</label>
+                            <input type="file" name="mobile_banner_image" id="mobile_banner_image" class="form-control" accept="image/*" capture="environment">
+                            <input type="text" name="mobile_banner_image_alt" class="form-control mt-2" value="{{ $developer->mobile_banner_image_alt ?? '' }}" placeholder="Alt text for mobile banner image">
+                            
+                            <div class="row mt-2">
+                                <div class="col-md-6">
+                                    <label>Compression Quality: <span id="mobile_banner_image_quality_value">80</span>%</label>
+                                    <input type="range" id="mobile_banner_image_quality" class="form-range" min="10" max="100" value="80">
+                                </div>
+                                <div class="col-md-6">
+                                    <label>Max Width: <span id="mobile_banner_image_max_width_value">1500</span>px</label>
+                                    <select id="mobile_banner_image_max_width" class="form-select">
+                                        <option value="1000">1000px</option>
+                                        <option value="1200">1200px</option>
+                                        <option value="1500" selected>1500px</option>
+                                        <option value="2000">2000px</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div id="mobile_banner_image_preview" class="mt-2">
+                                @if (isset($developer) && $developer->mobile_banner_image)
+                                    <img src="{{ asset('storage/' . $developer->mobile_banner_image) }}" class="img-thumbnail" style="max-height: 150px;" alt="{{ $developer->mobile_banner_image_alt ?? '' }}">
+                                    <button type="button" class="btn btn-sm btn-danger mt-1" onclick="deleteMobileBannerImage({{ $developer->id }})">Remove Mobile Banner Image</button>
+                                @endif
+                            </div>
+                            
+                            <input type="hidden" name="mobile_banner_image_compressed" id="mobile_banner_image_compressed">
+                        </div>
 
                         <!-- Awards Section -->
                         <div class="form-group mb-3">
@@ -344,5 +445,236 @@
             }
         });
         // OG and Twitter image removal is now handled by the metadata-form component
+        
+        // Mobile Photo Handling
+        document.getElementById('mobile_photo').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const quality = parseInt(document.getElementById('mobile_photo_quality').value) / 100;
+                    const maxWidth = parseInt(document.getElementById('mobile_photo_max_width').value);
+                    
+                    // Compress the image
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+                    
+                    if (width > maxWidth) {
+                        height = Math.round(height * maxWidth / width);
+                        width = maxWidth;
+                    }
+                    
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    // Convert to base64
+                    const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+                    
+                    // Display preview
+                    const preview = document.getElementById('mobile_photo_preview');
+                    preview.innerHTML = `<img src="${compressedDataUrl}" class="img-thumbnail" style="max-height: 150px;">`;
+                    
+                    // Store compressed image data - ONLY for mobile_photo
+                    document.getElementById('mobile_photo_compressed').value = compressedDataUrl;
+                    console.log('Mobile photo compressed data set:', compressedDataUrl.substring(0, 50) + '...');
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // Mobile Logo Handling
+        document.getElementById('mobile_logo').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const quality = parseInt(document.getElementById('mobile_logo_quality').value) / 100;
+                    const maxWidth = parseInt(document.getElementById('mobile_logo_max_width').value);
+                    
+                    // Compress the image
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+                    
+                    if (width > maxWidth) {
+                        height = Math.round(height * maxWidth / width);
+                        width = maxWidth;
+                    }
+                    
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    // Convert to base64
+                    const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+                    
+                    // Display preview
+                    const preview = document.getElementById('mobile_logo_preview');
+                    preview.innerHTML = `<img src="${compressedDataUrl}" class="img-thumbnail" style="max-height: 150px;">`;
+                    
+                    // Store compressed image data - ONLY for mobile_logo
+                    document.getElementById('mobile_logo_compressed').value = compressedDataUrl;
+                    // Make sure we're not affecting other fields
+                    console.log('Mobile logo compressed data set:', compressedDataUrl.substring(0, 50) + '...');
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // Mobile Banner Image Handling
+        document.getElementById('mobile_banner_image').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const quality = parseInt(document.getElementById('mobile_banner_image_quality').value) / 100;
+                    const maxWidth = parseInt(document.getElementById('mobile_banner_image_max_width').value);
+                    
+                    // Compress the image
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+                    
+                    if (width > maxWidth) {
+                        height = Math.round(height * maxWidth / width);
+                        width = maxWidth;
+                    }
+                    
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    // Convert to base64
+                    const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+                    
+                    // Display preview
+                    const preview = document.getElementById('mobile_banner_image_preview');
+                    preview.innerHTML = `<img src="${compressedDataUrl}" class="img-thumbnail" style="max-height: 150px;">`;
+                    
+                    // Store compressed image data - ONLY for mobile_banner_image
+                    document.getElementById('mobile_banner_image_compressed').value = compressedDataUrl;
+                    // Make sure we're not affecting other fields
+                    console.log('Mobile banner image compressed data set:', compressedDataUrl.substring(0, 50) + '...');
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // Update quality and max width display values
+        document.getElementById('mobile_photo_quality').addEventListener('input', function() {
+            document.getElementById('mobile_photo_quality_value').textContent = this.value;
+        });
+
+        document.getElementById('mobile_photo_max_width').addEventListener('change', function() {
+            document.getElementById('mobile_photo_max_width_value').textContent = this.value;
+        });
+
+        document.getElementById('mobile_logo_quality').addEventListener('input', function() {
+            document.getElementById('mobile_logo_quality_value').textContent = this.value;
+        });
+
+        document.getElementById('mobile_logo_max_width').addEventListener('change', function() {
+            document.getElementById('mobile_logo_max_width_value').textContent = this.value;
+        });
+
+        document.getElementById('mobile_banner_image_quality').addEventListener('input', function() {
+            document.getElementById('mobile_banner_image_quality_value').textContent = this.value;
+        });
+
+        document.getElementById('mobile_banner_image_max_width').addEventListener('change', function() {
+            document.getElementById('mobile_banner_image_max_width_value').textContent = this.value;
+        });
+        
+        // Mobile image deletion functions
+        function deleteMobilePhoto(developerId) {
+            if (confirm('Are you sure you want to delete this mobile photo?')) {
+                $.ajax({
+                    url: `/ioka_admin/developer/${developerId}/delete-mobile-photo`,
+                    type: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}'
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            $('#mobile_photo_preview').html('');
+                            document.getElementById('mobile_photo_compressed').value = '';
+                            alert('Mobile photo deleted successfully');
+                        } else {
+                            alert('Error: ' + (response.message || 'Error deleting mobile photo'));
+                        }
+                    },
+                    error: function(xhr) {
+                        let errorMsg = 'Error deleting mobile photo';
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            errorMsg = xhr.responseJSON.message;
+                        }
+                        alert('Error: ' + errorMsg);
+                    }
+                });
+            }
+        }
+        
+        function deleteMobileLogo(developerId) {
+            if (confirm('Are you sure you want to delete this mobile logo?')) {
+                $.ajax({
+                    url: `/ioka_admin/developer/${developerId}/delete-mobile-logo`,
+                    type: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}'
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            $('#mobile_logo_preview').html('');
+                            alert('Mobile logo deleted successfully');
+                        } else {
+                            alert('Error deleting mobile logo');
+                        }
+                    },
+                    error: function() {
+                        alert('Error deleting mobile logo');
+                    }
+                });
+            }
+        }
+        
+        function deleteMobileBannerImage(developerId) {
+            if (confirm('Are you sure you want to delete this mobile banner image?')) {
+                $.ajax({
+                    url: `/ioka_admin/developer/${developerId}/delete-mobile-banner-image`,
+                    type: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}'
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            $('#mobile_banner_image_preview').html('');
+                            alert('Mobile banner image deleted successfully');
+                        } else {
+                            alert('Error deleting mobile banner image');
+                        }
+                    },
+                    error: function() {
+                        alert('Error deleting mobile banner image');
+                    }
+                });
+            }
+        }
     </script>
 @endpush

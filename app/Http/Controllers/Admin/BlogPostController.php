@@ -40,8 +40,13 @@ class BlogPostController extends Controller
             'date' => 'required|date',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'banner_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'banner_title' => 'nullable|string|max:255',
             'banner_image_alt' => 'nullable|string|max:255',
             'image_alt' => 'nullable|string|max:255',
+            'mobile_image_compressed' => 'nullable|string',
+            'mobile_image_alt' => 'nullable|string|max:255',
+            'mobile_banner_image_compressed' => 'nullable|string',
+            'mobile_banner_image_alt' => 'nullable|string|max:255',
             'show_on_main_page' => 'nullable|boolean',
             'tags' => 'nullable|array',
             'tags.*' => 'string',
@@ -64,6 +69,21 @@ class BlogPostController extends Controller
         }
         if ($request->hasFile('banner_image')) {
             $validated['banner_image'] = $request->file('banner_image')->store('blog-banners', 'public');
+        }
+        
+        // Handle mobile image from compressed data
+        if ($request->filled('mobile_image_compressed')) {
+            $validated['mobile_image'] = $request->input('mobile_image_compressed');
+        }
+        
+        // Handle mobile banner image from compressed data
+        if ($request->filled('mobile_banner_image_compressed')) {
+            $validated['mobile_banner_image'] = $request->input('mobile_banner_image_compressed');
+        }
+        
+        // Ensure banner_title is included in the validated data
+        if ($request->has('banner_title')) {
+            $validated['banner_title'] = $request->input('banner_title');
         }
 
         // Create the blog post
@@ -114,7 +134,12 @@ class BlogPostController extends Controller
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'banner_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'image_alt' => 'nullable|string|max:255',
+            'banner_title' => 'nullable|string|max:255',
             'banner_image_alt' => 'nullable|string|max:255',
+            'mobile_image_compressed' => 'nullable|string',
+            'mobile_image_alt' => 'nullable|string|max:255',
+            'mobile_banner_image_compressed' => 'nullable|string',
+            'mobile_banner_image_alt' => 'nullable|string|max:255',
             // Metadata validation
             'metadata.meta_title' => 'nullable|string|max:255',
             'metadata.meta_description' => 'nullable|string',
@@ -144,6 +169,27 @@ class BlogPostController extends Controller
                 Storage::disk('public')->delete($blogPost->banner_image);
             }
             $validated['banner_image'] = $request->file('banner_image')->store('blog_banners', 'public');
+        }
+        
+        // Handle mobile image from compressed data
+        if ($request->filled('mobile_image_compressed')) {
+            if ($blogPost->mobile_image) {
+                Storage::disk('public')->delete($blogPost->mobile_image);
+            }
+            $validated['mobile_image'] = $request->input('mobile_image_compressed');
+        }
+        
+        // Handle mobile banner image from compressed data
+        if ($request->filled('mobile_banner_image_compressed')) {
+            if ($blogPost->mobile_banner_image) {
+                Storage::disk('public')->delete($blogPost->mobile_banner_image);
+            }
+            $validated['mobile_banner_image'] = $request->input('mobile_banner_image_compressed');
+        }
+        
+        // Ensure banner_title is included in the validated data
+        if ($request->has('banner_title')) {
+            $validated['banner_title'] = $request->input('banner_title');
         }
 
         $blogPost->update($validated);
@@ -192,6 +238,16 @@ class BlogPostController extends Controller
         if ($type === 'banner_image' && $blogPost->banner_image) {
             Storage::disk('public')->delete($blogPost->banner_image);
             $blogPost->update(['banner_image' => null, 'banner_image_alt' => null]);
+        }
+        
+        if ($type === 'mobile_image' && $blogPost->mobile_image) {
+            Storage::disk('public')->delete($blogPost->mobile_image);
+            $blogPost->update(['mobile_image' => null, 'mobile_image_alt' => null]);
+        }
+        
+        if ($type === 'mobile_banner_image' && $blogPost->mobile_banner_image) {
+            Storage::disk('public')->delete($blogPost->mobile_banner_image);
+            $blogPost->update(['mobile_banner_image' => null, 'mobile_banner_image_alt' => null]);
         }
 
         if ($type === 'og_image' && $blogPost->metadata && $blogPost->metadata->og_image) {

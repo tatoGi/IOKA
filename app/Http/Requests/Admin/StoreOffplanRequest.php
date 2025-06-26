@@ -28,6 +28,7 @@ class StoreOffplanRequest extends FormRequest
             // File uploads
             'main_photo' => 'nullable|file|image|max:5120', // 5MB max
             'banner_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'banner_title' => 'nullable|string|max:255',
             'exterior_gallery.*' => 'nullable|file|image|max:5120',
             'interior_gallery.*' => 'nullable|file|image|max:5120',
             'property_type' => 'nullable|string|max:50',

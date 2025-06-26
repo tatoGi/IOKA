@@ -76,11 +76,61 @@
                                         </div>
                                     @endif
                                 </div>
-                                <input type="file" class="form-control @error('header_logo') is-invalid @enderror" name="header_logo" accept="image/*,.svg">
-                                @error('header_logo')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                                <small class="text-muted">Recommended size: 200x60px. Supported formats: JPEG, PNG, JPG, GIF, SVG</small>
+                                <div class="mobile-image-upload" id="mobile-upload-header_logo">
+                                    <div class="mb-2">
+                                        <div class="d-flex align-items-center">
+                                            <input type="file" class="form-control mobile-image-input @error('header_logo') is-invalid @enderror" 
+                                                id="input-header_logo" name="header_logo" accept="image/*,.svg"
+                                                data-field="header_logo"
+                                                onchange="handleMobileImageSelect(this)">
+                                            @error('header_logo')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="compression-options mb-2 d-none">
+                                        <div class="card p-3">
+                                            <div class="mb-2">
+                                                <label class="form-label">Image Quality</label>
+                                                <input type="range" class="form-range quality-slider" min="10" max="100" value="70" 
+                                                    id="quality-header_logo" data-field="header_logo">
+                                                <div class="d-flex justify-content-between">
+                                                    <small>Lower (Smaller File)</small>
+                                                    <small class="quality-value">70%</small>
+                                                    <small>Higher (Better Quality)</small>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="mb-2">
+                                                <label class="form-label">Max Width</label>
+                                                <select class="form-select max-width" id="max-width-header_logo" data-field="header_logo" style="display: block !important; width: 100%;">
+                                                    <option value="200" selected>Logo Size (200px)</option>
+                                                    <option value="400">Medium (400px)</option>
+                                                    <option value="0">Original Size</option>
+                                                </select>
+                                            </div>
+                                            
+                                            <div class="image-preview-container mb-2 d-none">
+                                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                                    <label class="form-label mb-0">Preview</label>
+                                                    <div class="file-info small text-muted"></div>
+                                                </div>
+                                                <img src="" class="img-fluid img-thumbnail preview-image" style="max-height: 200px;">
+                                            </div>
+                                            
+                                            <div class="d-flex justify-content-between">
+                                                <button type="button" class="btn btn-secondary btn-sm cancel-compression" 
+                                                    onclick="cancelCompression('header_logo')">Cancel</button>
+                                                <button type="button" class="btn btn-primary btn-sm apply-compression" 
+                                                    onclick="applyCompression('header_logo')">Apply & Upload</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <input type="hidden" name="header_logo_compressed" id="compressed-header_logo" class="compressed-image-data">
+                                    <small class="text-muted">Recommended size: 200x60px. Supported formats: JPEG, PNG, JPG, GIF, SVG</small>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -375,6 +425,261 @@
 document.getElementById('saveSettings').addEventListener('click', function(e) {
     e.preventDefault();
     document.getElementById('settingsForm').submit();
+});
+
+// Mobile image upload functionality
+let originalFiles = {};
+
+// Handle mobile image file selection
+function handleMobileImageSelect(input) {
+    const inputId = input.id;
+    const file = input.files[0];
+    
+    if (!file) return;
+    
+    // Parse the input ID to determine field identifier
+    const parts = inputId.split('-');
+    let fieldIdentifier;
+    
+    if (parts.length >= 2) {
+        fieldIdentifier = parts[1];
+        console.log('Field detected:', fieldIdentifier);
+    } else {
+        fieldIdentifier = inputId;
+        console.log('Using input ID as field identifier:', fieldIdentifier);
+    }
+    
+    // Store original file for later use
+    originalFiles[fieldIdentifier] = file;
+    console.log('Stored file for field:', fieldIdentifier, 'File name:', file.name);
+    
+    // Show compression options
+    const container = document.getElementById('mobile-upload-' + fieldIdentifier);
+    const options = container.querySelector('.compression-options');
+    options.classList.remove('d-none');
+    
+    // Set up quality slider event listener
+    const qualitySlider = document.getElementById('quality-' + fieldIdentifier);
+    const qualityValue = qualitySlider.closest('.mb-2').querySelector('.quality-value');
+    
+    qualitySlider.addEventListener('input', function() {
+        qualityValue.textContent = this.value + '%';
+        previewCompressedImage(fieldIdentifier);
+    });
+    
+    // Set up max width select event listener
+    const maxWidthSelect = document.getElementById('max-width-' + fieldIdentifier);
+    maxWidthSelect.addEventListener('change', function() {
+        previewCompressedImage(fieldIdentifier);
+    });
+    
+    // Preview the image
+    previewCompressedImage(fieldIdentifier);
+}
+
+// Preview compressed image with current settings
+function previewCompressedImage(fieldIdentifier) {
+    const file = originalFiles[fieldIdentifier];
+    if (!file) return;
+    
+    const container = document.getElementById('mobile-upload-' + fieldIdentifier);
+    const qualitySlider = document.getElementById('quality-' + fieldIdentifier);
+    const widthSelect = document.getElementById('max-width-' + fieldIdentifier);
+    const previewContainer = container.querySelector('.image-preview-container');
+    const previewImage = container.querySelector('.preview-image');
+    const fileInfo = container.querySelector('.file-info');
+    
+    const quality = parseInt(qualitySlider.value) / 100;
+    const maxWidth = parseInt(widthSelect.value);
+    
+    // Create a FileReader to read the image file
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        // Create an image element to get dimensions
+        const img = new Image();
+        img.onload = function() {
+            // Show preview container
+            previewContainer.classList.remove('d-none');
+            
+            // Calculate dimensions
+            let width = img.width;
+            let height = img.height;
+            
+            if (maxWidth > 0 && width > maxWidth) {
+                const ratio = maxWidth / width;
+                width = maxWidth;
+                height = Math.round(height * ratio);
+            }
+            
+            // Create canvas for preview
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            
+            // Update preview image
+            previewImage.src = canvas.toDataURL('image/jpeg', quality);
+            
+            // Estimate file size
+            const dataUrl = canvas.toDataURL('image/jpeg', quality);
+            const estimatedSize = Math.round((dataUrl.length - 'data:image/jpeg;base64,'.length) * 0.75 / 1024);
+            
+            // Update file info
+            fileInfo.textContent = `${width}x${height}px, ~${estimatedSize}KB`;
+        };
+        img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+}
+
+// Cancel compression and reset the input
+function cancelCompression(fieldIdentifier) {
+    const container = document.getElementById('mobile-upload-' + fieldIdentifier);
+    const fileInput = document.getElementById('input-' + fieldIdentifier);
+    const options = container.querySelector('.compression-options');
+    const previewContainer = container.querySelector('.image-preview-container');
+    
+    // Reset file input
+    fileInput.value = '';
+    
+    // Hide options and preview
+    options.classList.add('d-none');
+    previewContainer.classList.add('d-none');
+    
+    // Remove stored file
+    delete originalFiles[fieldIdentifier];
+}
+
+// Apply compression and store in hidden field for form submission
+function applyCompression(fieldIdentifier) {
+    const file = originalFiles[fieldIdentifier];
+    if (!file) {
+        console.error('No file found for field:', fieldIdentifier);
+        return;
+    }
+    
+    console.log('Applying compression for field:', fieldIdentifier);
+    
+    // Get the file input element
+    const fileInput = document.getElementById('input-' + fieldIdentifier);
+    if (!fileInput) {
+        console.error('File input not found for field:', fieldIdentifier);
+        return;
+    }
+    
+    const container = document.getElementById('mobile-upload-' + fieldIdentifier);
+    const qualitySlider = document.getElementById('quality-' + fieldIdentifier);
+    const widthSelect = document.getElementById('max-width-' + fieldIdentifier);
+    const hiddenInput = document.getElementById('compressed-' + fieldIdentifier);
+    const options = container.querySelector('.compression-options');
+    
+    if (!container || !qualitySlider || !widthSelect || !hiddenInput || !fileInput || !options) {
+        console.error('Required elements not found for field:', fieldIdentifier);
+        return;
+    }
+    
+    const quality = parseInt(qualitySlider.value) / 100;
+    const maxWidth = parseInt(widthSelect.value);
+    
+    console.log('Compression settings for', fieldIdentifier, '- Quality:', quality, 'Max Width:', maxWidth);
+    
+    // Create a FileReader to read the image file
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        // Create an image element to get dimensions
+        const img = new Image();
+        img.onload = function() {
+            // Calculate dimensions
+            let width = img.width;
+            let height = img.height;
+            
+            if (maxWidth > 0 && width > maxWidth) {
+                const ratio = maxWidth / width;
+                width = maxWidth;
+                height = Math.round(height * ratio);
+            }
+            
+            // Create canvas for compression
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            
+            // Get compressed image as base64
+            const compressedBase64 = canvas.toDataURL('image/jpeg', quality).split(',')[1];
+            
+            // Disable the file input while uploading
+            fileInput.disabled = true;
+            
+            // Show loading message
+            options.innerHTML = '<div class="alert alert-info">Uploading and optimizing image...</div>';
+            
+            // Send to server for further optimization
+            fetch('{{ route("mobile.image.upload") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({
+                    image: compressedBase64,
+                    quality: quality * 100,
+                    max_width: maxWidth
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log('Server response success for field:', fieldIdentifier);
+                    console.log('Image path from server:', data.path);
+                    console.log('Image URL from server:', data.url);
+                    
+                    // Store the server-optimized image path in hidden input
+                    hiddenInput.value = data.path;
+                    console.log('Updated hidden input value for', fieldIdentifier, 'to:', hiddenInput.value);
+                    
+                    // Disable the file input to prevent double submission
+                    fileInput.disabled = true;
+                    
+                    // Show success message with server-side optimization details
+                    options.innerHTML = `
+                        <div class="alert alert-success">
+                            <strong>Image optimized successfully!</strong><br>
+                            Data usage has been optimized for mobile networks.<br>
+                            <img src="${data.url}" class="img-fluid img-thumbnail mt-2" style="max-height: 200px;">
+                        </div>
+                    `;
+                } else {
+                    console.error('Server error for field:', fieldIdentifier, data.message);
+                    // Show error message
+                    options.innerHTML = `<div class="alert alert-danger">Server error: ${data.message}</div>`;
+                    // Re-enable file input
+                    fileInput.disabled = false;
+                }
+            })
+            .catch(error => {
+                console.error('Fetch error:', error);
+                // Show error message
+                options.innerHTML = `<div class="alert alert-danger">Network error: ${error.message}</div>`;
+                // Re-enable file input
+                fileInput.disabled = false;
+            });
+        };
+        img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+}
+
+// Initialize all mobile image inputs on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const mobileImageInputs = document.querySelectorAll('.mobile-image-input');
+    console.log('Found', mobileImageInputs.length, 'mobile image inputs');
+    
+    mobileImageInputs.forEach(input => {
+        console.log('Initializing mobile image input:', input.id);
+    });
 });
 </script>
 @endsection

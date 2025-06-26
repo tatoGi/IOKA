@@ -104,6 +104,8 @@
                                 </div>
                             </div>
                         </div>
+                      
+
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="mb-3">
@@ -131,11 +133,63 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="mb-3">
-                                    <label for="main_photo" class="form-label">Banner</label>
+                                    <label for="mobile_main_photo" class="form-label">Mobile Main Photo</label>
+                                    <input type="file" class="form-control" id="mobile_main_photo" name="mobile_main_photo" accept="image/*" capture="environment">
+                                    <input type="text" class="form-control mt-2" name="mobile_main_photo_alt" placeholder="Alt text for mobile main photo">
+                                    <div class="mt-2">
+                                        <label for="mobile_main_photo_quality" class="form-label">Compression Quality: <span id="mobile_main_photo_quality_value">80</span>%</label>
+                                        <input type="range" class="form-range" id="mobile_main_photo_quality" min="10" max="100" value="80">
+                                    </div>
+                                    <div class="mt-2">
+                                        <label for="mobile_main_photo_max_width" class="form-label">Max Width: <span id="mobile_main_photo_max_width_value">1200</span>px</label>
+                                        <select class="form-select" id="mobile_main_photo_max_width">
+                                            <option value="800">800px</option>
+                                            <option value="1000">1000px</option>
+                                            <option value="1200" selected>1200px</option>
+                                            <option value="1600">1600px</option>
+                                        </select>
+                                    </div>
+                                    <div id="mobile_main_photo_preview" class="mt-2 uploaded-files"></div>
+                                    <input type="hidden" id="mobile_main_photo_compressed" name="mobile_main_photo_compressed">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="main_banner" class="form-label">Banner</label>
                                     <input type="file" class="form-control" id="main_banner" name="main_banner">
                                     <input type="text" class="form-control mt-2" name="banner_photo_alt" placeholder="Alt text for banner photo">
                                     <div id="main_banner_preview" class="uploaded-files"></div>
                                     <input type="hidden" id="main_banner_path" name="main_banner">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="mb-3">
+                                        <label for="banner_title" class="form-label">Banner Title</label>
+                                        <input type="text" class="form-control" id="banner_title" name="banner_title" placeholder="Enter banner title">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="mobile_banner_photo" class="form-label">Mobile Banner Photo</label>
+                                    <input type="file" class="form-control" id="mobile_banner_photo" name="mobile_banner_photo" accept="image/*" capture="environment">
+                                    <input type="text" class="form-control mt-2" name="mobile_banner_photo_alt" placeholder="Alt text for mobile banner photo">
+                                    <div class="mt-2">
+                                        <label for="mobile_banner_photo_quality" class="form-label">Compression Quality: <span id="mobile_banner_photo_quality_value">80</span>%</label>
+                                        <input type="range" class="form-range" id="mobile_banner_photo_quality" min="10" max="100" value="80">
+                                    </div>
+                                    <div class="mt-2">
+                                        <label for="mobile_banner_photo_max_width" class="form-label">Max Width: <span id="mobile_banner_photo_max_width_value">1200</span>px</label>
+                                        <select class="form-select" id="mobile_banner_photo_max_width">
+                                            <option value="800">800px</option>
+                                            <option value="1000">1000px</option>
+                                            <option value="1200" selected>1200px</option>
+                                            <option value="1600">1600px</option>
+                                        </select>
+                                    </div>
+                                    <div id="mobile_banner_photo_preview" class="mt-2 uploaded-files"></div>
+                                    <input type="hidden" id="mobile_banner_photo_compressed" name="mobile_banner_photo_compressed">
                                 </div>
                             </div>
                             <div class="col-md-4">
@@ -444,5 +498,105 @@
             }
         });
 
+        // Mobile Main Photo Handling
+        document.getElementById('mobile_main_photo').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const quality = parseInt(document.getElementById('mobile_main_photo_quality').value) / 100;
+                    const maxWidth = parseInt(document.getElementById('mobile_main_photo_max_width').value);
+                    
+                    // Compress the image
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+                    
+                    if (width > maxWidth) {
+                        height = Math.round(height * maxWidth / width);
+                        width = maxWidth;
+                    }
+                    
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    // Convert to base64
+                    const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+                    
+                    // Display preview
+                    const preview = document.getElementById('mobile_main_photo_preview');
+                    preview.innerHTML = `<img src="${compressedDataUrl}" class="img-thumbnail" style="max-height: 150px;">`;
+                    
+                    // Store compressed image data
+                    document.getElementById('mobile_main_photo_compressed').value = compressedDataUrl;
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // Mobile Banner Photo Handling
+        document.getElementById('mobile_banner_photo').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const quality = parseInt(document.getElementById('mobile_banner_photo_quality').value) / 100;
+                    const maxWidth = parseInt(document.getElementById('mobile_banner_photo_max_width').value);
+                    
+                    // Compress the image
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+                    
+                    if (width > maxWidth) {
+                        height = Math.round(height * maxWidth / width);
+                        width = maxWidth;
+                    }
+                    
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    // Convert to base64
+                    const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+                    
+                    // Display preview
+                    const preview = document.getElementById('mobile_banner_photo_preview');
+                    preview.innerHTML = `<img src="${compressedDataUrl}" class="img-thumbnail" style="max-height: 150px;">`;
+                    
+                    // Store compressed image data
+                    document.getElementById('mobile_banner_photo_compressed').value = compressedDataUrl;
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // Update quality and max width display values
+        document.getElementById('mobile_main_photo_quality').addEventListener('input', function() {
+            document.getElementById('mobile_main_photo_quality_value').textContent = this.value;
+        });
+
+        document.getElementById('mobile_main_photo_max_width').addEventListener('change', function() {
+            document.getElementById('mobile_main_photo_max_width_value').textContent = this.value;
+        });
+
+        document.getElementById('mobile_banner_photo_quality').addEventListener('input', function() {
+            document.getElementById('mobile_banner_photo_quality_value').textContent = this.value;
+        });
+
+        document.getElementById('mobile_banner_photo_max_width').addEventListener('change', function() {
+            document.getElementById('mobile_banner_photo_max_width_value').textContent = this.value;
+        });
     </script>
 @endsection

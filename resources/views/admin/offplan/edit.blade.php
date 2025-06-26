@@ -34,13 +34,14 @@
                     <div class="container">
                         <div class="form-group">
                             <label for="title">Title</label>
-                            <input type="text" class="form-control" id="title" name="title" value="{{ $offplan->title }}"
-                                required>
+                            <input type="text" class="form-control" id="title" name="title"
+                                value="{{ $offplan->title }}" required>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="slug" class="form-label">slug</label>
-                                <input type="text" class="form-control" id="slug" name="slug" value="{{ $offplan->slug }}">
+                                <input type="text" class="form-control" id="slug" name="slug"
+                                    value="{{ $offplan->slug }}">
                             </div>
                         </div>
                         <div class="container">
@@ -48,15 +49,16 @@
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label for="amount" class="form-label">Amount (in dollars)</label>
-                                        <input type="number" step="0.01" class="form-control amount" id="amount" name="amount"
-                                            value="{{ $offplan->amount }}" required>
+                                        <input type="number" step="0.01" class="form-control amount" id="amount"
+                                            name="amount" value="{{ $offplan->amount }}" required>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label for="amount_dirhams" class="form-label">Amount (in Dirhams)</label>
-                                        <input type="number" step="0.01" class="form-control amount_dirhams" id="amount_dirhams"
-                                            name="amount_dirhams" value="{{ $offplan->amount_dirhams }}" readonly>
+                                        <input type="number" step="0.01" class="form-control amount_dirhams"
+                                            id="amount_dirhams" name="amount_dirhams" value="{{ $offplan->amount_dirhams }}"
+                                            readonly>
                                     </div>
                                 </div>
                             </div>
@@ -71,42 +73,44 @@
                             <label for="features">Features</label>
                             <div id="features_repeater">
                                 {{-- {{ dd($offplan) }} --}}
-@php
-    $features_items = $offplan->features;
-    if (is_string($features_items)) {
-        $features_items = json_decode($features_items, true);
-    }
-    if (!is_array($features_items)) {
-        $features_items = [];
-    }
-@endphp
+                                @php
+                                    $features_items = $offplan->features;
+                                    if (is_string($features_items)) {
+                                        $features_items = json_decode($features_items, true);
+                                    }
+                                    if (!is_array($features_items)) {
+                                        $features_items = [];
+                                    }
+                                @endphp
                                 @foreach ($features_items as $index => $feature)
-                                <div class="features_item">
-                                    <input type="text" class="form-control mb-2" name="features[{{ $index }}]"
-                                           value="{{ $feature }}" placeholder="Feature">
-                                    <button type="button" class="btn btn-danger btn-sm remove-feature">Remove</button>
-                                </div>
-                            @endforeach
+                                    <div class="features_item">
+                                        <input type="text" class="form-control mb-2" name="features[{{ $index }}]"
+                                            value="{{ $feature }}" placeholder="Feature">
+                                        <button type="button" class="btn btn-danger btn-sm remove-feature">Remove</button>
+                                    </div>
+                                @endforeach
                             </div>
                             <button type="button" class="btn btn-secondary" id="add_feature">Add More</button>
                         </div>
                         <div class="form-group mt-2">
                             <label for="amenities">Amenities</label>
                             <div id="amenities_repeater">
-@php
-    $amenities_items = $offplan->amenities;
-    if (is_string($amenities_items)) {
-        $amenities_items = json_decode($amenities_items, true);
-    }
-    if (!is_array($amenities_items)) {
-        $amenities_items = [];
-    }
-@endphp
+                                @php
+                                    $amenities_items = $offplan->amenities;
+                                    if (is_string($amenities_items)) {
+                                        $amenities_items = json_decode($amenities_items, true);
+                                    }
+                                    if (!is_array($amenities_items)) {
+                                        $amenities_items = [];
+                                    }
+                                @endphp
                                 @foreach ($amenities_items as $index => $amenity)
                                     <div class="amenities_item">
-                                        <input type="text" class="form-control mb-2" name="amenities[{{ $index }}]"
-                                            value="{{ $amenity }}" placeholder="amenities">
-                                        <button type="button" class="btn btn-danger btn-sm remove-amenities">Remove</button>
+                                        <input type="text" class="form-control mb-2"
+                                            name="amenities[{{ $index }}]" value="{{ $amenity }}"
+                                            placeholder="amenities">
+                                        <button type="button"
+                                            class="btn btn-danger btn-sm remove-amenities">Remove</button>
                                     </div>
                                 @endforeach
                             </div>
@@ -117,26 +121,30 @@
                             <input type="text" class="form-control" id="map_location" name="map_location"
                                 value="{{ $offplan->map_location }}">
                         </div>
+                      
+
                         <div class="form-group">
                             <label for="near_by">Near By</label>
                             <div id="near_by_repeater">
-@php
-    $near_by_items = $offplan->near_by;
-    if (is_string($near_by_items)) {
-        $near_by_items = json_decode($near_by_items, true);
-    }
-    if (!is_array($near_by_items)) {
-        $near_by_items = [];
-    }
-@endphp
+                                @php
+                                    $near_by_items = $offplan->near_by;
+                                    if (is_string($near_by_items)) {
+                                        $near_by_items = json_decode($near_by_items, true);
+                                    }
+                                    if (!is_array($near_by_items)) {
+                                        $near_by_items = [];
+                                    }
+                                @endphp
                                 @foreach ($near_by_items as $index => $nearBy)
                                     <div class="near_by_item">
-                                        <input type="text" class="form-control mb-2" name="near_by[{{ $index }}][title]"
-                                            value="{{ $nearBy['title'] }}" placeholder="Title">
+                                        <input type="text" class="form-control mb-2"
+                                            name="near_by[{{ $index }}][title]" value="{{ $nearBy['title'] }}"
+                                            placeholder="Title">
                                         <input type="number" step="0.1" class="form-control mb-2"
-                                            name="near_by[{{ $index }}][distance]" value="{{ $nearBy['distance'] }}"
-                                            placeholder="Distance (e.g., 4.5)">
-                                        <button type="button" class="btn btn-danger btn-sm remove-near-by">Remove</button>
+                                            name="near_by[{{ $index }}][distance]"
+                                            value="{{ $nearBy['distance'] }}" placeholder="Distance (e.g., 4.5)">
+                                        <button type="button"
+                                            class="btn btn-danger btn-sm remove-near-by">Remove</button>
                                     </div>
                                 @endforeach
                             </div>
@@ -149,14 +157,18 @@
                                         <label for="main_photo">Main Photo</label>
                                         <input type="file" class="form-control" id="main_photo" name="main_photo"
                                             accept="image/*">
-                                        <input type="text" class="form-control mt-2" name="main_photo_alt" placeholder="Alt text for main photo" value="{{ $offplan->alt_texts['main_photo'] ?? '' }}">
+                                        <input type="text" class="form-control mt-2" name="main_photo_alt"
+                                            placeholder="Alt text for main photo"
+                                            value="{{ $offplan->alt_texts['main_photo'] ?? '' }}">
                                         <div id="main_photo_preview" class="uploaded-files">
                                             @if ($offplan->main_photo)
                                                 <div class="uploaded-file">
-                                                    <img src="{{ asset('storage/' . $offplan->main_photo) }}" alt="{{ $offplan->alt_texts['main_photo'] ?? 'Main Property Photo - ' . $offplan->title }}"
+                                                    <img src="{{ asset('storage/' . $offplan->main_photo) }}"
+                                                        alt="{{ $offplan->alt_texts['main_photo'] ?? 'Main Property Photo - ' . $offplan->title }}"
                                                         class="img-thumbnail" style="max-width: 100px;">
                                                     <button type="button" class="btn btn-danger btn-sm remove-image"
-                                                        data-id="{{ $offplan->id }}" data-type="main_photo" data-path="{{ $offplan->main_photo }}">Delete</button>
+                                                        data-id="{{ $offplan->id }}" data-type="main_photo"
+                                                        data-path="{{ $offplan->main_photo }}">Delete</button>
                                                 </div>
                                             @endif
                                         </div>
@@ -165,42 +177,57 @@
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="main_photo">Banner</label>
-                                        <input type="file" class="form-control" id="banner_photo" name="banner_photo">
-                                        <input type="text" class="form-control mt-2" name="banner_photo_alt" placeholder="Alt text for banner photo" value="{{ $offplan->alt_texts['banner_photo'] ?? '' }}">
+                                        <input type="file" class="form-control" id="banner_photo"
+                                            name="banner_photo">
+                                        <input type="text" class="form-control mt-2" name="banner_photo_alt"
+                                            placeholder="Alt text for banner photo"
+                                            value="{{ $offplan->alt_texts['banner_photo'] ?? '' }}">
                                         <div id="main_photo_preview" class="uploaded-files">
                                             @if ($offplan->banner_photo)
                                                 <div class="uploaded-file">
-                                                    <img src="{{ asset('storage/' . $offplan->banner_photo) }}" alt="{{ $offplan->alt_texts['banner_photo'] ?? 'Property Banner - ' . $offplan->title }}"
+                                                    <img src="{{ asset('storage/' . $offplan->banner_photo) }}"
+                                                        alt="{{ $offplan->alt_texts['banner_photo'] ?? 'Property Banner - ' . $offplan->title }}"
                                                         class="img-thumbnail" style="max-width: 100px;">
                                                     <button type="button" class="btn btn-danger btn-sm remove-image"
-                                                        data-id="{{ $offplan->id }}" data-type="banner_photo" data-path="{{ $offplan->banner_photo }}">Delete</button>
+                                                        data-id="{{ $offplan->id }}" data-type="banner_photo"
+                                                        data-path="{{ $offplan->banner_photo }}">Delete</button>
                                                 </div>
                                             @endif
                                         </div>
                                     </div>
                                 </div>
+                                <div class="form-group col-md-4">
+                                    <label for="banner_title">Banner Title</label>
+                                    <input type="text" class="form-control" id="banner_title" name="banner_title"
+                                        value="{{ $offplan->banner_title }}" placeholder="Enter banner title">
+                                </div>
                                 <div class="col-md-4">
 
                                     <div class="form-group">
                                         <label for="exterior_gallery">Exterior Gallery</label>
-                                        <input type="file" class="form-control" id="exterior_gallery" name="exterior_gallery[]"
-                                            multiple accept="image/*">
+                                        <input type="file" class="form-control" id="exterior_gallery"
+                                            name="exterior_gallery[]" multiple accept="image/*">
                                         <div id="exterior_gallery_preview" class="uploaded-files">
-@php
-    $exterior_gallery_items = $offplan->exterior_gallery;
-    if (is_string($exterior_gallery_items)) {
-        $exterior_gallery_items = json_decode($exterior_gallery_items, true);
-    }
-    if (!is_array($exterior_gallery_items)) {
-        $exterior_gallery_items = []; // Default to empty array if not an array
-    }
-@endphp
-                                            @if(!empty($exterior_gallery_items))
+                                            @php
+                                                $exterior_gallery_items = $offplan->exterior_gallery;
+                                                if (is_string($exterior_gallery_items)) {
+                                                    $exterior_gallery_items = json_decode(
+                                                        $exterior_gallery_items,
+                                                        true,
+                                                    );
+                                                }
+                                                if (!is_array($exterior_gallery_items)) {
+                                                    $exterior_gallery_items = []; // Default to empty array if not an array
+                                                }
+                                            @endphp
+                                            @if (!empty($exterior_gallery_items))
                                                 @foreach ($exterior_gallery_items as $index => $photo)
                                                     <div class="uploaded-file">
-                                                        <img src="{{ asset('storage/' . $photo) }}" alt="{{ $offplan->alt_texts['exterior_gallery'][$index] ?? 'Exterior Photo ' . ($index + 1) . ' - ' . $offplan->title }}"
+                                                        <img src="{{ asset('storage/' . $photo) }}"
+                                                            alt="{{ $offplan->alt_texts['exterior_gallery'][$index] ?? 'Exterior Photo ' . ($index + 1) . ' - ' . $offplan->title }}"
                                                             class="img-thumbnail" style="max-width: 100px;">
-                                                        <input type="text" class="form-control mt-2" name="exterior_gallery_alt[]"
+                                                        <input type="text" class="form-control mt-2"
+                                                            name="exterior_gallery_alt[]"
                                                             placeholder="Alt text for exterior photo {{ $index + 1 }}"
                                                             value="{{ $offplan->alt_texts['exterior_gallery'][$index] ?? '' }}">
                                                         <button type="button" class="btn btn-danger btn-sm remove-image"
@@ -219,24 +246,29 @@
 
                                     <div class="form-group">
                                         <label for="interior_gallery">Interior Gallery</label>
-                                        <input type="file" class="form-control" id="interior_gallery" name="interior_gallery[]"
-                                            multiple accept="image/*">
+                                        <input type="file" class="form-control" id="interior_gallery"
+                                            name="interior_gallery[]" multiple accept="image/*">
                                         <div id="interior_gallery_preview" class="uploaded-files">
-@php
-    $interior_gallery_items = $offplan->interior_gallery;
-    if (is_string($interior_gallery_items)) {
-        $interior_gallery_items = json_decode($interior_gallery_items, true);
-    }
-    if (!is_array($interior_gallery_items)) {
-        $interior_gallery_items = []; // Default to empty array if not an array
-    }
-@endphp
-                                            @if(!empty($interior_gallery_items))
+                                            @php
+                                                $interior_gallery_items = $offplan->interior_gallery;
+                                                if (is_string($interior_gallery_items)) {
+                                                    $interior_gallery_items = json_decode(
+                                                        $interior_gallery_items,
+                                                        true,
+                                                    );
+                                                }
+                                                if (!is_array($interior_gallery_items)) {
+                                                    $interior_gallery_items = []; // Default to empty array if not an array
+                                                }
+                                            @endphp
+                                            @if (!empty($interior_gallery_items))
                                                 @foreach ($interior_gallery_items as $index => $photo)
                                                     <div class="uploaded-file">
-                                                        <img src="{{ asset('storage/' . $photo) }}" alt="{{ $offplan->alt_texts['interior_gallery'][$index] ?? 'Interior Photo ' . ($index + 1) . ' - ' . $offplan->title }}"
+                                                        <img src="{{ asset('storage/' . $photo) }}"
+                                                            alt="{{ $offplan->alt_texts['interior_gallery'][$index] ?? 'Interior Photo ' . ($index + 1) . ' - ' . $offplan->title }}"
                                                             class="img-thumbnail" style="max-width: 100px;">
-                                                        <input type="text" class="form-control mt-2" name="interior_gallery_alt[]"
+                                                        <input type="text" class="form-control mt-2"
+                                                            name="interior_gallery_alt[]"
                                                             placeholder="Alt text for interior photo {{ $index + 1 }}"
                                                             value="{{ $offplan->alt_texts['interior_gallery'][$index] ?? '' }}">
                                                         <button type="button" class="btn btn-danger btn-sm remove-image"
@@ -258,15 +290,21 @@
                         <div class="form-group">
                             <label for="property_type">Property Type</label>
                             <select class="form-control" id="property_type" name="property_type">
-                                <option value="Villa" {{ $offplan->property_type == 'Villa' ? 'selected' : '' }}>Villa</option>
-                                <option value="Townhouse" {{ $offplan->property_type == 'Townhouse' ? 'selected' : '' }}>Townhouse
+                                <option value="Villa" {{ $offplan->property_type == 'Villa' ? 'selected' : '' }}>Villa
                                 </option>
-                                <option value="Apartment" {{ $offplan->property_type == 'Apartment' ? 'selected' : '' }}>Apartment
+                                <option value="Townhouse" {{ $offplan->property_type == 'Townhouse' ? 'selected' : '' }}>
+                                    Townhouse
                                 </option>
-                                <option value="Land" {{ $offplan->property_type == 'Land' ? 'selected' : '' }}>Land</option>
-                                <option value="Full Building" {{ $offplan->property_type == 'Full Building' ? 'selected' : '' }}>Full
+                                <option value="Apartment" {{ $offplan->property_type == 'Apartment' ? 'selected' : '' }}>
+                                    Apartment
+                                </option>
+                                <option value="Land" {{ $offplan->property_type == 'Land' ? 'selected' : '' }}>Land
+                                </option>
+                                <option value="Full Building"
+                                    {{ $offplan->property_type == 'Full Building' ? 'selected' : '' }}>Full
                                     Building</option>
-                                <option value="Commercial" {{ $offplan->property_type == 'Commercial' ? 'selected' : '' }}>Commercial
+                                <option value="Commercial"
+                                    {{ $offplan->property_type == 'Commercial' ? 'selected' : '' }}>Commercial
                                 </option>
                             </select>
                         </div>
@@ -314,14 +352,17 @@
                         <div class="form-group mt-3">
                             <label for="qr_photo">QR Photo</label>
                             <input type="file" class="form-control" id="qr_photo" name="qr_photo" accept="image/*">
-                            <input type="text" class="form-control mt-2" name="qr_photo_alt" placeholder="Alt text for QR photo" value="{{ $offplan->alt_texts['qr_photo'] ?? '' }}">
+                            <input type="text" class="form-control mt-2" name="qr_photo_alt"
+                                placeholder="Alt text for QR photo" value="{{ $offplan->alt_texts['qr_photo'] ?? '' }}">
                             <div id="qr_photo_preview" class="uploaded-files">
                                 @if ($offplan->qr_photo)
                                     <div class="uploaded-file">
-                                        <img src="{{ asset('storage/' . $offplan->qr_photo) }}" alt="{{ $offplan->alt_texts['qr_photo'] ?? 'QR Code - ' . $offplan->title }}" class="img-thumbnail"
-                                            style="max-width: 100px;">
+                                        <img src="{{ asset('storage/' . $offplan->qr_photo) }}"
+                                            alt="{{ $offplan->alt_texts['qr_photo'] ?? 'QR Code - ' . $offplan->title }}"
+                                            class="img-thumbnail" style="max-width: 100px;">
                                         <button type="button" class="btn btn-danger btn-sm remove-image"
-                                            data-id="{{ $offplan->id }}" data-type="qr_photo" data-path="{{ $offplan->qr_photo }}">Delete</button>
+                                            data-id="{{ $offplan->id }}" data-type="qr_photo"
+                                            data-path="{{ $offplan->qr_photo }}">Delete</button>
                                     </div>
                                 @endif
                             </div>
@@ -354,22 +395,22 @@
                                 <div class="col-md-2">
                                     <div class="form-group mt-3">
                                         <label for="agent_telephone">Agent Telephone</label>
-                                        <input type="text" class="form-control" id="agent_telephone" name="agent_telephone"
-                                            value="{{ $offplan->agent_telephone }}">
+                                        <input type="text" class="form-control" id="agent_telephone"
+                                            name="agent_telephone" value="{{ $offplan->agent_telephone }}">
                                     </div>
                                 </div>
                                 <div class="col-md-2">
                                     <div class="form-group mt-3">
                                         <label for="agent_whatsapp">Agent WhatsApp</label>
-                                        <input type="text" class="form-control" id="agent_whatsapp" name="agent_whatsapp"
-                                            value="{{ $offplan->agent_whatsapp }}">
+                                        <input type="text" class="form-control" id="agent_whatsapp"
+                                            name="agent_whatsapp" value="{{ $offplan->agent_whatsapp }}">
                                     </div>
                                 </div>
                                 <div class="col-md-2">
                                     <div class="form-group mt-3">
                                         <label for="agent_linkedin">Agent LinkedIn</label>
-                                        <input type="text" class="form-control" id="agent_linkedin" name="agent_linkedin"
-                                            value="{{ $offplan->agent_linkedin }}">
+                                        <input type="text" class="form-control" id="agent_linkedin"
+                                            name="agent_linkedin" value="{{ $offplan->agent_linkedin }}">
                                     </div>
                                 </div>
                                 <div class="col-md-2">
@@ -385,21 +426,23 @@
                         <div class="form-group mt-3">
                             <label for="agent_languages">Agent Languages</label>
                             <div id="agent_languages_repeater">
-@php
-    $agent_languages_items = $offplan->agent_languages;
-    if (is_string($agent_languages_items)) {
-        $agent_languages_items = json_decode($agent_languages_items, true);
-    }
-    if (!is_array($agent_languages_items)) {
-        $agent_languages_items = [];
-    }
-@endphp
-                                @if($agent_languages_items)
+                                @php
+                                    $agent_languages_items = $offplan->agent_languages;
+                                    if (is_string($agent_languages_items)) {
+                                        $agent_languages_items = json_decode($agent_languages_items, true);
+                                    }
+                                    if (!is_array($agent_languages_items)) {
+                                        $agent_languages_items = [];
+                                    }
+                                @endphp
+                                @if ($agent_languages_items)
                                     @foreach ($agent_languages_items as $index => $language)
                                         <div class="agent_languages_item">
-                                            <input type="text" class="form-control mb-2" name="agent_languages[{{ $index }}]"
-                                                value="{{ $language }}" placeholder="Language">
-                                            <button type="button" class="btn btn-danger btn-sm remove-agent-language">Remove</button>
+                                            <input type="text" class="form-control mb-2"
+                                                name="agent_languages[{{ $index }}]" value="{{ $language }}"
+                                                placeholder="Language">
+                                            <button type="button"
+                                                class="btn btn-danger btn-sm remove-agent-language">Remove</button>
                                         </div>
                                     @endforeach
                                 @endif
@@ -409,15 +452,20 @@
 
                         <div class="form-group mt-3">
                             <label for="agent_image">Agent Image</label>
-                            <input type="file" class="form-control" id="agent_image" name="agent_image" accept="image/*">
-                            <input type="text" class="form-control mt-2" name="agent_image_alt" placeholder="Alt text for agent photo" value="{{ $offplan->alt_texts['agent_image'] ?? '' }}">
+                            <input type="file" class="form-control" id="agent_image" name="agent_image"
+                                accept="image/*">
+                            <input type="text" class="form-control mt-2" name="agent_image_alt"
+                                placeholder="Alt text for agent photo"
+                                value="{{ $offplan->alt_texts['agent_image'] ?? '' }}">
                             <div id="agent_image_preview" class="uploaded-files">
                                 @if ($offplan->agent_image)
                                     <div class="uploaded-file">
-                                        <img src="{{ asset('storage/' . $offplan->agent_image) }}" alt="{{ $offplan->alt_texts['agent_image'] ?? 'Agent Photo - ' . $offplan->agent_title }}"
+                                        <img src="{{ asset('storage/' . $offplan->agent_image) }}"
+                                            alt="{{ $offplan->alt_texts['agent_image'] ?? 'Agent Photo - ' . $offplan->agent_title }}"
                                             class="img-thumbnail" style="max-width: 100px;">
                                         <button type="button" class="btn btn-danger btn-sm remove-image"
-                                            data-id="{{ $offplan->id }}" data-type="agent_image" data-path="{{ $offplan->agent_image }}">Delete</button>
+                                            data-id="{{ $offplan->id }}" data-type="agent_image"
+                                            data-path="{{ $offplan->agent_image }}">Delete</button>
                                     </div>
                                 @endif
                             </div>
@@ -425,7 +473,7 @@
                         <div class="form-group">
                             <label for="location_id">Locations</label>
                             <select name="location_id" id="location_id" class="form-control select2">
-                                @foreach($locations as $location)
+                                @foreach ($locations as $location)
                                     <option value="{{ $location->id }}"
                                         {{ $selectedLocation == $location->id ? 'selected' : '' }}>
                                         {{ $location->title }}
