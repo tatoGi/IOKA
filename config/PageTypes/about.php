@@ -53,6 +53,11 @@ return [
                             'label' => 'Image',
                             'required' => true,
                         ],
+                        'mobile_image' => [
+                            'type' => 'mobile_image',
+                            'label' => 'Mobile Image',
+                            'required' => false,
+                        ],
                         'alt_text' => [
                             'type' => 'text',
                             'label' => 'Image Alt Text',

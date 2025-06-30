@@ -19,6 +19,7 @@ Route::middleware('admin_auth')->group(function () {
     include_once 'admin/developer.php';
     Route::resource('ioka_admin/partners', PartnerController::class)->names('admin.partners');
     Route::delete('ioka_admin/partners/{id}/delete-image', [PartnerController::class, 'deleteImage'])->name('admin.partners.delete-image');
+    Route::delete('ioka_admin/partners/{id}/delete-mobile-image', [PartnerController::class, 'deleteMobileImage'])->name('admin.partners.delete-mobile-image');
 
     Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('offplan', OffplanController::class);

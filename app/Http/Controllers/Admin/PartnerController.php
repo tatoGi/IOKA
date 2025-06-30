@@ -25,14 +25,20 @@ class PartnerController extends Controller
     {
         $validated = $request->validate([
             'title' => 'required|max:255',
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'url' => 'nullable|url',
             'alt' => 'nullable|max:255',
+            'mobile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
         if ($request->hasFile('image')) {
             $path = $request->file('image')->store('partners', 'public');
             $validated['image'] = $path;
+        }
+      
+        if ($request->has('mobile_image_compressed')) {
+            // The mobile_image_compressed is already a path from MobileImageController
+            $validated['mobile_image'] = $request->input('mobile_image_compressed');
         }
 
         Partner::create($validated);
@@ -48,11 +54,13 @@ class PartnerController extends Controller
 
     public function update(Request $request, Partner $partner)
     {
+      
         $validated = $request->validate([
             'title' => 'required|max:255',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'url' => 'nullable|url',
             'alt' => 'nullable|max:255',
+            'mobile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
         if ($request->hasFile('image')) {
@@ -62,6 +70,13 @@ class PartnerController extends Controller
             }
             $path = $request->file('image')->store('partners', 'public');
             $validated['image'] = $path;
+        }
+      
+        if ($request->has('mobile_image_compressed')) {
+            if ($partner->mobile_image) {
+                Storage::disk('public')->delete($partner->mobile_image);
+            }
+            $validated['mobile_image'] = $request->input('mobile_image_compressed');
         }
 
         $partner->update($validated);
@@ -74,6 +89,9 @@ class PartnerController extends Controller
     {
         if ($partner->image) {
             Storage::disk('public')->delete($partner->image);
+        }
+        if ($partner->mobile_image) {
+            Storage::disk('public')->delete($partner->mobile_image);
         }
         $partner->delete();
 
@@ -93,6 +111,31 @@ class PartnerController extends Controller
 
             // Update the partner record
             $partner->update(['image' => null]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Image deleted successfully.'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error deleting image: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function deleteMobileImage($id)
+    {
+        try {
+            $partner = Partner::findOrFail($id);
+
+            // Delete the image file from storage
+            if ($partner->mobile_image) {
+                Storage::disk('public')->delete($partner->mobile_image);
+            }
+
+            // Update the partner record
+            $partner->update(['mobile_image' => null]);
 
             return response()->json([
                 'success' => true,

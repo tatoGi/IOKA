@@ -65,7 +65,7 @@ return [
                 'description' => [
                     'type' => 'description',
                     'label' => 'Description',
-                    'default' => 'Search for potential matches? from studio apartments to penthouses - select, your layout to see whats available',
+                    'default' => '',
                     'required' => true,
                 ],
                 'slider_images' => [
@@ -507,6 +507,11 @@ return [
                             'type' => 'image',
                             'label' => 'Client Photo',
                             'required' => true,
+                        ],
+                        'mobile_photo' => [
+                            'type' => 'mobile_image',
+                            'label' => 'Mobile Client Photo',
+                            'required' => false,
                         ],
                         'alt_text' => [
                             'type' => 'text',

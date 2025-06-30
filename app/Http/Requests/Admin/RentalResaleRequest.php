@@ -48,7 +48,16 @@ class RentalResaleRequest extends FormRequest
             'languages.*.languages' => 'required|string',
             'agent_photo' => 'required|array|min:1',
             'agent_photo.*' => 'image',
-            'alt_texts' => 'nullable|array',
+            'mobile_agent_photo' => 'nullable|image',
+            'mobile_agent_photo_alt' => 'nullable|string|max:255',
+            'mobile_agent_photo_compressed' => 'nullable|string',
+            'mobile_qr_photo' => 'nullable|image',
+            'mobile_qr_photo_alt' => 'nullable|string|max:255',
+            'qr_mobile_photo_compressed' => 'nullable|string',
+            'mobile_gallery_images' => 'nullable|array',
+            'mobile_gallery_images.*' => 'image',
+
+
         ];
     }
 

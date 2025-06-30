@@ -28,14 +28,16 @@ class RentalResaleService
 
     public function storeRentalResale(RentalResaleRequest $request)
     {
+       // Debugging line to check the request data
+        // dd($request->all()); // Debugging line to check the request data
         $validatedData = $request->validated();
+       // Debugging line to check the validated data
         $validatedData['slug'] = $this->generateUniqueSlug($request->input('title'));
 
         // Handle QR photo upload
         if ($request->hasFile('qr_photo')) {
             $validatedData['qr_photo'] = $request->file('qr_photo')->store('qr_photos', 'public');
         }
-
         // Handle agent photo upload
         if ($request->hasFile('agent_photo')) {
             $agentPhotos = [];
@@ -48,14 +50,23 @@ class RentalResaleService
         // Handle gallery images upload
         if ($request->hasFile('gallery_images')) {
             $galleryImages = [];
-
             foreach ($request->file('gallery_images') as $image) {
                 $galleryImages[] = $image->store('gallery_images', 'public');
             }
-
             $validatedData['gallery_images'] = json_encode($galleryImages);
         } else {
             $validatedData['gallery_images'] = json_encode([]);
+        }
+
+        // Handle mobile gallery images upload
+        if ($request->hasFile('mobile_gallery_images')) {
+            $mobileGalleryImages = [];
+            foreach ($request->file('mobile_gallery_images') as $image) {
+                $mobileGalleryImages[] = $image->store('mobile_gallery_images', 'public');
+            }
+            $validatedData['mobile_gallery_images'] = json_encode($mobileGalleryImages);
+        } else {
+            $validatedData['mobile_gallery_images'] = json_encode([]);
         }
 
         // Get location ID from the validated data
@@ -66,8 +77,20 @@ class RentalResaleService
         unset($validatedData['amount']);
         unset($validatedData['amount_dirhams']);
 
+        // Handle mobile_agent_photo_compressed (base64 string)
+        if ($request->filled('mobile_agent_photo_compressed')) {
+            $validatedData['mobile_agent_photo'] = $request->input('mobile_agent_photo_compressed');
+        }
+
+        // Handle qr_mobile_photo_compressed (base64 string)
+        if ($request->filled('qr_mobile_photo_compressed')) {
+            $validatedData['mobile_qr_photo'] = $request->input('qr_mobile_photo_compressed');
+        }
+
         return DB::transaction(function () use ($validatedData, $locationId, $request) {
+             // Debugging line to check the validated data
             // Create the RentalResale record
+
             $rentalResale = RentalResale::create($validatedData);
 
             // Attach location if available
@@ -270,6 +293,16 @@ class RentalResaleService
         // Store location ID
         $locationId = $request->input('location_id')[0] ?? null;
         unset($validatedData['location_id']);
+
+        // Handle mobile_agent_photo_compressed (base64 string)
+        if ($request->filled('mobile_agent_photo_compressed')) {
+            $validatedData['mobile_agent_photo'] = $request->input('mobile_agent_photo_compressed');
+        }
+
+        // Handle qr_mobile_photo_compressed (base64 string)
+        if ($request->filled('qr_mobile_photo_compressed')) {
+            $validatedData['mobile_qr_photo'] = $request->input('qr_mobile_photo_compressed');
+        }
 
         return DB::transaction(function () use ($rentalResale, $validatedData, $locationId, $request) {
             // Update the RentalResale record

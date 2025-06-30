@@ -201,13 +201,12 @@
                                     <input type="text" class="form-control" id="banner_title" name="banner_title"
                                         value="{{ $offplan->banner_title }}" placeholder="Enter banner title">
                                 </div>
-                                <div class="col-md-4">
-
+                                <div class="col-md-6 mt-3">
                                     <div class="form-group">
                                         <label for="exterior_gallery">Exterior Gallery</label>
                                         <input type="file" class="form-control" id="exterior_gallery"
                                             name="exterior_gallery[]" multiple accept="image/*">
-                                        <div id="exterior_gallery_preview" class="uploaded-files">
+                                        <div id="exterior_gallery_preview" class="uploaded-files gallery-container" style="border: 1px solid #ddd; border-radius: 5px; padding: 15px; margin-top: 10px;">
                                             @php
                                                 $exterior_gallery_items = $offplan->exterior_gallery;
                                                 if (is_string($exterior_gallery_items)) {
@@ -220,35 +219,39 @@
                                                     $exterior_gallery_items = []; // Default to empty array if not an array
                                                 }
                                             @endphp
-                                            @if (!empty($exterior_gallery_items))
-                                                @foreach ($exterior_gallery_items as $index => $photo)
-                                                    <div class="uploaded-file">
-                                                        <img src="{{ asset('storage/' . $photo) }}"
-                                                            alt="{{ $offplan->alt_texts['exterior_gallery'][$index] ?? 'Exterior Photo ' . ($index + 1) . ' - ' . $offplan->title }}"
-                                                            class="img-thumbnail" style="max-width: 100px;">
-                                                        <input type="text" class="form-control mt-2"
-                                                            name="exterior_gallery_alt[]"
-                                                            placeholder="Alt text for exterior photo {{ $index + 1 }}"
-                                                            value="{{ $offplan->alt_texts['exterior_gallery'][$index] ?? '' }}">
-                                                        <button type="button" class="btn btn-danger btn-sm remove-image"
-                                                            data-id="{{ $offplan->id }}" data-type="exterior_gallery"
-                                                            data-path="{{ $photo }}">Delete</button>
-                                                    </div>
-                                                @endforeach
-                                            @else
-                                                <p>No exterior gallery photos available.</p>
-                                            @endif
+                                            <div class="container">
+                                                <div class="row">
+                                                    @if (!empty($exterior_gallery_items))
+                                                        @foreach ($exterior_gallery_items as $index => $photo)
+                                                            <div class="col-4 mb-3">
+                                                                <div class="uploaded-file" style="padding: 10px;">
+                                                                    <img src="{{ asset('storage/' . $photo) }}"
+                                                                        alt="{{ $offplan->alt_texts['exterior_gallery'][$index] ?? 'Exterior Photo ' . ($index + 1) . ' - ' . $offplan->title }}"
+                                                                        class="img-thumbnail" style="width: 100%; height: auto;">
+                                                                    <input type="text" class="form-control mt-2"
+                                                                        name="exterior_gallery_alt[]"
+                                                                        placeholder="Alt text for exterior photo {{ $index + 1 }}"
+                                                                        value="{{ $offplan->alt_texts['exterior_gallery'][$index] ?? '' }}">
+                                                                    <button type="button" class="btn btn-danger btn-sm remove-image mt-2 w-100"
+                                                                        data-id="{{ $offplan->id }}" data-type="exterior_gallery"
+                                                                        data-path="{{ $photo }}">Delete</button>
+                                                                </div>
+                                                            </div>
+                                                        @endforeach
+                                                    @else
+                                                        <p>No exterior gallery photos available.</p>
+                                                    @endif
+                                                </div>
+                                            </div>
                                         </div>
-
                                     </div>
                                 </div>
-                                <div class="col-md-4">
-
+                                <div class="col-md-6 mt-3">
                                     <div class="form-group">
                                         <label for="interior_gallery">Interior Gallery</label>
                                         <input type="file" class="form-control" id="interior_gallery"
                                             name="interior_gallery[]" multiple accept="image/*">
-                                        <div id="interior_gallery_preview" class="uploaded-files">
+                                        <div id="interior_gallery_preview" class="uploaded-files gallery-container" style="border: 1px solid #ddd; border-radius: 5px; padding: 15px; margin-top: 10px;">
                                             @php
                                                 $interior_gallery_items = $offplan->interior_gallery;
                                                 if (is_string($interior_gallery_items)) {
@@ -261,27 +264,31 @@
                                                     $interior_gallery_items = []; // Default to empty array if not an array
                                                 }
                                             @endphp
-                                            @if (!empty($interior_gallery_items))
-                                                @foreach ($interior_gallery_items as $index => $photo)
-                                                    <div class="uploaded-file">
-                                                        <img src="{{ asset('storage/' . $photo) }}"
-                                                            alt="{{ $offplan->alt_texts['interior_gallery'][$index] ?? 'Interior Photo ' . ($index + 1) . ' - ' . $offplan->title }}"
-                                                            class="img-thumbnail" style="max-width: 100px;">
-                                                        <input type="text" class="form-control mt-2"
-                                                            name="interior_gallery_alt[]"
-                                                            placeholder="Alt text for interior photo {{ $index + 1 }}"
-                                                            value="{{ $offplan->alt_texts['interior_gallery'][$index] ?? '' }}">
-                                                        <button type="button" class="btn btn-danger btn-sm remove-image"
-                                                            data-id="{{ $offplan->id }}" data-type="interior_gallery"
-                                                            data-path="{{ $photo }}">Delete</button>
-                                                    </div>
-                                                @endforeach
-                                            @else
-                                                <p>No interior gallery photos available.</p>
-                                            @endif
+                                            <div class="container">
+                                                <div class="row">
+                                                    @if (!empty($interior_gallery_items))
+                                                        @foreach ($interior_gallery_items as $index => $photo)
+                                                            <div class="col-4 mb-3">
+                                                                <div class="uploaded-file" style="padding: 10px;">
+                                                                    <img src="{{ asset('storage/' . $photo) }}"
+                                                                        alt="{{ $offplan->alt_texts['interior_gallery'][$index] ?? 'Interior Photo ' . ($index + 1) . ' - ' . $offplan->title }}"
+                                                                        class="img-thumbnail" style="width: 100%; height: auto;">
+                                                                    <input type="text" class="form-control mt-2"
+                                                                        name="interior_gallery_alt[]"
+                                                                        placeholder="Alt text for interior photo {{ $index + 1 }}"
+                                                                        value="{{ $offplan->alt_texts['interior_gallery'][$index] ?? '' }}">
+                                                                    <button type="button" class="btn btn-danger btn-sm remove-image mt-2 w-100"
+                                                                        data-id="{{ $offplan->id }}" data-type="interior_gallery"
+                                                                        data-path="{{ $photo }}">Delete</button>
+                                                                </div>
+                                                            </div>
+                                                        @endforeach
+                                                    @else
+                                                        <p>No interior gallery photos available.</p>
+                                                    @endif
+                                                </div>
+                                            </div>
                                         </div>
-
-
                                     </div>
                                 </div>
                             </div>
@@ -503,20 +510,48 @@
         function handleFileInput(event, previewId) {
             const files = event.target.files;
             const preview = document.getElementById(previewId);
+            
+            // Clear the preview and create container structure
             preview.innerHTML = '';
+            
+            // Create container and row for grid layout
+            const container = document.createElement('div');
+            container.classList.add('container');
+            
+            const row = document.createElement('div');
+            row.classList.add('row');
+            container.appendChild(row);
+            
+            // Process each file
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];
                 const reader = new FileReader();
+                
                 reader.onload = function(e) {
+                    // Create column for grid layout
+                    const colDiv = document.createElement('div');
+                    colDiv.classList.add('col-4', 'mb-3');
+                    
+                    // Create file container with proper styling
                     const fileDiv = document.createElement('div');
                     fileDiv.classList.add('uploaded-file');
+                    fileDiv.style.padding = '10px';
+                    
                     fileDiv.innerHTML = `
-                    <img src="${e.target.result}" alt="${file.name}" class="img-thumbnail" style="max-width: 100px;">
-                `;
-                    preview.appendChild(fileDiv);
+                        <img src="${e.target.result}" alt="${file.name}" class="img-thumbnail" style="width: 100%; height: auto;">
+                        <input type="text" class="form-control mt-2" name="${previewId.replace('_preview', '')}_alt[]" placeholder="Alt text for photo ${i+1}">
+                    `;
+                    
+                    // Add to column and row
+                    colDiv.appendChild(fileDiv);
+                    row.appendChild(colDiv);
                 };
+                
                 reader.readAsDataURL(file);
             }
+            
+            // Add everything to the preview
+            preview.appendChild(container);
         }
 
         document.getElementById('main_photo').addEventListener('change', function(event) {

@@ -6,16 +6,15 @@
         <form id="rental-resale-form" action="{{ route('admin.postypes.rental_resale.store') }}" method="POST" enctype="multipart/form-data" class="shadow p-4 rounded bg-light">
             @csrf
             <input type="hidden" id="postId" value="">
-            @if ($errors->any())
-                <div class="alert alert-danger">
-                    <ul>
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
-
+          @if ($errors->any())
+    <div class="alert alert-danger">
+        <ul>
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
             <!-- Nav tabs -->
             <ul class="nav nav-tabs mb-4" role="tablist">
                 <li class="nav-item">
@@ -184,7 +183,7 @@
                                     <input type="text" class="form-control" id="agent_status" name="agent_status" required>
                                 </div>
                             </div>
-                           
+
                             <div class="col-md-2">
                                 <div class="mb-3">
                                     <label for="agent_call" class="form-label">Agent Call<span class="text-danger">*</span></label>
@@ -210,6 +209,68 @@
                                     <input type="text" class="form-control mt-2" name="alt_texts[agent_photo]" placeholder="Alt text for agent photo">
                                 </div>
                             </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label for="mobile_agent_photo" class="form-label">Mobile Agent Photo</label>
+                                    <div class="mobile-image-upload" id="mobile-upload-mobile_agent_photo">
+                                        <div class="mb-2">
+                                            <div class="d-flex align-items-center">
+                                                <input type="file" class="form-control mobile-image-input @error('mobile_agent_photo') is-invalid @enderror"
+                                                    id="input-mobile_agent_photo" name="mobile_agent_photo" accept="image/*" capture="environment"
+                                                    data-field="mobile_agent_photo"
+                                                    onchange="handleMobileImageSelect(this)">
+                                                @error('mobile_agent_photo')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+                                        </div>
+                                        <div class="compression-options mb-2 d-none">
+                                            <div class="card p-3">
+                                                <div class="mb-2">
+                                                    <label class="form-label">Image Quality</label>
+                                                    <input type="range" class="form-range quality-slider" min="10" max="100" value="70"
+                                                        id="quality-mobile_agent_photo" data-field="mobile_agent_photo">
+                                                    <div class="d-flex justify-content-between">
+                                                        <small>Lower (Smaller File)</small>
+                                                        <small class="quality-value">70%</small>
+                                                        <small>Higher (Better Quality)</small>
+                                                    </div>
+                                                </div>
+                                                <div class="mb-2">
+                                                    <label class="form-label">Max Width</label>
+                                                    <select class="form-select max-width" id="max-width-mobile_agent_photo" data-field="mobile_agent_photo" style="display: block !important; width: 100%;">
+                                                        <option value="800" selected>Small (800px)</option>
+                                                        <option value="1200">Medium (1200px)</option>
+                                                        <option value="1600">Large (1600px)</option>
+                                                        <option value="0">Original Size</option>
+                                                    </select>
+                                                </div>
+                                                <div class="image-preview-container mb-2 d-none">
+                                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                                        <label class="form-label mb-0">Preview</label>
+                                                        <div class="file-info small text-muted"></div>
+                                                    </div>
+                                                    <img src="" class="img-fluid img-thumbnail preview-image" style="max-height: 200px;">
+                                                </div>
+                                                <div class="d-flex justify-content-between">
+                                                    <button type="button" class="btn btn-secondary btn-sm cancel-compression"
+                                                        onclick="cancelCompression('mobile_agent_photo')">Cancel</button>
+                                                    <button type="button" class="btn btn-primary btn-sm apply-compression"
+                                                        onclick="applyCompression('mobile_agent_photo')">Apply & Upload</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <input type="hidden" name="mobile_agent_photo_compressed" id="compressed-mobile_agent_photo" class="compressed-image-data">
+                                        {{-- If editing, show preview --}}
+                                        @if(isset($edit) && $edit && !empty($post->mobile_agent_photo))
+                                            <div class="mt-2">
+                                                <img src="{{ asset('storage/' . $post->mobile_agent_photo) }}" class="img-fluid img-thumbnail" style="max-height: 120px;">
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="col-md-3">
                                 <div class="mb-3">
                                     <label for="languages" class="form-label">languages<span class="text-danger">*</span></label>
@@ -251,6 +312,59 @@
                         <input type="file" class="form-control" id="qr_photo" name="qr_photo" required>
                     </div>
                     <div class="mb-3">
+                        <label for="qr_photo" class="form-label">Qr Mobile Photo</label>
+                        <div class="mobile-image-upload" id="qr-upload-qr_mobile_photo">
+                            <div class="mb-2">
+                                <div class="d-flex align-items-center">
+                                    <input type="file" class="form-control mobile-image-input @error('qr_mobile_photo') is-invalid @enderror"
+                                        id="input-qr_mobile_photo" name="qr_mobile_photo" accept="image/*" capture="environment"
+                                        data-field="qr_mobile_photo"
+                                        onchange="handleMobileImageSelect(this)">
+                                    @error('qr_mobile_photo')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="compression-options mb-2 d-none">
+                                <div class="card p-3">
+                                    <div class="mb-2">
+                                        <label class="form-label">Image Quality</label>
+                                        <input type="range" class="form-range quality-slider" min="10" max="100" value="70"
+                                            id="quality-qr_mobile_photo" data-field="qr_mobile_photo">
+                                        <div class="d-flex justify-content-between">
+                                            <small>Lower (Smaller File)</small>
+                                            <small class="quality-value">70%</small>
+                                            <small>Higher (Better Quality)</small>
+                                        </div>
+                                    </div>
+                                    <div class="mb-2">
+                                        <label class="form-label">Max Width</label>
+                                        <select class="form-select max-width" id="max-width-qr_mobile_photo" data-field="qr_mobile_photo" style="display: block !important; width: 100%;">
+                                            <option value="800" selected>Small (800px)</option>
+                                            <option value="1200">Medium (1200px)</option>
+                                            <option value="1600">Large (1600px)</option>
+                                            <option value="0">Original Size</option>
+                                        </select>
+                                    </div>
+                                    <div class="image-preview-container mb-2 d-none">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <label class="form-label mb-0">Preview</label>
+                                            <div class="file-info small text-muted"></div>
+                                        </div>
+                                        <img src="" class="img-fluid img-thumbnail preview-image" style="max-height: 200px;">
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <button type="button" class="btn btn-secondary btn-sm cancel-compression"
+                                            onclick="cancelCompression('qr_mobile_photo')">Cancel</button>
+                                        <button type="button" class="btn btn-primary btn-sm apply-compression"
+                                            onclick="applyCompression('qr_mobile_photo')">Apply & Upload</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <input type="hidden" name="qr_mobile_photo_compressed" id="compressed-qr_mobile_photo" class="compressed-image-data">
+                        </div>
+                    </div>
+                    <div class="mb-3">
                         <label for="reference" class="form-label">Reference<span class="text-danger">*</span></label>
                         <input type="text" class="form-control" id="reference" name="reference" required>
                     </div>
@@ -265,6 +379,34 @@
                             <label class="form-check-label" for="is_top">Check this box to mark the property as a top listing</label>
                         </div>
                     </div>
+
+                            <!-- Mobile Gallery -->
+                            <div class="col-12">
+                                <div class="card mb-4">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">Mobile Gallery</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mobile-gallery-upload">
+                                            <div class="row" id="mobile-gallery-preview">
+                                                <!-- Gallery preview items will be added here -->
+                                                <div class="col-md-3 mb-3">
+                                                    <div class="gallery-upload-btn" style="height: 150px; border: 2px dashed #ccc; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer;" onclick="document.getElementById('mobile_gallery_images').click()">
+                                                        <div class="text-center">
+                                                            <i class="fas fa-plus-circle fa-2x text-muted"></i>
+                                                            <p class="mb-0">Add Gallery Images</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <input type="file" class="d-none" id="mobile_gallery_images" name="mobile_gallery_images[]" accept="image/*" multiple onchange="previewMobileGallery(event)">
+                                            <div id="gallery-alt-texts-container" class="mt-3">
+                                                <!-- Alt text inputs will be added here -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                     <div class="mb-3">
                         <label for="gallery" class="form-label">Gallery<span class="text-danger">*</span></label>
                         <input type="file" class="form-control" id="gallery" name="gallery_images[]" multiple>
@@ -310,26 +452,399 @@
 
     <script src="{{ asset('storage/admin/assets/rental_resale.js') }}"></script>
     <script>
+        // Object to store original files for compression
+        const originalFiles = {};
+
+        // Initialize mobile upload functionality
         document.addEventListener('DOMContentLoaded', function() {
             // Handle gallery image file input change
             const galleryInput = document.getElementById('gallery');
             const galleryAltTexts = document.getElementById('gallery-alt-texts');
 
-            galleryInput.addEventListener('change', function() {
-                galleryAltTexts.innerHTML = ''; // Clear existing alt text inputs
+            if (galleryInput && galleryAltTexts) {
+                galleryInput.addEventListener('change', function() {
+                    galleryAltTexts.innerHTML = ''; // Clear existing alt text inputs
 
-                Array.from(this.files).forEach((file, index) => {
-                    const altTextDiv = document.createElement('div');
-                    altTextDiv.className = 'mb-2';
-                    altTextDiv.innerHTML = `
-                        <input type="text"
-                               class="form-control"
-                               name="alt_texts[gallery_images][${index}]"
-                               placeholder="Alt text for ${file.name}">
-                    `;
-                    galleryAltTexts.appendChild(altTextDiv);
+                    Array.from(this.files).forEach((file, index) => {
+                        const altTextDiv = document.createElement('div');
+                        altTextDiv.className = 'mb-2';
+                        altTextDiv.innerHTML = `
+                            <input type="text"
+                                   class="form-control"
+                                   name="alt_texts[gallery_images][${index}]"
+                                   placeholder="Alt text for ${file.name}">
+                        `;
+                        galleryAltTexts.appendChild(altTextDiv);
+                    });
                 });
-            });
+            }
+
+            // Initialize all mobile image uploaders
+            initializeMobileUploaders();
         });
+
+        // Initialize all mobile uploaders on the page
+        function initializeMobileUploaders() {
+            // Find all mobile image upload containers
+            const uploaders = document.querySelectorAll('.mobile-image-upload');
+
+            uploaders.forEach(uploader => {
+                const input = uploader.querySelector('input[type="file"]');
+                if (input) {
+                    // Add event listener for file selection
+                    input.addEventListener('change', function() {
+                        handleMobileImageSelect(this);
+                    });
+
+                    // Initialize quality sliders
+                    const qualitySlider = uploader.querySelector('.quality-slider');
+                    if (qualitySlider) {
+                        qualitySlider.addEventListener('input', function() {
+                            const qualityValue = this.parentElement.querySelector('.quality-value');
+                            if (qualityValue) {
+                                qualityValue.textContent = this.value + '%';
+                            }
+                            const field = this.dataset.field || '';
+                            if (field) {
+                                previewCompressedImage(field);
+                            }
+                        });
+                    }
+
+                    // Initialize max width select
+                    const maxWidthSelect = uploader.querySelector('.max-width');
+                    if (maxWidthSelect) {
+                        maxWidthSelect.addEventListener('change', function() {
+                            const field = this.dataset.field || '';
+                            if (field) {
+                                previewCompressedImage(field);
+                            }
+                        });
+                    }
+                }
+            });
+        }
+
+        // Handle mobile image file selection
+        function handleMobileImageSelect(input) {
+            if (!input || !input.files || input.files.length === 0) return;
+
+            const file = input.files[0];
+            const container = input.closest('.mobile-image-upload');
+            if (!container) return;
+
+            const fieldIdentifier = input.dataset.field || input.id.replace('input-', '');
+            console.log('Handling image selection for field:', fieldIdentifier);
+
+            // Store original file
+            originalFiles[fieldIdentifier] = file;
+
+            // Show compression options
+            const options = container.querySelector('.compression-options');
+            if (options) {
+                options.classList.remove('d-none');
+
+                // Initialize quality slider
+                const qualitySlider = container.querySelector('.quality-slider');
+                const qualityValue = container.querySelector('.quality-value');
+
+                if (qualitySlider && qualityValue) {
+                    qualitySlider.addEventListener('input', function() {
+                        qualityValue.textContent = this.value + '%';
+                        previewCompressedImage(fieldIdentifier);
+                    });
+                }
+
+                // Initialize preview
+                previewCompressedImage(fieldIdentifier);
+            }
+        }
+
+        // Preview the compressed image with current settings
+        function previewCompressedImage(fieldIdentifier) {
+            const file = originalFiles[fieldIdentifier];
+            if (!file) return;
+
+            const container = document.querySelector(`[data-field="${fieldIdentifier}"]`).closest('.mobile-image-upload');
+            if (!container) return;
+
+            const qualitySlider = container.querySelector('.quality-slider');
+            const widthSelect = container.querySelector('.max-width');
+            const previewContainer = container.querySelector('.image-preview-container');
+            const previewImage = container.querySelector('.preview-image');
+            const fileInfo = container.querySelector('.file-info');
+
+            if (!qualitySlider || !widthSelect || !previewContainer || !previewImage || !fileInfo) {
+                console.error('Missing required elements for preview');
+                return;
+            }
+
+            // Show preview container
+            previewContainer.classList.remove('d-none');
+
+            // Get settings
+            const quality = parseInt(qualitySlider.value) / 100;
+            const maxWidth = parseInt(widthSelect.value);
+
+            // Create a FileReader to read the image
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                // Create an image element to get dimensions
+                const img = new Image();
+                img.onload = function() {
+                    // Calculate new dimensions while maintaining aspect ratio
+                    let newWidth = img.width;
+                    let newHeight = img.height;
+
+                    if (maxWidth > 0 && img.width > maxWidth) {
+                        newWidth = maxWidth;
+                        newHeight = (img.height * maxWidth) / img.width;
+                    }
+
+                    // Create canvas for compression
+                    const canvas = document.createElement('canvas');
+                    canvas.width = newWidth;
+                    canvas.height = newHeight;
+
+                    // Draw and compress image
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, newWidth, newHeight);
+
+                    // Get compressed image as data URL
+                    const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+
+                    // Update preview
+                    previewImage.src = compressedDataUrl;
+
+                    // Calculate and display file size information
+                    const originalSizeKB = Math.round(file.size / 1024);
+
+                    // Estimate compressed size from data URL
+                    const base64 = compressedDataUrl.split(',')[1];
+                    const compressedSizeKB = Math.round((base64.length * 3/4) / 1024);
+
+                    const savedPercent = Math.round((1 - (compressedSizeKB / originalSizeKB)) * 100);
+
+                    fileInfo.textContent = `Original: ${originalSizeKB}KB → Compressed: ~${compressedSizeKB}KB (${savedPercent}% saved)`;
+
+                    // Store the compressed data URL for later use
+                    const compressedInput = container.querySelector('.compressed-image-data');
+                    if (compressedInput) {
+                        compressedInput.value = compressedDataUrl;
+                    }
+                };
+                img.onerror = function() {
+                    console.error('Error loading image for preview');
+                    fileInfo.textContent = 'Error: Could not load image for preview';
+                };
+                img.src = e.target.result;
+            };
+            reader.onerror = function() {
+                console.error('Error reading file');
+                if (fileInfo) {
+                    fileInfo.textContent = 'Error: Could not read file';
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Apply compression and store in hidden field for form submission
+        function applyCompression(fieldIdentifier) {
+            const file = originalFiles[fieldIdentifier];
+            if (!file) {
+                console.error('No file found for field:', fieldIdentifier);
+                return;
+            }
+
+            const container = document.querySelector(`[data-field="${fieldIdentifier}"]`).closest('.mobile-image-upload');
+            if (!container) {
+                console.error('Container not found for field:', fieldIdentifier);
+                return;
+            }
+
+            const fileInput = container.querySelector('input[type="file"]');
+            const qualitySlider = container.querySelector('.quality-slider');
+            const widthSelect = container.querySelector('.max-width');
+            const hiddenInput = container.querySelector('.compressed-image-data');
+            const options = container.querySelector('.compression-options');
+
+            if (!fileInput || !qualitySlider || !widthSelect || !hiddenInput || !options) {
+                console.error('Missing required elements for compression');
+                return;
+            }
+
+            // Get settings
+            const quality = parseInt(qualitySlider.value) / 100;
+            const maxWidth = parseInt(widthSelect.value);
+
+            // Create a FileReader to read the image
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                // Create an image element to get dimensions
+                const img = new Image();
+                img.onload = function() {
+                    // Calculate new dimensions while maintaining aspect ratio
+                    let newWidth = img.width;
+                    let newHeight = img.height;
+
+                    if (maxWidth > 0 && img.width > maxWidth) {
+                        newWidth = maxWidth;
+                        newHeight = (img.height * maxWidth) / img.width;
+                    }
+
+                    // Create canvas for compression
+                    const canvas = document.createElement('canvas');
+                    canvas.width = newWidth;
+                    canvas.height = newHeight;
+
+                    // Draw and compress image
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, newWidth, newHeight);
+
+                    // Get compressed image as data URL
+                    canvas.toBlob(function(blob) {
+                        // Create a new file with the compressed image
+                        const compressedFile = new File([blob], file.name, {
+                            type: 'image/jpeg',
+                            lastModified: Date.now()
+                        });
+
+                        // Create a new DataTransfer object and add the compressed file
+                        const dataTransfer = new DataTransfer();
+                        dataTransfer.items.add(compressedFile);
+
+                        // Update the file input with the compressed file
+                        fileInput.files = dataTransfer.files;
+
+                        // Update the hidden input with the compressed data URL
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            hiddenInput.value = e.target.result;
+
+                            // Show success message
+                            options.innerHTML = `
+                                <div class="alert alert-success">
+                                    <strong>Image optimized successfully!</strong><br>
+                                    File size reduced for better mobile performance.
+                                </div>
+                            `;
+
+                            // Disable the file input to prevent changes
+                            fileInput.disabled = true;
+
+                            // Update the preview with the compressed image
+                            const previewImage = container.querySelector('.preview-image');
+                            if (previewImage) {
+                                previewImage.src = e.target.result;
+                            }
+
+                            // Update file info
+                            const originalSizeKB = Math.round(file.size / 1024);
+                            const compressedSizeKB = Math.round(compressedFile.size / 1024);
+                            const savedPercent = Math.round((1 - (compressedFile.size / file.size)) * 100);
+
+                            const fileInfo = container.querySelector('.file-info');
+                            if (fileInfo) {
+                                fileInfo.textContent = `Original: ${originalSizeKB}KB → Compressed: ~${compressedSizeKB}KB (${savedPercent}% saved)`;
+                            }
+                        };
+                        reader.readAsDataURL(compressedFile);
+
+                    }, 'image/jpeg', quality);
+                };
+                img.onerror = function() {
+                    console.error('Error loading image for compression');
+                    if (options) {
+                        options.innerHTML = '<div class="alert alert-danger">Error: Could not load image for compression</div>';
+                    }
+                };
+                img.src = e.target.result;
+            };
+            reader.onerror = function() {
+                console.error('Error reading file');
+                if (options) {
+                    options.innerHTML = '<div class="alert alert-danger">Error: Could not read file</div>';
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Cancel compression and reset the file input
+        function cancelCompression(fieldIdentifier) {
+            console.log('Cancelling compression for field:', fieldIdentifier);
+
+            // Find the container using the field identifier
+            const input = document.querySelector(`[data-field="${fieldIdentifier}"]`);
+            if (!input) {
+                console.error('Input not found for field:', fieldIdentifier);
+                return;
+            }
+
+            const container = input.closest('.mobile-image-upload');
+            if (!container) {
+                console.error('Container not found for field:', fieldIdentifier);
+                return;
+            }
+
+            // Get elements
+            const fileInput = container.querySelector('input[type="file"]');
+            const options = container.querySelector('.compression-options');
+            const previewContainer = container.querySelector('.image-preview-container');
+            const hiddenInput = container.querySelector('.compressed-image-data');
+
+            // Reset file input
+            if (fileInput) {
+                fileInput.value = '';
+                fileInput.disabled = false;
+            }
+
+            // Hide options and preview
+            if (options) {
+                options.classList.add('d-none');
+            }
+            if (previewContainer) {
+                previewContainer.classList.add('d-none');
+            }
+
+            // Clear hidden input
+            if (hiddenInput) {
+                hiddenInput.value = '';
+            }
+
+            // Remove from original files
+            delete originalFiles[fieldIdentifier];
+
+            console.log('Compression cancelled for field:', fieldIdentifier);
+        }
+
+        // Add this function to prevent JS error and provide basic preview
+        function previewMobileGallery(event) {
+            const input = event.target;
+            const previewContainer = document.getElementById('mobile-gallery-preview');
+            // Remove all previews except the upload button
+            previewContainer.querySelectorAll('.gallery-image-preview').forEach(el => el.remove());
+
+            if (input.files && input.files.length > 0) {
+                Array.from(input.files).forEach((file, idx) => {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        // Insert preview before the upload button
+                        const col = document.createElement('div');
+                        col.className = 'col-md-3 mb-3 gallery-image-preview';
+                        col.innerHTML = `
+                            <div class="card">
+                                <img src="${e.target.result}" class="card-img-top" style="height: 120px; object-fit: cover;">
+                                <div class="card-body p-2">
+                                    <small class="text-muted">${file.name}</small>
+                                </div>
+                            </div>
+                        `;
+                        // Insert before the upload button (first child)
+                        previewContainer.insertBefore(col, previewContainer.firstChild);
+                    };
+                    reader.readAsDataURL(file);
+                });
+            }
+        }
     </script>
 @endsection
