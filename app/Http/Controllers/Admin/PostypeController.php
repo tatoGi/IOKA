@@ -137,4 +137,23 @@ class PostypeController extends Controller
         }
     }
 
+    public function removeMobilePhoto(RentalResale $postype, Request $request)
+    {
+        try {
+            $this->rentalResaleService->removeMobilePhoto($postype->id, $request);
+            return response()->json(['success' => true, 'message' => 'Mobile photo removed successfully.']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Error removing mobile photo: ' . $e->getMessage()], 500);
+        }
+    }
+
+    public function removeMobileGalleryImage(RentalResale $postype, Request $request)
+    {
+        try {
+            $this->rentalResaleService->removeMobileGalleryImage($postype->id, $request);
+            return response()->json(['success' => true, 'message' => 'Mobile gallery image removed successfully.']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Error removing mobile gallery image: ' . $e->getMessage()], 500);
+        }
+    }
 }

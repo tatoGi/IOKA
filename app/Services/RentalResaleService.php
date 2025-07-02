@@ -3,8 +3,10 @@
 namespace App\Services;
 
 use App\Http\Requests\Admin\RentalResaleRequest;
+use Illuminate\Support\Facades\Log;
 use App\Http\Requests\Admin\UpdateRentalResaleRequest;
 use App\Models\Amount;
+use App\Models\Location;
 use App\Models\Page;
 use App\Models\RentalResale;
 use Illuminate\Http\Request;
@@ -26,91 +28,178 @@ class RentalResaleService
         return compact('rentalResales', 'tags');
     }
 
+    /**
+     * Save a base64 encoded image to storage
+     *
+     * @param string $base64Image
+     * @param string $directory
+     * @return string
+     */
+    protected function saveBase64Image($base64Image, $directory)
+    {
+        // Remove the data:image/...;base64, part
+        $image = explode(';base64,', $base64Image);
+        $imageType = explode('image/', $image[0]);
+        $imageType = $imageType[1] ?? 'png';
+        
+        // Decode the base64 data
+        $imageData = base64_decode($image[1]);
+        
+        // Generate a unique filename
+        $filename = uniqid() . '.' . $imageType;
+        $path = $directory . '/' . $filename;
+        
+        // Save the file to storage
+        Storage::disk('public')->put($path, $imageData);
+        
+        return $path;
+    }
+
     public function storeRentalResale(RentalResaleRequest $request)
     {
-       // Debugging line to check the request data
-        // dd($request->all()); // Debugging line to check the request data
         $validatedData = $request->validated();
-       // Debugging line to check the validated data
+        
+        // Generate unique slug
         $validatedData['slug'] = $this->generateUniqueSlug($request->input('title'));
 
         // Handle QR photo upload
         if ($request->hasFile('qr_photo')) {
             $validatedData['qr_photo'] = $request->file('qr_photo')->store('qr_photos', 'public');
         }
-        // Handle agent photo upload
+
+        // Handle agent photo upload (single file, not array)
         if ($request->hasFile('agent_photo')) {
-            $agentPhotos = [];
-            foreach ($request->file('agent_photo') as $photo) {
-                $agentPhotos[] = $photo->store('agent_photo', 'public');
-            }
-            $validatedData['agent_photo'] = json_encode($agentPhotos);
+            $validatedData['agent_photo'] = $request->file('agent_photo')->store('agent_photos', 'public');
         }
 
         // Handle gallery images upload
+        $galleryImages = [];
         if ($request->hasFile('gallery_images')) {
-            $galleryImages = [];
             foreach ($request->file('gallery_images') as $image) {
                 $galleryImages[] = $image->store('gallery_images', 'public');
             }
-            $validatedData['gallery_images'] = json_encode($galleryImages);
-        } else {
-            $validatedData['gallery_images'] = json_encode([]);
+            $validatedData['gallery_images'] = $galleryImages; // Let the model handle JSON encoding
         }
 
         // Handle mobile gallery images upload
+        $mobileGalleryImages = [];
         if ($request->hasFile('mobile_gallery_images')) {
-            $mobileGalleryImages = [];
             foreach ($request->file('mobile_gallery_images') as $image) {
                 $mobileGalleryImages[] = $image->store('mobile_gallery_images', 'public');
             }
-            $validatedData['mobile_gallery_images'] = json_encode($mobileGalleryImages);
-        } else {
-            $validatedData['mobile_gallery_images'] = json_encode([]);
+            $validatedData['mobile_gallery_images'] = $mobileGalleryImages; // Let the model handle JSON encoding
         }
 
-        // Get location ID from the validated data
-        $locationId = $validatedData['location_id'] ?? null;
-        unset($validatedData['location_id']);
-
-        // Remove amount fields for now (they go into a separate table)
-        unset($validatedData['amount']);
-        unset($validatedData['amount_dirhams']);
-
-        // Handle mobile_agent_photo_compressed (base64 string)
+        // Handle mobile agent photo (base64 string)
         if ($request->filled('mobile_agent_photo_compressed')) {
-            $validatedData['mobile_agent_photo'] = $request->input('mobile_agent_photo_compressed');
+            $validatedData['mobile_agent_photo'] = $this->saveBase64Image($request->input('mobile_agent_photo_compressed'), 'mobile_agent_photos');
         }
 
-        // Handle qr_mobile_photo_compressed (base64 string)
+        // Handle mobile QR photo (base64 string)
         if ($request->filled('qr_mobile_photo_compressed')) {
-            $validatedData['mobile_qr_photo'] = $request->input('qr_mobile_photo_compressed');
+            $validatedData['mobile_qr_photo'] = $this->saveBase64Image($request->input('qr_mobile_photo_compressed'), 'mobile_qr_photos');
         }
 
-        return DB::transaction(function () use ($validatedData, $locationId, $request) {
-             // Debugging line to check the validated data
-            // Create the RentalResale record
-
-            $rentalResale = RentalResale::create($validatedData);
-
-            // Attach location if available
-            if ($locationId) {
-                $rentalResale->locations()->attach($locationId);
+        // Get location IDs (handling both single and multiple locations)
+        $locationIds = [];
+        if ($request->has('location_ids')) {
+            $locationIds = array_filter(
+                (array)$request->input('location_ids'),
+                function($id) {
+                    return !empty($id) && is_numeric($id);
+                }
+            );
+        } elseif ($request->has('location_id') && !empty($request->input('location_id'))) {
+            $locationId = (int)$request->input('location_id');
+            if ($locationId > 0) {
+                $locationIds = [$locationId];
             }
+        }
 
-            // Create the related Amount record
-            Amount::create([
-                'rental_resale_id' => $rentalResale->id,
-                'amount' => $request->amount,
-                'amount_dirhams' => $request->amount_dirhams,
-            ]);
-
-            // Handle metadata creation
-            if ($request->has('metadata')) {
-                $this->handleMetadataCreation($rentalResale, $request);
+        // Handle mobile gallery images
+        if ($request->hasFile('mobile_gallery_images')) {
+            $mobileGalleryImages = [];
+            foreach ($request->file('mobile_gallery_images') as $image) {
+                $path = $image->store('mobile_gallery', 'public');
+                if ($path) {
+                    $mobileGalleryImages[] = $path;
+                }
             }
+            $validatedData['mobile_gallery_images'] = $mobileGalleryImages;
+        }
 
-            return $rentalResale;
+        // Handle JSON fields
+        $jsonFields = ['details', 'amenities', 'addresses', 'tags', 'languages', 'alt_texts', 'mobile_gallery_images'];
+        foreach ($jsonFields as $field) {
+            if (isset($validatedData[$field]) && is_string($validatedData[$field])) {
+                $validatedData[$field] = json_decode($validatedData[$field], true);
+            }
+        }
+
+        // Remove fields that shouldn't go directly to the model
+        $amount = $validatedData['amount'] ?? null;
+        $amountDirhams = $validatedData['amount_dirhams'] ?? null;
+        unset(
+            $validatedData['amount'],
+            $validatedData['amount_dirhams'],
+            $validatedData['location_id'],
+            $validatedData['location_ids'],
+            $validatedData['mobile_agent_photo_compressed'],
+            $validatedData['qr_mobile_photo_compressed']
+        );
+
+        // Start database transaction
+        return DB::transaction(function () use ($validatedData, $locationIds, $amount, $amountDirhams, $request) {
+            try {
+                // Create the RentalResale record
+                $rentalResale = RentalResale::create($validatedData);
+
+                // Attach locations if we have valid location IDs
+                if (!empty($locationIds) && is_array($locationIds)) {
+                    // Ensure all location IDs are integers
+                    $locationIds = array_map('intval', array_filter($locationIds, 'is_numeric'));
+                    
+                    // Only proceed if we have valid location IDs
+                    if (!empty($locationIds)) {
+                        // Check if all locations exist
+                        $existingLocations = \App\Models\Location::whereIn('id', $locationIds)->pluck('id')->toArray();
+                        $missingLocations = array_diff($locationIds, $existingLocations);
+                        
+                        // Log any missing locations
+                        if (!empty($missingLocations)) {
+                            Log::warning('Attempted to sync non-existent location IDs: ' . implode(', ', $missingLocations));
+                        }
+                        
+                        // Only sync locations that exist
+                        $validLocationIds = array_intersect($locationIds, $existingLocations);
+                        
+                        if (!empty($validLocationIds)) {
+                            $rentalResale->locations()->sync($validLocationIds);
+                        } else {
+                            Log::warning('No valid locations found to sync for rental resale ID: ' . $rentalResale->id);
+                        }
+                    }
+                }
+
+                // Create the related Amount record
+                if ($amount !== null) {
+                    Amount::create([
+                        'rental_resale_id' => $rentalResale->id,
+                        'amount' => $amount,
+                        'amount_dirhams' => $amountDirhams,
+                    ]);
+                }
+
+                // Handle metadata creation
+                if ($request->has('metadata')) {
+                    $this->handleMetadataCreation($rentalResale, $request);
+                }
+
+                return $rentalResale;
+            } catch (\Exception $e) {
+                Log::error('Error creating rental resale: ' . $e->getMessage());
+                throw $e;
+            }
         });
     }
 
@@ -129,14 +218,7 @@ class RentalResaleService
     {
         $rentalResale = RentalResale::findOrFail($id);
         if ($rentalResale->agent_photo) {
-            $agentPhotos = is_array($rentalResale->agent_photo) ? $rentalResale->agent_photo : json_decode($rentalResale->agent_photo, true);
-            if(is_array($agentPhotos)){
-                foreach($agentPhotos as $photo){
-                    Storage::delete($photo);
-                }
-            } else {
-                Storage::delete($rentalResale->agent_photo);
-            }
+            Storage::delete($rentalResale->agent_photo);
             $rentalResale->agent_photo = null;
             $rentalResale->save();
         }
@@ -192,6 +274,60 @@ class RentalResaleService
         return ['success' => false, 'message' => 'No image uploaded'];
     }
 
+    public function removeMobilePhoto($id, Request $request)
+    {
+        $rentalResale = RentalResale::findOrFail($id);
+        $photoPath = $request->input('photo');
+        
+        // Get the current mobile upload photos
+        $mobileUploadPhotos = is_array($rentalResale->mobile_upload_photos) 
+            ? $rentalResale->mobile_upload_photos 
+            : json_decode($rentalResale->mobile_upload_photos, true) ?? [];
+        
+        // Find and remove the photo from the array
+        $updatedPhotos = array_filter($mobileUploadPhotos, function($photo) use ($photoPath) {
+            return $photo !== $photoPath;
+        });
+        
+        // Delete the photo file from storage
+        if (Storage::disk('public')->exists($photoPath)) {
+            Storage::disk('public')->delete($photoPath);
+        }
+        
+        // Update the model with the new photos array
+        $rentalResale->mobile_upload_photos = array_values($updatedPhotos); // Reindex the array
+        $rentalResale->save();
+        
+        return true;
+    }
+
+    public function removeMobileGalleryImage($id, Request $request)
+    {
+        $rentalResale = RentalResale::findOrFail($id);
+        $imagePath = $request->input('image');
+        
+        // Get the current mobile gallery images
+        $mobileGalleryImages = is_array($rentalResale->mobile_gallery_images) 
+            ? $rentalResale->mobile_gallery_images 
+            : (json_decode($rentalResale->mobile_gallery_images, true) ?? []);
+        
+        // Find and remove the image from the array
+        $updatedImages = array_filter($mobileGalleryImages, function($image) use ($imagePath) {
+            return $image !== $imagePath;
+        });
+        
+        // Delete the image file from storage
+        if (Storage::disk('public')->exists($imagePath)) {
+            Storage::disk('public')->delete($imagePath);
+        }
+        
+        // Update the model with the new images array
+        $rentalResale->mobile_gallery_images = array_values($updatedImages); // Reindex the array
+        $rentalResale->save();
+        
+        return true;
+    }
+
     public function updateRentalResale(UpdateRentalResaleRequest $request, $id)
     {
         $validatedData = $request->validated();
@@ -217,18 +353,9 @@ class RentalResaleService
         if ($request->hasFile('agent_photo')) {
             // Delete existing agent photos
             if ($rentalResale->agent_photo) {
-                $existingPhotos = is_array($rentalResale->agent_photo) ? $rentalResale->agent_photo : json_decode($rentalResale->agent_photo, true);
-                if (is_array($existingPhotos)) {
-                    foreach ($existingPhotos as $photo) {
-                        Storage::delete($photo);
-                    }
-                }
+                Storage::delete($rentalResale->agent_photo);
             }
-            $agentPhotos = [];
-            foreach ($request->file('agent_photo') as $photo) {
-                $agentPhotos[] = $photo->store('agent_photo', 'public');
-            }
-            $validatedData['agent_photo'] = json_encode($agentPhotos);
+            $validatedData['agent_photo'] = $request->file('agent_photo')->store('agent_photo', 'public');
         }
 
         // Handle gallery images update
@@ -237,7 +364,36 @@ class RentalResaleService
             foreach ($request->file('gallery_images') as $image) {
                 $galleryImages[] = $image->store('gallery_images', 'public');
             }
-            $validatedData['gallery_images'] = json_encode($galleryImages);
+            $validatedData['gallery_images'] = $galleryImages; // No need to json_encode as it's handled by the model cast
+        }
+        
+        // Handle mobile gallery images update
+        if ($request->hasFile('mobile_gallery_images')) {
+            $mobileGalleryImages = $rentalResale->mobile_gallery_images ?? [];
+            foreach ($request->file('mobile_gallery_images') as $image) {
+                $mobileGalleryImages[] = $image->store('mobile_gallery', 'public');
+            }
+            $validatedData['mobile_gallery_images'] = $mobileGalleryImages;
+        }
+        
+        // Handle removed mobile gallery images
+        if ($request->has('removed_mobile_gallery_images') && is_array($request->input('removed_mobile_gallery_images'))) {
+            $currentImages = $rentalResale->mobile_gallery_images ?? [];
+            $removedImages = $request->input('removed_mobile_gallery_images');
+            
+            // Filter out removed images
+            $updatedImages = array_filter($currentImages, function($image) use ($removedImages) {
+                return !in_array($image, $removedImages);
+            });
+            
+            // Delete the removed image files
+            foreach ($removedImages as $removedImage) {
+                if (Storage::disk('public')->exists($removedImage)) {
+                    Storage::disk('public')->delete($removedImage);
+                }
+            }
+            
+            $validatedData['mobile_gallery_images'] = array_values($updatedImages);
         }
 
         // Handle alt texts
@@ -302,6 +458,11 @@ class RentalResaleService
         // Handle qr_mobile_photo_compressed (base64 string)
         if ($request->filled('qr_mobile_photo_compressed')) {
             $validatedData['mobile_qr_photo'] = $request->input('qr_mobile_photo_compressed');
+        }
+        
+        // Handle mobile_upload_photos
+        if ($request->has('mobile_upload_photos') && is_array($request->input('mobile_upload_photos'))) {
+            $validatedData['mobile_upload_photos'] = array_values(array_filter($request->input('mobile_upload_photos')));
         }
 
         return DB::transaction(function () use ($rentalResale, $validatedData, $locationId, $request) {

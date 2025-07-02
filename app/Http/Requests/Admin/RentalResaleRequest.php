@@ -46,7 +46,7 @@ class RentalResaleRequest extends FormRequest
             'tags' => 'required|array',
             'languages' => 'nullable|array',
             'languages.*.languages' => 'required|string',
-            'agent_photo' => 'required|array|min:1',
+            'agent_photo' => 'required',
             'agent_photo.*' => 'image',
             'mobile_agent_photo' => 'nullable|image',
             'mobile_agent_photo_alt' => 'nullable|string|max:255',

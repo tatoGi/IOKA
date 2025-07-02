@@ -16,5 +16,7 @@ Route::group(['prefix' => 'ioka_admin/postypes', 'as' => 'admin.postypes.'], fun
     Route::delete('/rental_resale/{postype}/remove-gallery-image', [PostypeController::class, 'removeGalleryImage'])->name('rental_resale.removeGalleryImage');
     Route::get('/rental_resale/{postype}/gallery-images', [PostypeController::class, 'getGalleryImages'])->name('rental_resale.getGalleryImages');
     Route::post('/rental_resale/upload-gallery_images', [PostypeController::class, 'uploadGalleryImages'])->name('rental_resale.uploadGalleryImages');
+    Route::delete('/rental_resale/{postype}/remove-mobile-photo', [PostypeController::class, 'removeMobilePhoto'])->name('rental_resale.removeMobilePhoto');
+    Route::delete('/rental_resale/{postype}/remove-mobile-gallery-image', [PostypeController::class, 'removeMobileGalleryImage'])->name('rental_resale.removeMobileGalleryImage');
 
 });

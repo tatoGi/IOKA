@@ -59,6 +59,7 @@ class RentalResale extends Model
         'top' => 'boolean',
         'languages' => 'array', // Ensuring JSON is handled properly
         'alt_texts' => 'array',
+        'mobile_upload_photos' => 'array',
         'mobile_gallery_images' => 'array',
     ];
 

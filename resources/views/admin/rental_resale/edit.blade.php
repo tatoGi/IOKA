@@ -43,12 +43,12 @@
                     <div class="mb-3">
                         <label for="amount" class="form-label">Amount (in dollars)</label>
                         <input type="number" step="0.01" class="form-control amount" id="amount" name="amount"
-                            value="{{ $rentalResale->amount->amount }}" required>
+                            value="{{ $rentalResale->amount->amount ?? '' }}" required>
                     </div>
                     <div class="mb-3">
                         <label for="amount_dirhams" class="form-label">Amount (in Dirhams)</label>
                         <input type="number" step="0.01" class="form-control amount_dirhams" id="amount_dirhams" name="amount_dirhams"
-                            value="{{ $rentalResale->amount->amount_dirhams }}" readonly>
+                            value="{{ $rentalResale->amount->amount_dirhams ?? '' }}" readonly>
                     </div>
                     <div class="mb-3">
                         <label for="property_type" class="form-label">Property Type<span class="text-danger">*</span></label>
@@ -234,7 +234,7 @@
                         </div>
                     </div>
 
-               
+
                     <!-- Agent Information -->
                     <div class="container">
                         <div class="row">
@@ -291,6 +291,71 @@
                                     <input type="file" class="form-control" id="agent_photo" name="agent_photo[]" multiple>
                                     <input type="text" class="form-control mt-2" name="alt_texts[agent_photo]" value="{{ (is_array($rentalResale->alt_texts) ? $rentalResale->alt_texts : json_decode($rentalResale->alt_texts, true))['agent_photo'] ?? '' }}" placeholder="Alt text for agent photo">
                                 </div>
+                                <div class="mb-3">
+                                    <label for="mobile_agent_photo" class="form-label">Mobile Agent Photo</label>
+                                    <div class="mobile-image-upload" id="mobile-upload-blog_mobile_agent_photo">
+                                        <div class="mb-2">
+                                            <div class="d-flex align-items-center">
+                                                <input type="file" class="form-control mobile-image-input @error('mobile_agent_photo') is-invalid @enderror" 
+                                                    id="input-blog_mobile_agent_photo" name="mobile_agent_photo" accept="image/*" capture="environment"
+                                                    data-field="blog_mobile_agent_photo"
+                                                    onchange="handleMobileImageSelect(this)">
+                                                @error('mobile_agent_photo')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="compression-options mb-2 d-none">
+                                            <div class="card p-3">
+                                                <div class="mb-2">
+                                                    <label class="form-label">Image Quality</label>
+                                                    <input type="range" class="form-range quality-slider" min="10" max="100" value="70" 
+                                                        id="quality-blog_mobile_banner_image" data-field="blog_mobile_banner_image">
+                                                    <div class="d-flex justify-content-between">
+                                                        <small>Lower (Smaller File)</small>
+                                                        <small class="quality-value">70%</small>
+                                                        <small>Higher (Better Quality)</small>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="mb-2">
+                                                    <label class="form-label">Max Width</label>
+                                                    <select class="form-select max-width" id="max-width-blog_mobile_banner_image" data-field="blog_mobile_banner_image" style="display: block !important; width: 100%;">
+                                                        <option value="800" selected>Small (800px)</option>
+                                                        <option value="1200">Medium (1200px)</option>
+                                                        <option value="1600">Large (1600px)</option>
+                                                        <option value="0">Original Size</option>
+                                                    </select>
+                                                </div>
+                                                
+                                                <div class="image-preview-container mb-2 d-none">
+                                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                                        <label class="form-label mb-0">Preview</label>
+                                                        <div class="file-info small text-muted"></div>
+                                                    </div>
+                                                    <img src="" class="img-fluid img-thumbnail preview-image" style="max-height: 200px;">
+                                                </div>
+                                                
+                                                <div class="d-flex justify-content-between">
+                                                    <button type="button" class="btn btn-secondary btn-sm cancel-compression" 
+                                                        onclick="cancelCompression('blog_mobile_banner_image')">Cancel</button>
+                                                    <button type="button" class="btn btn-primary btn-sm apply-compression" 
+                                                        onclick="applyCompression('blog_mobile_banner_image')">Apply & Upload</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <input type="hidden" name="mobile_banner_image_compressed" id="compressed-blog_mobile_banner_image" class="compressed-image-data">
+                                    </div>
+                                    @if (isset($rentalResale->mobile_agent_photo) && $rentalResale->mobile_agent_photo)
+                                        <div class="mt-2">
+                                            <img src="{{ asset('storage/' . $rentalResale->mobile_agent_photo) }}" alt="{{ $rentalResale->mobile_agent_photo_alt }}" class="img-thumbnail" width="200">
+                                            <button type="button" class="btn btn-danger mt-2" id="remove-mobile-agent-photo-btn">Remove Mobile Agent Photo</button>
+                                        </div>
+                                    @endif
+                                </div>
+    
                             </div>
                             <div class="col-md-3">
                                 <div class="mb-3">
@@ -345,7 +410,7 @@
                         <input type="text" class="form-control" id="location_link" name="location_link" value="{{ $rentalResale->location_link }}" required>
                     </div>
                     <div class="mb-3">
-                    
+
                         <label for="location_id" class="form-label">Location</label>
                         <select name="location_id[]" id="location_id" class="form-control select2" >
                             <option value="">Select Location</option>
@@ -366,6 +431,105 @@
                         @endif
                         <input type="file" class="form-control" id="qr_photo" name="qr_photo">
                     </div>
+                    <div class="mb-3">
+                        <label for="mobile_qr_image" class="form-label">Mobile qr Photo</label>
+                        <div class="mobile-image-upload" id="mobile-upload-blog_mobile_qr_image">
+                            <div class="mb-2">
+                                <div class="d-flex align-items-center">
+                                    <input type="file" class="form-control mobile-image-input @error('mobile_qr_image') is-invalid @enderror" 
+                                        id="input-blog_mobile_qr_image" name="mobile_qr_image" accept="image/*" capture="environment"
+                                        data-field="blog_mobile_qr_image"
+                                        onchange="handleMobileImageSelect(this)">
+                                    @error('mobile_qr_image')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                            
+                            <div class="compression-options mb-2 d-none">
+                                <div class="card p-3">
+                                    <div class="mb-2">
+                                        <label class="form-label">Image Quality</label>
+                                        <input type="range" class="form-range quality-slider" min="10" max="100" value="70" 
+                                            id="quality-blog_mobile_banner_image" data-field="blog_mobile_banner_image">
+                                        <div class="d-flex justify-content-between">
+                                            <small>Lower (Smaller File)</small>
+                                            <small class="quality-value">70%</small>
+                                            <small>Higher (Better Quality)</small>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-2">
+                                        <label class="form-label">Max Width</label>
+                                        <select class="form-select max-width" id="max-width-blog_mobile_banner_image" data-field="blog_mobile_banner_image" style="display: block !important; width: 100%;">
+                                            <option value="800" selected>Small (800px)</option>
+                                            <option value="1200">Medium (1200px)</option>
+                                            <option value="1600">Large (1600px)</option>
+                                            <option value="0">Original Size</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="image-preview-container mb-2 d-none">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <label class="form-label mb-0">Preview</label>
+                                            <div class="file-info small text-muted"></div>
+                                        </div>
+                                        <img src="" class="img-fluid img-thumbnail preview-image" style="max-height: 200px;">
+                                    </div>
+                                    
+                                    <div class="d-flex justify-content-between">
+                                        <button type="button" class="btn btn-secondary btn-sm cancel-compression" 
+                                            onclick="cancelCompression('blog_mobile_banner_image')">Cancel</button>
+                                        <button type="button" class="btn btn-primary btn-sm apply-compression" 
+                                            onclick="applyCompression('blog_mobile_banner_image')">Apply & Upload</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <input type="hidden" name="mobile_banner_image_compressed" id="compressed-blog_mobile_banner_image" class="compressed-image-data">
+                        </div>
+                        @if (isset($rentalResale->mobile_qr_photo) && $rentalResale->mobile_qr_photo)
+                            <div class="mt-2">
+                                <img src="{{ asset('storage/' . $rentalResale->mobile_qr_photo) }}" alt="{{ $rentalResale->mobile_qr_photo_alt }}" class="img-thumbnail" width="200">
+                                <button type="button" class="btn btn-danger mt-2" id="remove-mobile-qr-image-btn">Remove Mobile QR Photo</button>
+                            </div>
+                        @endif
+                    </div>
+
+                    <!-- Mobile Gallery -->
+                    <div class="mb-3">
+                        <label for="mobile_gallery_images" class="form-label">Mobile Gallery Images</label>
+                        <div class="row g-3 mb-3" id="mobile-gallery-preview">
+                            @if($rentalResale->mobile_gallery_images && is_array($rentalResale->mobile_gallery_images))
+                                @foreach($rentalResale->mobile_gallery_images as $image)
+                                    <div class="col-6 col-md-4 col-lg-3 mobile-gallery-item" data-image="{{ $image }}">
+                                        <div class="card h-100">
+                                            <img src="{{ asset('storage/' . $image) }}" class="card-img-top" alt="Mobile Gallery Image" style="height: 150px; object-fit: cover;">
+                                            <div class="card-body text-center">
+                                                <button type="button" class="btn btn-danger btn-sm remove-mobile-gallery-image" data-image="{{ $image }}">
+                                                    <i class="fas fa-trash-alt"></i> Remove
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            @endif
+                        </div>
+                        <div class="input-group">
+                            <input type="file" 
+                                   class="form-control" 
+                                   id="mobile_gallery_images" 
+                                   name="mobile_gallery_images[]" 
+                                   multiple 
+                                   accept="image/*" 
+                                   onchange="handleMobileGallerySelect(this)">
+                            <label class="input-group-text" for="mobile_gallery_images">
+                                <i class="fas fa-upload"></i> Upload
+                            </label>
+                        </div>
+                        <small class="form-text text-muted">Upload multiple images for the mobile gallery (JPEG, PNG, JPG, GIF, max 5MB each)</small>
+                    </div>
+
                     <div class="mb-3">
                         <label for="reference" class="form-label">Reference<span class="text-danger">*</span></label>
                         <input type="text" class="form-control" id="reference" name="reference" value="{{ $rentalResale->reference }}" required>
@@ -390,6 +554,47 @@
                             <!-- New gallery images alt text inputs will be added here dynamically -->
                         </div>
                         <button type="button" class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#galleryModal">Manage Gallery</button>
+                    </div>
+
+                    <!-- Mobile Gallery -->
+                    <div class="mb-3">
+                        <label for="mobile_gallery" class="form-label">Mobile Gallery</label>
+                        <div class="mobile-gallery-container">
+                            <div class="row row-cols-1 row-cols-md-3 g-4" id="mobile-gallery-preview">
+                                @php
+                                    $mobileGallery = is_array($rentalResale->mobile_gallery_images) 
+                                        ? $rentalResale->mobile_gallery_images 
+                                        : (json_decode($rentalResale->mobile_gallery_images, true) ?? []);
+                                    $mobileGallery = array_filter($mobileGallery);
+                                @endphp
+                                @foreach($mobileGallery as $index => $image)
+                                    <div class="col mobile-gallery-item" data-image="{{ $image }}">
+                                        <div class="card h-100">
+                                            <img src="{{ asset('storage/' . $image) }}" class="card-img-top" alt="Mobile Gallery Image">
+                                            <div class="card-body text-center">
+                                                <button type="button" class="btn btn-danger btn-sm remove-mobile-gallery-image" data-image="{{ $image }}">
+                                                    <i class="fas fa-trash-alt"></i> Remove
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                            
+                            <div class="mt-3">
+                                <div class="mobile-image-upload" id="mobile-upload-gallery">
+                                    <div class="mb-2">
+                                        <div class="d-flex align-items-center">
+                                            <input type="file" class="form-control mobile-image-input" 
+                                                id="input-mobile-gallery" name="mobile_gallery_images[]" 
+                                                accept="image/*" multiple capture="environment"
+                                                onchange="handleMobileGallerySelect(this)">
+                                        </div>
+                                    </div>
+                                </div>
+                                <input type="hidden" name="mobile_gallery_compressed" id="compressed-mobile-gallery">
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -739,6 +944,111 @@
                     }
                 })
                 .catch(error => console.error('Error:', error));
+            }
+        });
+
+        // Handle Mobile Gallery Image Upload
+        function handleMobileGallerySelect(input) {
+            const files = input.files;
+            const previewContainer = document.getElementById('mobile-gallery-preview');
+            
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    // Create a preview card for the uploaded image
+                    const previewCard = document.createElement('div');
+                    previewCard.className = 'col mobile-gallery-item';
+                    previewCard.innerHTML = `
+                        <div class="card h-100">
+                            <img src="${e.target.result}" class="card-img-top" alt="Mobile Gallery Preview">
+                            <div class="card-body text-center">
+                                <button type="button" class="btn btn-danger btn-sm remove-mobile-gallery-image">
+                                    <i class="fas fa-trash-alt"></i> Remove
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Add remove functionality
+                    const removeBtn = previewCard.querySelector('.remove-mobile-gallery-image');
+                    removeBtn.addEventListener('click', function() {
+                        if (confirm('Are you sure you want to remove this image?')) {
+                            previewCard.remove();
+                            // If this was an existing image, add it to a hidden field for server-side cleanup
+                            if (previewCard.dataset.image) {
+                                const removedImages = document.getElementById('removed-mobile-gallery-images') || 
+                                    (function() {
+                                        const input = document.createElement('input');
+                                        input.type = 'hidden';
+                                        input.name = 'removed_mobile_gallery_images[]';
+                                        input.id = 'removed-mobile-gallery-images';
+                                        input.multiple = true;
+                                        input.form.appendChild(input);
+                                        return input;
+                                    })();
+                                const hiddenInput = document.createElement('input');
+                                hiddenInput.type = 'hidden';
+                                hiddenInput.name = 'removed_mobile_gallery_images[]';
+                                hiddenInput.value = previewCard.dataset.image;
+                                removedImages.parentNode.insertBefore(hiddenInput, removedImages.nextSibling);
+                            }
+                        }
+                    });
+                    
+                    previewContainer.appendChild(previewCard);
+                };
+                
+                reader.readAsDataURL(file);
+            }
+            
+            // Reset the file input to allow selecting the same file again
+            input.value = '';
+        }
+
+        // Handle Mobile Gallery Image Deletion
+        $(document).on('click', '.remove-mobile-gallery-image', function() {
+            if (confirm('Are you sure you want to remove this image from the mobile gallery?')) {
+                const imagePath = $(this).data('image');
+                const imageItem = $(this).closest('.mobile-gallery-item');
+                
+                // If this is an existing image (not a new upload)
+                if (imagePath) {
+                    const formData = new FormData();
+                    formData.append('image', imagePath);
+                    formData.append('_token', '{{ csrf_token() }}');
+                    formData.append('_method', 'DELETE');
+
+                    fetch(`{{ route('admin.postypes.rental_resale.removeMobileGalleryImage', ['postype' => $rentalResale->id]) }}`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json'
+                        },
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            imageItem.fadeOut(300, function() {
+                                $(this).remove();
+                            });
+                        } else {
+                            alert('Failed to remove image: ' + (data.message || 'Unknown error'));
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('An error occurred while removing the image.');
+                    });
+                } else {
+                    // For newly added images that haven't been saved yet
+                    imageItem.fadeOut(300, function() {
+                        $(this).remove();
+                    });
+                }
             }
         });
 

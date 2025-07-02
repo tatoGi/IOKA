@@ -50,7 +50,13 @@ class UpdateRentalResaleRequest extends FormRequest
             'languages.*.language' => 'sometimes|string|nullable',
             'alt_texts' => 'sometimes|array',
             'alt_texts.*' => 'sometimes|string|nullable',
-             // Metadata validation
+            'mobile_upload_photos' => 'sometimes|array',
+            'mobile_upload_photos.*' => 'sometimes|string',
+            'mobile_gallery_images' => 'sometimes|array',
+            'mobile_gallery_images.*' => 'sometimes|image|mimes:jpeg,png,jpg,gif|max:5120',
+            'removed_mobile_gallery_images' => 'sometimes|array',
+            'removed_mobile_gallery_images.*' => 'sometimes|string',
+            // Metadata validation
              'metadata.meta_title' => 'nullable|string|max:255',
              'metadata.meta_description' => 'nullable|string',
              'metadata.meta_keywords' => 'nullable|string',

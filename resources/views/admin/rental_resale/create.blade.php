@@ -205,7 +205,7 @@
                             <div class="col-md-3">
                                 <div class="mb-3">
                                     <label for="agent_photo" class="form-label">Agent Photo<span class="text-danger">*</span></label>
-                                    <input type="file" class="form-control" id="agent_photo" name="agent_photo[]" multiple>
+                                    <input type="file" class="form-control" id="agent_photo" name="agent_photo" >
                                     <input type="text" class="form-control mt-2" name="alt_texts[agent_photo]" placeholder="Alt text for agent photo">
                                 </div>
                             </div>
