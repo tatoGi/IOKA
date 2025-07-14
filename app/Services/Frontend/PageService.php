@@ -255,6 +255,7 @@ class PageService
                     'id'         => $partner->id,
                     'title'      => $partner->title,
                     'image'      => $partner->image ? asset('storage/'.$partner->image) : null,
+                    'mobile_image' => $partner->mobile_image ? asset('storage/'.$partner->mobile_image) : null,
                     'url'        => $partner->url,
                     'alt'        => $partner->alt,
                     'created_at' => $partner->created_at,

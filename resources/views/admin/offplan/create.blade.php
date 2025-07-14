@@ -124,7 +124,7 @@
                         <div class="row">
                             <div class="col-md-4">
                                 <div class="mb-3">
-                                    <label for="main_photo" class="form-label">Main Photo</label>
+                                    <label for="main_photo" class="form-label">Main Photo(737 x 461)</label>
                                     <input type="file" class="form-control" id="main_photo" name="main_photo" accept="image/*">
                                     <input type="text" class="form-control mt-2" name="main_photo_alt" placeholder="Alt text for main photo">
                                     <div id="main_photo_preview" class="uploaded-files"></div>
@@ -193,7 +193,7 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="mb-3">
-                                    <label for="main_banner" class="form-label">Banner</label>
+                                    <label for="main_banner" class="form-label">Banner(1560  x 405)</label>
                                     <input type="file" class="form-control" id="main_banner" name="main_banner">
                                     <input type="text" class="form-control mt-2" name="banner_photo_alt" placeholder="Alt text for banner photo">
                                     <div id="main_banner_preview" class="uploaded-files"></div>
@@ -270,7 +270,7 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="mb-3">
-                                    <label for="exterior_gallery" class="form-label">Exterior Gallery</label>
+                                    <label for="exterior_gallery" class="form-label">Exterior Gallery(372 x 272)</label>
                                     <input type="file" class="form-control" id="exterior_gallery" name="exterior_gallery[]" multiple accept="image/*">
                                     <div id="exterior_gallery_preview" class="uploaded-files"></div>
                                     <input type="hidden" id="exterior_gallery_paths" name="exterior_gallery_paths">
@@ -279,7 +279,7 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="mb-3">
-                                    <label for="interior_gallery" class="form-label">Interior Gallery</label>
+                                    <label for="interior_gallery" class="form-label">Interior Gallery(372 x 272)</label>
                                     <input type="file" class="form-control" id="interior_gallery" name="interior_gallery[]" multiple accept="image/*">
                                     <div id="interior_gallery_preview" class="uploaded-files"></div>
                                     <input type="hidden" id="interior_gallery_paths" name="interior_gallery_paths">
@@ -339,7 +339,7 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="mb-3">
-                                    <label for="qr_photo" class="form-label">QR Photo</label>
+                                    <label for="qr_photo" class="form-label">QR Photo (149 x 149)</label>
                                     <input type="file" class="form-control" id="qr_photo" name="qr_photo">
                                     <input type="text" class="form-control mt-2" name="qr_photo_alt" placeholder="Alt text for QR photo">
                                     <input type="hidden" id="qr_photo_path" name="qr_photo_path">
@@ -407,7 +407,7 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="mb-3">
-                                    <label for="agent_image" class="form-label">Agent Image</label>
+                                    <label for="agent_image" class="form-label">Agent Image (92 x 92)</label>
                                     <input type="file" class="form-control" id="agent_image" name="agent_image" accept="image/*">
                                     <input type="text" class="form-control mt-2" name="agent_image_alt" placeholder="Alt text for agent photo">
                                     <div id="agent_image_preview" class="uploaded-files"></div>

@@ -29,7 +29,7 @@
 
                     <!-- Image Field -->
                     <div class="mb-3">
-                        <label for="image" class="form-label">Partner Image</label>
+                        <label for="image" class="form-label">Partner Image (174 x 174)</label>
                         <input type="file" id="image" name="image"
                             class="form-control @error('image') is-invalid @enderror" accept="image/*">
                         @if ($partner->image)

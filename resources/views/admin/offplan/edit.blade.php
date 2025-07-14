@@ -154,7 +154,7 @@
                             <div class="row">
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        <label for="main_photo">Main Photo</label>
+                                        <label for="main_photo">Main Photo(737 x 461)</label>
                                         <input type="file" class="form-control" id="main_photo" name="main_photo"
                                             accept="image/*">
                                         <input type="text" class="form-control mt-2" name="main_photo_alt"
@@ -176,7 +176,7 @@
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        <label for="main_photo">Banner</label>
+                                        <label for="main_photo">Banner (1280 x 461)</label>
                                         <input type="file" class="form-control" id="banner_photo"
                                             name="banner_photo">
                                         <input type="text" class="form-control mt-2" name="banner_photo_alt"
@@ -203,7 +203,7 @@
                                 </div>
                                 <div class="col-md-6 mt-3">
                                     <div class="form-group">
-                                        <label for="exterior_gallery">Exterior Gallery</label>
+                                        <label for="exterior_gallery">Exterior Gallery(372 x 272)</label>
                                         <input type="file" class="form-control" id="exterior_gallery"
                                             name="exterior_gallery[]" multiple accept="image/*">
                                         <div id="exterior_gallery_preview" class="uploaded-files gallery-container" style="border: 1px solid #ddd; border-radius: 5px; padding: 15px; margin-top: 10px;">
@@ -248,7 +248,7 @@
                                 </div>
                                 <div class="col-md-6 mt-3">
                                     <div class="form-group">
-                                        <label for="interior_gallery">Interior Gallery</label>
+                                        <label for="interior_gallery">Interior Gallery(372 x 272)</label>
                                         <input type="file" class="form-control" id="interior_gallery"
                                             name="interior_gallery[]" multiple accept="image/*">
                                         <div id="interior_gallery_preview" class="uploaded-files gallery-container" style="border: 1px solid #ddd; border-radius: 5px; padding: 15px; margin-top: 10px;">
@@ -357,7 +357,7 @@
                                 value="{{ $offplan->qr_title }}">
                         </div>
                         <div class="form-group mt-3">
-                            <label for="qr_photo">QR Photo</label>
+                            <label for="qr_photo">QR Photo(149 x 149)</label>
                             <input type="file" class="form-control" id="qr_photo" name="qr_photo" accept="image/*">
                             <input type="text" class="form-control mt-2" name="qr_photo_alt"
                                 placeholder="Alt text for QR photo" value="{{ $offplan->alt_texts['qr_photo'] ?? '' }}">
@@ -458,7 +458,7 @@
                         </div>
 
                         <div class="form-group mt-3">
-                            <label for="agent_image">Agent Image</label>
+                            <label for="agent_image">Agent Image(92 x 92)</label>
                             <input type="file" class="form-control" id="agent_image" name="agent_image"
                                 accept="image/*">
                             <input type="text" class="form-control mt-2" name="agent_image_alt"

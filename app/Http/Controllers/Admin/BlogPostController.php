@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Log;
 use App\Models\BlogPost;
 use App\Models\Tag;
 use Illuminate\Http\Request;
@@ -70,17 +71,17 @@ class BlogPostController extends Controller
         if ($request->hasFile('banner_image')) {
             $validated['banner_image'] = $request->file('banner_image')->store('blog-banners', 'public');
         }
-        
+
         // Handle mobile image from compressed data
         if ($request->filled('mobile_image_compressed')) {
             $validated['mobile_image'] = $request->input('mobile_image_compressed');
         }
-        
+
         // Handle mobile banner image from compressed data
         if ($request->filled('mobile_banner_image_compressed')) {
             $validated['mobile_banner_image'] = $request->input('mobile_banner_image_compressed');
         }
-        
+
         // Ensure banner_title is included in the validated data
         if ($request->has('banner_title')) {
             $validated['banner_title'] = $request->input('banner_title');
@@ -124,6 +125,8 @@ class BlogPostController extends Controller
 
     public function update(Request $request, BlogPost $blogPost)
     {
+
+
         $validated = $request->validate([
             'title' => 'required|string|max:255',
                         'body' => 'required',
@@ -131,14 +134,14 @@ class BlogPostController extends Controller
             'date' => 'required|date',
             'show_on_main_page' => 'sometimes|boolean',
             'tags' => 'array',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-            'banner_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'image' => 'nullable|string',
+            'banner_image' => 'nullable|string',
             'image_alt' => 'nullable|string|max:255',
             'banner_title' => 'nullable|string|max:255',
             'banner_image_alt' => 'nullable|string|max:255',
-            'mobile_image_compressed' => 'nullable|string',
+            'mobile_image' => 'nullable|string',
             'mobile_image_alt' => 'nullable|string|max:255',
-            'mobile_banner_image_compressed' => 'nullable|string',
+            'mobile_banner_image' => 'nullable|string',
             'mobile_banner_image_alt' => 'nullable|string|max:255',
             // Metadata validation
             'metadata.meta_title' => 'nullable|string|max:255',
@@ -147,7 +150,7 @@ class BlogPostController extends Controller
             'metadata.og_title' => 'nullable|string|max:255',
             'metadata.og_description' => 'nullable|string',
             'metadata.og_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-            'metadata.twitter_card' => 'nullable|string|in:summary,summary_large_image',
+            'metadata.twitter_card' => 'nullable|   string|in:summary,summary_large_image',
             'metadata.twitter_title' => 'nullable|string|max:255',
             'metadata.twitter_description' => 'nullable|string',
             'metadata.twitter_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
@@ -170,23 +173,69 @@ class BlogPostController extends Controller
             }
             $validated['banner_image'] = $request->file('banner_image')->store('blog_banners', 'public');
         }
-        
+
         // Handle mobile image from compressed data
         if ($request->filled('mobile_image_compressed')) {
-            if ($blogPost->mobile_image) {
-                Storage::disk('public')->delete($blogPost->mobile_image);
+            $mobileImagePath = $request->input('mobile_image_compressed');
+
+            // Ensure we have a clean path
+            $mobileImagePath = ltrim($mobileImagePath, '/');
+
+            // Remove any storage/app/public prefix if it exists
+            $mobileImagePath = preg_replace('#^storage/app/public/#', '', $mobileImagePath);
+
+            // Remove any storage/ prefix
+            $mobileImagePath = preg_replace('#^storage/#', '', $mobileImagePath);
+
+            // Verify the file exists in storage
+            if (Storage::disk('public')->exists($mobileImagePath)) {
+                if ($blogPost->mobile_image && $blogPost->mobile_image !== $mobileImagePath) {
+                    Storage::disk('public')->delete($blogPost->mobile_image);
+                }
+                // Store the relative path without any prefixes
+                $validated['mobile_image'] = $mobileImagePath;
+            } else {
+                // If file doesn't exist, log the issue but don't update the path
+                \Log::warning('Mobile image not found in storage', [
+                    'requested_path' => $mobileImagePath,
+                    'full_path' => Storage::disk('public')->path($mobileImagePath),
+                    'exists' => Storage::disk('public')->exists($mobileImagePath) ? 'yes' : 'no',
+                    'files_in_sections' => Storage::disk('public')->files('sections')
+                ]);
             }
-            $validated['mobile_image'] = $request->input('mobile_image_compressed');
         }
-        
+
         // Handle mobile banner image from compressed data
         if ($request->filled('mobile_banner_image_compressed')) {
-            if ($blogPost->mobile_banner_image) {
-                Storage::disk('public')->delete($blogPost->mobile_banner_image);
+            $mobileBannerPath = $request->input('mobile_banner_image_compressed');
+
+            // Ensure we have a clean path
+            $mobileBannerPath = ltrim($mobileBannerPath, '/');
+
+            // Remove any storage/app/public prefix if it exists
+            $mobileBannerPath = preg_replace('#^storage/app/public/#', '', $mobileBannerPath);
+
+            // Remove any storage/ prefix
+            $mobileBannerPath = preg_replace('#^storage/#', '', $mobileBannerPath);
+
+            // Verify the file exists in storage
+            if (Storage::disk('public')->exists($mobileBannerPath)) {
+                if ($blogPost->mobile_banner_image && $blogPost->mobile_banner_image !== $mobileBannerPath) {
+                    Storage::disk('public')->delete($blogPost->mobile_banner_image);
+                }
+                // Store the relative path without any prefixes
+                $validated['mobile_banner_image'] = $mobileBannerPath;
+            } else {
+                // If file doesn't exist, log the issue but don't update the path
+                \Log::warning('Mobile banner image not found in storage', [
+                    'requested_path' => $mobileBannerPath,
+                    'full_path' => Storage::disk('public')->path($mobileBannerPath),
+                    'exists' => Storage::disk('public')->exists($mobileBannerPath) ? 'yes' : 'no',
+                    'files_in_sections' => Storage::disk('public')->files('sections')
+                ]);
             }
-            $validated['mobile_banner_image'] = $request->input('mobile_banner_image_compressed');
         }
-        
+
         // Ensure banner_title is included in the validated data
         if ($request->has('banner_title')) {
             $validated['banner_title'] = $request->input('banner_title');
@@ -223,7 +272,7 @@ class BlogPostController extends Controller
 
         $blogPost->tags()->sync($tags);
 
-        return redirect()->route('blogposts.index')->with('success', 'Blog post updated successfully.');
+        return redirect()->back()->with('success', 'Blog post updated successfully.');
     }
 
     public function removeImage(Request $request, BlogPost $blogPost)
@@ -239,12 +288,12 @@ class BlogPostController extends Controller
             Storage::disk('public')->delete($blogPost->banner_image);
             $blogPost->update(['banner_image' => null, 'banner_image_alt' => null]);
         }
-        
+
         if ($type === 'mobile_image' && $blogPost->mobile_image) {
             Storage::disk('public')->delete($blogPost->mobile_image);
             $blogPost->update(['mobile_image' => null, 'mobile_image_alt' => null]);
         }
-        
+
         if ($type === 'mobile_banner_image' && $blogPost->mobile_banner_image) {
             Storage::disk('public')->delete($blogPost->mobile_banner_image);
             $blogPost->update(['mobile_banner_image' => null, 'mobile_banner_image_alt' => null]);

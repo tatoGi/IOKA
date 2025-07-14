@@ -19,7 +19,7 @@ return [
                     'fields' => [
                         'image' => [
                             'type' => 'image',
-                            'label' => 'Photo',
+                            'label' => '1920 x 828',
                             'required' => false,
                         ],
                         'mobile_image' => [
@@ -74,7 +74,7 @@ return [
                     'fields' => [
                         'image' => [
                             'type' => 'image',
-                            'label' => 'Image',
+                            'label' => '364 x 364',
                             'required' => true,
                         ],
                         'alt_text' => [
@@ -135,7 +135,7 @@ return [
                             'fields' => [
                                 'image_field' => [
                                     'type' => 'image',
-                                    'label' => 'Image Field',
+                                    'label' => '966x338',
                                     'required' => true,
                                 ],
                                 'mobile_image' => [
@@ -170,7 +170,7 @@ return [
                                     'required' => true,
                                 ],
                                 'number' => [
-                                    'type' => 'number',
+                                    'type' => 'text',
                                     'label' => 'Number',
                                     'required' => true,
                                 ],
@@ -204,7 +204,7 @@ return [
                             'fields' => [
                                 'image_field' => [
                                     'type' => 'image',
-                                    'label' => 'Image Field',
+                                    'label' => '966x338',
                                     'required' => true,
                                 ],
                                 'mobile_image' => [
@@ -239,7 +239,7 @@ return [
                                     'required' => true,
                                 ],
                                 'number' => [
-                                    'type' => 'number',
+                                    'type' => 'text',
                                     'label' => 'Number',
                                     'required' => true,
                                 ],
@@ -273,7 +273,7 @@ return [
                             'fields' => [
                                 'image_field' => [
                                     'type' => 'image',
-                                    'label' => 'Image Field',
+                                    'label' => '966x338',
                                     'required' => true,
                                 ],
                                 'mobile_image' => [
@@ -308,7 +308,7 @@ return [
                                     'required' => true,
                                 ],
                                 'number' => [
-                                    'type' => 'number',
+                                    'type' => 'text',
                                     'label' => 'Number',
                                     'required' => true,
                                 ],
@@ -368,7 +368,7 @@ return [
                 ],
                 'image' => [
                     'type' => 'image',
-                    'label' => 'Image',
+                    'label' => '372 x 240',
                     'required' => true,
                 ],
                 'mobile_image' => [
@@ -416,7 +416,7 @@ return [
                     'fields' => [
                         'image' => [
                             'type' => 'image',
-                            'label' => 'Team Member Photo',
+                            'label' => '380 x 320',
                             'required' => true,
                         ],
                         'mobile_image' => [
@@ -505,7 +505,7 @@ return [
                     'fields' => [
                         'photo' => [
                             'type' => 'image',
-                            'label' => 'Client Photo',
+                            'label' => 'Client Photo (88 x 88)',
                             'required' => true,
                         ],
                         'mobile_photo' => [

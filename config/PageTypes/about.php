@@ -50,7 +50,7 @@ return [
                         ],
                         'image' => [
                             'type' => 'image',
-                            'label' => 'Image',
+                            'label' => ' (390 x 320)',
                             'required' => true,
                         ],
                         'mobile_image' => [

@@ -73,5 +73,15 @@ Route::delete('admin/blogposts/{blogpost}/delete-twitter-image', [App\Http\Contr
 Route::delete('admin/rental_resale/{postype}/delete-og-image', [App\Http\Controllers\Admin\PostypeController::class, 'deleteOgImage'])->name('admin.rental_resale.delete-og-image');
 Route::delete('admin/rental_resale/{postype}/delete-twitter-image', [App\Http\Controllers\Admin\PostypeController::class, 'deleteTwitterImage'])->name('admin.rental_resale.delete-twitter-image');
 
-// Mobile image upload route
-Route::post('/api/mobile-image-upload', [MobileImageController::class, 'upload'])->name('mobile.image.upload');
+// Mobile image upload routes
+Route::post('/mobile-image-upload', [MobileImageController::class, 'upload'])
+    ->name('mobile.image.upload')
+    ->middleware('web');
+
+Route::delete('/mobile-image-delete', [MobileImageController::class, 'delete'])
+    ->name('mobile.image.delete')
+    ->middleware('web');
+
+// Blog post image removal route
+Route::delete('admin/blogposts/{blogpost}/remove-image', [App\Http\Controllers\Admin\BlogPostController::class, 'removeImage'])
+    ->name('admin.blogposts.remove-image');
