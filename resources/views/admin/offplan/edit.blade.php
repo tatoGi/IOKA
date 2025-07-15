@@ -588,14 +588,14 @@
             repeater.appendChild(newItem);
         });
         document.getElementById('add_amenities').addEventListener('click', function() {
-            var repeater = document.getElementById('features_amenities');
+            var repeater = document.getElementById('amenities_repeater');
             var index = repeater.children.length;
             var newItem = document.createElement('div');
             newItem.classList.add('amenities_item');
             newItem.innerHTML = `
-            <input type="text" class="form-control mb-2" name="amenities[${index}]" placeholder="amenities">
-            <button type="button" class="btn btn-danger btn-sm remove-amenities">Remove</button>
-        `;
+                <input type="text" class="form-control mb-2" name="amenities[${index}]" placeholder="amenities">
+                <button type="button" class="btn btn-danger btn-sm remove-amenities">Remove</button>
+            `;
             repeater.appendChild(newItem);
         });
         document.getElementById('add_near_by').addEventListener('click', function() {
