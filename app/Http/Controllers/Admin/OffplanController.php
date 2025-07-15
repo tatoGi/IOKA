@@ -124,7 +124,7 @@ class OffplanController extends Controller
         // Handle metadata
         $this->handleMetadata($request, $offplan);
 
-        return redirect()->route('admin.offplan.index')->with('success', 'Offplan updated successfully.');
+        return redirect()->back()->with('success', 'Offplan updated successfully.');
     }
 
     public function destroy($id)
