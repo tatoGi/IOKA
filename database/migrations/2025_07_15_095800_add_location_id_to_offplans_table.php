@@ -1,23 +1,25 @@
 <?php
-
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class AddLocationIdToOffplansTable extends Migration
 {
     public function up()
     {
-        Schema::table('offplans', function (Blueprint $table) {
-            $table->foreignId('location_id')->nullable()->constrained()->onDelete('set null');
-        });
+        if (!Schema::hasColumn('offplans', 'location_id')) {
+            Schema::table('offplans', function (Blueprint $table) {
+                $table->bigInteger('location_id')->unsigned()->nullable();
+            });
+        }
     }
 
     public function down()
     {
-        Schema::table('offplans', function (Blueprint $table) {
-            $table->dropForeign(['location_id']);
-            $table->dropColumn('location_id');
-        });
+        if (Schema::hasColumn('offplans', 'location_id')) {
+            Schema::table('offplans', function (Blueprint $table) {
+                $table->dropColumn('location_id');
+            });
+        }
     }
 }
