@@ -10,6 +10,7 @@ class Offplan extends Model
 {
     use HasFactory, HasMetaData;
 
+
     protected $fillable = [
         'title',
         'slug',
@@ -59,8 +60,8 @@ class Offplan extends Model
         'interior_gallery' => 'array',
         'agent_languages' => 'array',
         'alt_texts' => 'array',
-        'amount' => 'decimal:2',
-        'amount_dirhams' => 'decimal:2',
+        'amount' => 'string',
+        'amount_dirhams' => 'string',
     ];
 
     public function locations()

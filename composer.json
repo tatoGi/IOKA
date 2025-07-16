@@ -8,6 +8,7 @@
     "require": {
         "php": "^8.2",
         "binarytorch/larecipe": "^2.8",
+        "doctrine/dbal": "^4.3",
         "firebase/php-jwt": "^6.11",
         "intervention/image": "^3.11",
         "jenssegers/agent": "^2.6",

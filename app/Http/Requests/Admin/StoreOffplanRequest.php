@@ -16,8 +16,8 @@ class StoreOffplanRequest extends FormRequest
         return [
             'title' => 'required|string|max:255',
             'slug' => 'required|string|max:255',
-            'amount' => 'required|numeric',
-            'amount_dirhams' => 'nullable|numeric',
+            'amount' => ['required', 'regex:/^[0-9\s.,\-+\/]*$/'],
+            'amount_dirhams' => ['nullable', 'regex:/^[0-9\s.,\-+\/]*$/'],
             'description' => 'required',
             // Array inputs
             'features.*' => 'nullable|string',
