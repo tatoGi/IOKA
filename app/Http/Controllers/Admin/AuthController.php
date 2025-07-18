@@ -27,16 +27,24 @@ class AuthController extends Controller
         // Verify the reCAPTCHA response if not in local environment
         if (env('APP_ENV') !== 'local') {
             $secretKey = env('RECAPTCHA_SECRET');
+            $recaptchaResponse = $request->input('g-recaptcha-response');
+
+            if (empty($recaptchaResponse)) {
+                $this->logLoginActivity($validated['name'], 'failed');
+                return redirect()->route('admin.login')
+                    ->withErrors(['g-recaptcha-response' => 'Please complete the CAPTCHA.'])
+                    ->withInput();
+            }
 
             $response = Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
                 'secret' => $secretKey,
-                'response' => $request->input('g-recaptcha-response'),
+                'response' => $recaptchaResponse,
             ]);
 
             $recaptchaData = $response->json();
 
             // Log failed login attempt for invalid CAPTCHA
-            if (! $recaptchaData['success']) {
+            if (!isset($recaptchaData['success']) || !$recaptchaData['success']) {
                 $this->logLoginActivity($validated['name'], 'failed');
 
                 return redirect()->route('admin.login')

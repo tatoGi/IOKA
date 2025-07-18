@@ -38,6 +38,22 @@ class OffplanController extends Controller
     public function store(StoreOffplanRequest $request)
     {
         try {
+            // Check for file upload size before validation
+            if ($request->hasFile('images')) {
+                $maxSize = $this->getMaxUploadSizeInBytes();
+                foreach ($request->file('images') as $file) {
+                    if ($file->getSize() > $maxSize) {
+                        return back()
+                            ->withInput()
+                            ->with('error', sprintf(
+                                'The file "%s" is too large. Maximum allowed size is %s.',
+                                $file->getClientOriginalName(),
+                                $this->formatBytes($maxSize)
+                            ));
+                    }
+                }
+            }
+
             $data = $request->validate(array_merge(
                 $request->rules(),
                 $this->getMetadataValidationRules()
@@ -67,6 +83,47 @@ class OffplanController extends Controller
         }
     }
 
+    /**
+     * Get the maximum upload size in bytes
+     */
+    private function getMaxUploadSizeInBytes(): int
+    {
+        $postMaxSize = $this->parseSize(ini_get('post_max_size'));
+        $uploadMaxSize = $this->parseSize(ini_get('upload_max_filesize'));
+        
+        // Return the smaller of the two values
+        return min($postMaxSize, $uploadMaxSize);
+    }
+    
+    /**
+     * Parse size from php.ini string to bytes
+     */
+    private function parseSize(string $size): int
+    {
+        $unit = preg_replace('/[^bkmgtpezy]/i', '', $size);
+        $size = (float) preg_replace('/[^0-9\\.]/', '', $size);
+        
+        if ($unit) {
+            $size = round($size * (1024 ** stripos('bkmgtpezy', $unit[0])));
+        }
+        
+        return (int) $size;
+    }
+    
+    /**
+     * Format bytes to a human-readable format
+     */
+    private function formatBytes(int $bytes, int $precision = 2): string
+    {
+        $units = ['B', 'KB', 'MB', 'GB', 'TB'];
+        $bytes = max($bytes, 0);
+        $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
+        $pow = min($pow, count($units) - 1);
+        $bytes /= (1 << (10 * $pow));
+        
+        return round($bytes, $precision) . ' ' . $units[$pow];
+    }
+    
     private function generateUniqueSlug(string $slug): string
     {
         // Replace spaces with dashes
@@ -97,34 +154,58 @@ class OffplanController extends Controller
 
     public function update(StoreOffplanRequest $request, $id)
     {
-        $offplan = Offplan::findOrFail($id);
-        $data = $request->validate(array_merge(
-            $request->rules(),
-            $this->getMetadataValidationRules()
-        ));
+        try {
+            $offplan = Offplan::findOrFail($id);
+            
+            // Check for file upload size before validation
+            if ($request->hasFile('images')) {
+                $maxSize = $this->getMaxUploadSizeInBytes();
+                foreach ($request->file('images') as $file) {
+                    if ($file->getSize() > $maxSize) {
+                        return back()
+                            ->withInput()
+                            ->with('error', sprintf(
+                                'The file "%s" is too large. Maximum allowed size is %s.',
+                                $file->getClientOriginalName(),
+                                $this->formatBytes($maxSize)
+                            ));
+                    }
+                }
+            }
+            
+            $data = $request->validate(array_merge(
+                $request->rules(),
+                $this->getMetadataValidationRules()
+            ));
 
-        // Check if the slug has changed
-        if ($request->has('slug') && $request->input('slug') !== $offplan->slug) {
-            // Generate a unique slug only if the slug has changed
-            $data['slug'] = $this->generateUniqueSlug($data['slug']);
-        } else {
-            // Keep the existing slug
-            $data['slug'] = $offplan->slug;
+            // Check if the slug has changed
+            if ($request->has('slug') && $request->input('slug') !== $offplan->slug) {
+                // Generate a unique slug only if the slug has changed
+                $data['slug'] = $this->generateUniqueSlug($data['slug']);
+            } else {
+                // Keep the existing slug
+                $data['slug'] = $offplan->slug;
+            }
+
+            // Handle agent languages
+            if ($request->has('agent_languages')) {
+                $data['agent_languages'] = array_filter($request->input('agent_languages'));
+            }
+
+            // Handle file uploads and update the offplan
+            $this->offplanService->handleFileUploads($request, $data);
+            $this->offplanService->updateOffplan($offplan, $data);
+
+            // Handle metadata
+            $this->handleMetadata($request, $offplan);
+
+            return redirect()->back()->with('success', 'Offplan updated successfully.');
+            
+        } catch (\Exception $e) {
+            return back()
+                ->withInput()
+                ->with('error', 'Failed to update offplan: ' . $e->getMessage());
         }
-
-        // Handle agent languages
-        if ($request->has('agent_languages')) {
-            $data['agent_languages'] = array_filter($request->input('agent_languages'));
-        }
-
-        // Handle file uploads and update the offplan
-        $this->offplanService->handleFileUploads($request, $data);
-        $this->offplanService->updateOffplan($offplan, $data);
-
-        // Handle metadata
-        $this->handleMetadata($request, $offplan);
-
-        return redirect()->back()->with('success', 'Offplan updated successfully.');
     }
 
     public function destroy($id)

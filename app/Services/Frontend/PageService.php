@@ -128,7 +128,7 @@ class PageService
 
     public function getBlogs()
     {
-        return BlogPost::with('tags')->with('metadata')->orderBy('created_at', 'asc')->paginate(10);
+        return BlogPost::with('tags')->with('metadata')->orderBy('created_at', 'desc')->paginate(10);
     }
 
     /**

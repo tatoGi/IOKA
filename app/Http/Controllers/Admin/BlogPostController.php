@@ -20,6 +20,7 @@ class BlogPostController extends Controller
             ->when($request->date_from && $request->date_to, function ($query) use ($request) {
                 $query->whereBetween('date', [$request->date_from, $request->date_to]);
             })
+            ->orderBy('created_at', 'desc')
             ->paginate(10);
 
         return view('admin.blogposts.index', compact('blogPosts'));
@@ -196,7 +197,7 @@ class BlogPostController extends Controller
                 $validated['mobile_image'] = $mobileImagePath;
             } else {
                 // If file doesn't exist, log the issue but don't update the path
-                \Log::warning('Mobile image not found in storage', [
+                Log::warning('Mobile image not found in storage', [
                     'requested_path' => $mobileImagePath,
                     'full_path' => Storage::disk('public')->path($mobileImagePath),
                     'exists' => Storage::disk('public')->exists($mobileImagePath) ? 'yes' : 'no',
@@ -227,7 +228,7 @@ class BlogPostController extends Controller
                 $validated['mobile_banner_image'] = $mobileBannerPath;
             } else {
                 // If file doesn't exist, log the issue but don't update the path
-                \Log::warning('Mobile banner image not found in storage', [
+                Log::warning('Mobile banner image not found in storage', [
                     'requested_path' => $mobileBannerPath,
                     'full_path' => Storage::disk('public')->path($mobileBannerPath),
                     'exists' => Storage::disk('public')->exists($mobileBannerPath) ? 'yes' : 'no',

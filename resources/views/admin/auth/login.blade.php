@@ -63,10 +63,15 @@
                                         </div>
 
                                         <!-- Google reCAPTCHA -->
+                                        @if(env('APP_ENV') !== 'local')
                                         <div class="col-12">
                                             <div class="g-recaptcha" data-sitekey="{{ env('RECAPTCHA_SITEKEY') }}">
                                             </div>
+                                            @error('g-recaptcha-response')
+                                                <div class="text-danger">{{ $message }}</div>
+                                            @enderror
                                         </div>
+                                        @endif
 
                                         <div class="col-12">
                                             <button type="submit"
