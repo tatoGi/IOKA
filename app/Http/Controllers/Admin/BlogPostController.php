@@ -142,7 +142,7 @@ class BlogPostController extends Controller
             'banner_image_alt' => 'nullable|string|max:255',
             'mobile_image' => 'nullable',
             'mobile_image_alt' => 'nullable|string|max:255',
-            'mobile_banner_image' => 'nullable|string',
+            'mobile_banner_image' => 'nullable',
             'mobile_banner_image_alt' => 'nullable|string|max:255',
             // Metadata validation
             'metadata.meta_title' => 'nullable|string|max:255',
