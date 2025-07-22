@@ -1,0 +1,6 @@
+        // Bedrooms Filter - Handle both exact match and minimum bedrooms
+        if (!empty($filters['bedrooms'])) {
+            $query->where('bedroom', (int)$filters['bedrooms']);
+        } elseif (!empty($filters['bedrooms_min'])) {
+            $query->where('bedroom', '>=', (int)$filters['bedrooms_min']);
+        }
