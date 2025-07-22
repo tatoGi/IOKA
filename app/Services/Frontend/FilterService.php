@@ -36,14 +36,11 @@ class FilterService
             $query->where('bedroom', $filters['bedrooms']);
         }
 
-        // Bathrooms Filter - Updated to handle NULL values
+        // Bathrooms Filter - Exact match
         if (!empty($filters['bathrooms'])) {
-            $query->where(function($q) use ($filters) {
-                $q->where('bathroom', '=', (int)$filters['bathrooms'])
-                  ->orWhereNull('bathroom');
-            });
+            $query->where('bathroom', (int)$filters['bathrooms']);
         }
-
+     
         // Area (sq_ft) Filter - Updated to handle type conversion
         if (!empty($filters['sq_ft_min'])) {
             $query->where('sq_ft', '>=', (float)$filters['sq_ft_min']);
@@ -85,20 +82,31 @@ class FilterService
 
     public function filterOffplans(array $filters)
     {
-
         $query = Offplan::query();
-
+       
         // Property Type Filter
         if (!empty($filters['property_type'])) {
             $query->where('property_type', $filters['property_type']);
         }
 
-        // Price Range Filter
-        if (!empty($filters['price_min'])) {
-            $query->where('amount', '>=', (float)$filters['price_min']);
-        }
-        if (!empty($filters['price_max'])) {
-            $query->where('amount', '<=', (float)$filters['price_max']);
+        // Price Range Filter - Handle both price_min/price_max and price=min-max formats
+        if (!empty($filters['price'])) {
+            $priceRange = explode('-', $filters['price']);
+            if (count($priceRange) === 2) {
+                $priceMin = (float)trim($priceRange[0]);
+                $priceMax = (float)trim($priceRange[1]);
+                
+                $query->where('amount', '>=', $priceMin)
+                      ->where('amount', '<=', $priceMax);
+            }
+        } else {
+            // Fallback to individual min/max parameters if 'price' parameter is not present
+            if (!empty($filters['price_min'])) {
+                $query->where('amount', '>=', (float)$filters['price_min']);
+            }
+            if (!empty($filters['price_max'])) {
+                $query->where('amount', '<=', (float)$filters['price_max']);
+            }
         }
 
         // Bedrooms Filter
@@ -106,21 +114,21 @@ class FilterService
             $query->where('bedroom', $filters['bedrooms']);
         }
 
-        // Bathrooms Filter - Updated to handle NULL values
+        // Bathrooms Filter - Exact match
         if (!empty($filters['bathrooms'])) {
-
-            $query->where(function($q) use ($filters) {
-                $q->where('bathroom', '=', (int)$filters['bathrooms'])
-                  ->orWhereNull('bathroom');
-            });
+            $query->where('bathroom', (int)$filters['bathrooms']);
         }
 
-        // Area (sq_ft) Filter
-        if (!empty($filters['sq_ft_min'])) {
-            $query->where('sq_ft', '>=', (float)$filters['sq_ft_min']);
-        }
-        if (!empty($filters['sq_ft_max'])) {
-            $query->where('sq_ft', '<=', (float)$filters['sq_ft_max']);
+        // Parse sqFt range if present
+        if (!empty($filters['sqFt'])) {
+            $sqFtRange = explode('-', $filters['sqFt']);
+            if (count($sqFtRange) === 2) {
+                $sqFtMin = (float)trim($sqFtRange[0]);
+                $sqFtMax = (float)trim($sqFtRange[1]);
+                
+                $query->where('sq_ft', '>=', $sqFtMin)
+                      ->where('sq_ft', '<=', $sqFtMax);
+            }
         }
 
         // Location Search Filter

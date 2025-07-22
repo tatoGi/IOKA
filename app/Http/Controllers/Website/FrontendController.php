@@ -226,6 +226,7 @@ class FrontendController extends Controller
     {
 
         $filters = $request->all(); // Retrieve filters from the request
+       
         $offplan = $this->filterService->filterOffplans($filters);
 
         return response()->json($offplan);
