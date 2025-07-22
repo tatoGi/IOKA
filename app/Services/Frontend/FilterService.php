@@ -33,12 +33,16 @@ class FilterService
 
         // Bedrooms Filter
         if (!empty($filters['bedrooms'])) {
-            $query->where('bedroom', $filters['bedrooms']);
+            $query->where('bedroom', (int)$filters['bedrooms']);
+        } elseif (!empty($filters['bedrooms_min'])) {
+            $query->where('bedroom', '>=', (int)$filters['bedrooms_min']);
         }
 
         // Bathrooms Filter - Exact match
         if (!empty($filters['bathrooms'])) {
             $query->where('bathroom', (int)$filters['bathrooms']);
+        } elseif (!empty($filters['bathrooms_min'])) {
+            $query->where('bathroom', '>=', (int)$filters['bathrooms_min']);
         }
      
         // Area (sq_ft) Filter - Updated to handle type conversion
@@ -88,7 +92,7 @@ class FilterService
         if (!empty($filters['property_type'])) {
             $query->where('property_type', $filters['property_type']);
         }
-
+        
         // Price Range Filter - Handle both price_min/price_max and price=min-max formats
         if (!empty($filters['price'])) {
             $priceRange = explode('-', $filters['price']);
@@ -111,12 +115,16 @@ class FilterService
 
         // Bedrooms Filter
         if (!empty($filters['bedrooms'])) {
-            $query->where('bedroom', $filters['bedrooms']);
+            $query->where('bedroom', (int)$filters['bedrooms']);
+        } elseif (!empty($filters['bedrooms_min'])) {
+            $query->where('bedroom', '>=', (int)$filters['bedrooms_min']);
         }
 
         // Bathrooms Filter - Exact match
         if (!empty($filters['bathrooms'])) {
             $query->where('bathroom', (int)$filters['bathrooms']);
+        } elseif (!empty($filters['bathrooms_min'])) {
+            $query->where('bathroom', '>=', (int)$filters['bathrooms_min']);
         }
 
         // Parse sqFt range if present
