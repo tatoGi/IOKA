@@ -977,33 +977,44 @@
 
 
         // Handle remove icon button click
-        document.addEventListener('click', function(e) {
+        document.addEventListener('click', async function(e) {
             if (e.target.closest('.remove-icon')) {
                 e.preventDefault();
                 const button = e.target.closest('.remove-icon');
                 const item = button.closest('.amenities_item');
                 const hiddenInput = item.querySelector('input[type="hidden"][name^="existing_amenities_icon"]');
-
+                const previewContainer = item.querySelector('.icon-preview');
+                const fileInput = item.querySelector('input[type="file"]');
+                
                 if (hiddenInput && hiddenInput.value) {
+                    // Store the icon path for later use
+                    const iconPath = hiddenInput.value;
+                    
                     // Mark the icon for deletion on the server side
                     const deleteInput = document.createElement('input');
                     deleteInput.type = 'hidden';
                     deleteInput.name = 'deleted_amenities_icon[]';
-                    deleteInput.value = hiddenInput.value;
+                    deleteInput.value = iconPath;
                     document.querySelector('form').appendChild(deleteInput);
-
-                    // Remove the preview and hidden input
-                    const previewDiv = button.closest('.mt-2');
-                    if (previewDiv) {
-                        previewDiv.remove();
-                    }
-                    hiddenInput.remove();
-
-                    // Reset the file input
-                    const fileInput = item.querySelector('input[type="file"]');
+                    
+                    // Clear the file input if it exists
                     if (fileInput) {
                         fileInput.value = '';
                     }
+                    
+                    // Clear the preview container
+                    if (previewContainer) {
+                        previewContainer.innerHTML = '';
+                    }
+                    
+                    // Remove the hidden input
+                    hiddenInput.remove();
+                    
+                    // Also remove any existing previews
+                    const existingPreviews = item.querySelectorAll('.existing-icon, .new-icon-preview');
+                    existingPreviews.forEach(preview => preview.remove());
+                    
+                    console.log('Icon marked for deletion:', iconPath);
                 }
             }
         });

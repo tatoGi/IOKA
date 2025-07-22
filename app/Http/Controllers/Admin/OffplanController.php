@@ -251,6 +251,15 @@ class OffplanController extends Controller
             $deletedIcons = $request->input('deleted_amenities_icon', []);
             $removedAmenities = $request->input('removed_amenities', []);
             
+            // Process deleted icons first
+            if (!empty($deletedIcons)) {
+                foreach ($deletedIcons as $deletedIcon) {
+                    if (!empty($deletedIcon) && Storage::disk('public')->exists($deletedIcon)) {
+                        Storage::disk('public')->delete($deletedIcon);
+                    }
+                }
+            }
+            
             // Get all amenity inputs and their corresponding icons
             $amenityInputs = $request->input('amenities', []);
             $amenityIcons = $request->file('amenities_icon', []);
@@ -273,31 +282,23 @@ class OffplanController extends Controller
                 $isExisting = false;
                 
                 // Check if this is an existing amenity being updated
-                if (is_numeric($index) && $index < $existingAmenities->count()) {
-                    $existingAmenity = $existingAmenities[$index] ?? null;
-                    if ($existingAmenity && ($existingAmenity['name'] === $amenityName || empty($existingAmenity['name']))) {
-                        $iconPath = $existingAmenity['icon'] ?? '';
-                        $isExisting = true;
+                if (is_numeric($index) && isset($existingIcons[$index])) {
+                    $iconPath = $existingIcons[$index];
+                    $isExisting = true;
+                    
+                    // If this icon was marked for deletion, skip it
+                    if (in_array($iconPath, $deletedIcons)) {
+                        $iconPath = '';
                     }
                 }
                 
                 // Handle file upload if exists
                 if (isset($amenityIcons[$index]) && $amenityIcons[$index]->isValid()) {
-                    // Delete old icon if it exists
-                    if (!empty($iconPath) && Storage::disk('public')->exists($iconPath)) {
+                    // Delete old icon if it exists and not already marked for deletion
+                    if (!empty($iconPath) && !in_array($iconPath, $deletedIcons) && Storage::disk('public')->exists($iconPath)) {
                         Storage::disk('public')->delete($iconPath);
                     }
                     $iconPath = $amenityIcons[$index]->store('amenities_icons', 'public');
-                } 
-                // If no new file but using existing icon
-                elseif ($isExisting && !empty($iconPath)) {
-                    // Check if this icon was marked for deletion
-                    if (in_array($iconPath, $deletedIcons)) {
-                        if (Storage::disk('public')->exists($iconPath)) {
-                            Storage::disk('public')->delete($iconPath);
-                        }
-                        $iconPath = '';
-                    }
                 }
                 
                 // Only add if either name or icon is not empty
