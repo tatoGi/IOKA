@@ -92,36 +92,71 @@
                             </div>
                             <button type="button" class="btn btn-secondary" id="add_feature">Add More</button>
                         </div>
+                       
                         <div class="form-group mt-2">
                             <label for="amenities">Amenities</label>
                             <div id="amenities_repeater">
                                 @php
-                                    $amenities_items = $offplan->amenities;
-                                    if (is_string($amenities_items)) {
-                                        $amenities_items = json_decode($amenities_items, true);
+                                    $amenities = $offplan->amenities;
+                                    
+                                    if (is_string($amenities)) {
+                                        $amenities = json_decode($amenities, true);
                                     }
-                                    if (!is_array($amenities_items)) {
-                                        $amenities_items = [];
+                                    if (!is_array($amenities)) {
+                                        $amenities = [];
                                     }
                                 @endphp
-                                @foreach ($amenities_items as $index => $amenity)
-                                    <div class="amenities_item">
-                                        <input type="text" class="form-control mb-2"
-                                            name="amenities[{{ $index }}]" value="{{ $amenity }}"
-                                            placeholder="amenities">
-                                        <button type="button"
-                                            class="btn btn-danger btn-sm remove-amenities">Remove</button>
+                                @foreach ($amenities as $index => $amenity)
+                                    @php
+                                        $amenity = is_array($amenity) ? $amenity : ['name' => $amenity, 'icon' => ''];
+                                        $icon = $amenity['icon'] ?? '';
+                                        $amenityName = $amenity['name'] ?? '';
+                                    @endphp
+                                    <div class="amenities_item mb-3 p-3 border rounded">
+                                        <div class="row">
+                                            <div class="col-md-5">
+                                                <label class="form-label">Amenity Name</label>
+                                                <input type="text" class="form-control mb-2" name="amenities[{{ $index }}]" value="{{ $amenityName }}" placeholder="Enter amenity name" required>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">Icon (SVG recommended)</label>
+                                                <input type="file" class="form-control mb-2 file-upload" name="amenities_icon[{{ $index }}]" accept="image/svg+xml,image/png,image/jpeg" data-index="{{ $index }}">
+                                                <div class="icon-preview mt-2" id="icon-preview-{{ $index }}">
+                                                    @if(!empty($icon))
+                                                        <div class="existing-icon">
+                                                            <small>Current Icon:</small>
+                                                            @if(Storage::disk('public')->exists($icon))
+                                                                <img src="{{ asset('storage/' . $icon) }}" alt="{{ $amenityName }}" style="max-width: 30px; max-height: 30px;" class="ms-2">
+                                                            @else
+                                                                <span class="text-muted ms-2">[Icon not found]</span>
+                                                            @endif
+                                                            <button type="button" class="btn btn-sm btn-outline-danger remove-icon ms-2" data-icon-path="{{ $icon }}">
+                                                                <i class="fas fa-trash"></i> Remove
+                                                            </button>
+                                                            <input type="hidden" name="existing_amenities_icon[{{ $index }}]" value="{{ $icon }}">
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                            <div class="col-md-1 d-flex align-items-end">
+                                                <button type="button" class="btn btn-danger btn-sm remove-amenities">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
                                     </div>
                                 @endforeach
                             </div>
-                            <button type="button" class="btn btn-secondary" id="add_amenities">Add More</button>
+                            <button type="button" class="btn btn-secondary mt-2" id="add_amenities">
+                                <i class="fas fa-plus"></i> Add Amenity
+                            </button>
                         </div>
                         <div class="form-group">
                             <label for="map_location">Map Location</label>
                             <input type="text" class="form-control" id="map_location" name="map_location"
                                 value="{{ $offplan->map_location }}">
                         </div>
-                      
+
 
                         <div class="form-group">
                             <label for="near_by">Near By</label>
@@ -510,46 +545,46 @@
         function handleFileInput(event, previewId) {
             const files = event.target.files;
             const preview = document.getElementById(previewId);
-            
+
             // Clear the preview and create container structure
             preview.innerHTML = '';
-            
+
             // Create container and row for grid layout
             const container = document.createElement('div');
             container.classList.add('container');
-            
+
             const row = document.createElement('div');
             row.classList.add('row');
             container.appendChild(row);
-            
+
             // Process each file
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];
                 const reader = new FileReader();
-                
+
                 reader.onload = function(e) {
                     // Create column for grid layout
                     const colDiv = document.createElement('div');
                     colDiv.classList.add('col-4', 'mb-3');
-                    
+
                     // Create file container with proper styling
                     const fileDiv = document.createElement('div');
                     fileDiv.classList.add('uploaded-file');
                     fileDiv.style.padding = '10px';
-                    
+
                     fileDiv.innerHTML = `
                         <img src="${e.target.result}" alt="${file.name}" class="img-thumbnail" style="width: 100%; height: auto;">
                         <input type="text" class="form-control mt-2" name="${previewId.replace('_preview', '')}_alt[]" placeholder="Alt text for photo ${i+1}">
                     `;
-                    
+
                     // Add to column and row
                     colDiv.appendChild(fileDiv);
                     row.appendChild(colDiv);
                 };
-                
+
                 reader.readAsDataURL(file);
             }
-            
+
             // Add everything to the preview
             preview.appendChild(container);
         }
@@ -587,16 +622,390 @@
         `;
             repeater.appendChild(newItem);
         });
+        // Function to handle file input changes
+        function handleFileInputChange(input) {
+            const file = input.files[0];
+            const previewDiv = input.closest('.row').querySelector('.icon-preview');
+            const hiddenInput = input.closest('.amenities_item').querySelector('input[type="hidden"][name^="existing_amenities_icon"]');
+            
+            // Clear any existing preview
+            if (previewDiv) {
+                previewDiv.innerHTML = '';
+            }
+            
+            // If no file was selected, clear any existing preview and return
+            if (!file) {
+                if (hiddenInput) {
+                    hiddenInput.value = '';
+                }
+                return;
+            }
+            
+            // If there was a previous icon, clear any deletion markers for it
+            if (hiddenInput && hiddenInput.value) {
+                const deleteInputs = document.querySelectorAll('input[name="deleted_amenities_icon[]"][value="' + hiddenInput.value + '"]');
+                deleteInputs.forEach(deleteInput => {
+                    deleteInput.remove();
+                });
+                console.log('Cleared deletion marker for previous icon');
+                
+                // Mark the old icon for deletion
+                const deleteInput = document.createElement('input');
+                deleteInput.type = 'hidden';
+                deleteInput.name = 'deleted_amenities_icon[]';
+                deleteInput.value = hiddenInput.value;
+                input.closest('form').appendChild(deleteInput);
+                
+                // Clear the hidden input value
+                hiddenInput.value = '';
+            }
+            
+            // Clear any removal markers for this input
+            const removeMarkers = input.closest('.amenities_item').querySelectorAll('input[name^="removed_amenities_icon"]');
+            removeMarkers.forEach(marker => marker.remove());
+
+            // Create preview
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                if (!previewDiv) return;
+                
+                // Clear any existing previews first
+                previewDiv.innerHTML = '';
+                
+                const preview = document.createElement('div');
+                preview.className = 'mt-2';
+                preview.innerHTML = `
+                    <small>New Icon:</small>
+                    <img src="${e.target.result}" alt="Preview" style="max-width: 30px; max-height: 30px;" class="ms-2">
+                    <button type="button" class="btn btn-sm btn-outline-danger ms-2 remove-new-icon">
+                        <i class="fas fa-trash"></i> Remove
+                    </button>
+                `;
+                
+                // Add event listener to the remove button
+                const removeBtn = preview.querySelector('.remove-new-icon');
+                if (removeBtn) {
+                    removeBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        
+                        // Clear the file input
+                        input.value = '';
+                        
+                        // Clear the preview
+                        if (previewDiv) {
+                            previewDiv.innerHTML = '';
+                        }
+                        
+                        // If there was a previous icon, restore the deletion marker
+                        if (hiddenInput && hiddenInput.dataset.originalValue) {
+                            const deleteInput = document.createElement('input');
+                            deleteInput.type = 'hidden';
+                            deleteInput.name = 'deleted_amenities_icon[]';
+                            deleteInput.value = hiddenInput.dataset.originalValue;
+                            input.closest('form').appendChild(deleteInput);
+                            
+                            // Restore the original value
+                            hiddenInput.value = hiddenInput.dataset.originalValue;
+                            delete hiddenInput.dataset.originalValue;
+                        }
+                        
+                        console.log('New icon removed');
+                    });
+                }
+                
+                previewDiv.appendChild(preview);
+            };
+            
+            reader.onerror = function() {
+                console.error('Error reading file');
+                if (previewDiv) {
+                    previewDiv.innerHTML = '<div class="text-danger">Error loading preview</div>';
+                }
+            };
+            
+            reader.readAsDataURL(file);
+        }
+
+        // Function to handle amenity removal
+        function handleRemoveAmenity(button) {
+            const item = button.closest('.amenities_item');
+            if (!item) return;
+            
+            const hiddenInput = item.querySelector('input[type="hidden"][name^="existing_amenities_icon"]');
+            const nameInput = item.querySelector('input[type="text"][name^="amenities"]');
+            const fileInput = item.querySelector('input[type="file"][name^="amenities_icon"]');
+            
+            // If there's an existing icon, mark it for deletion
+            if (hiddenInput && hiddenInput.value) {
+                // Check if we already have this icon marked for deletion
+                const existingDelete = document.querySelector(`input[name="deleted_amenities_icon[]"][value="${hiddenInput.value}"]`);
+                
+                if (!existingDelete) {
+                    const deleteInput = document.createElement('input');
+                    deleteInput.type = 'hidden';
+                    deleteInput.name = 'deleted_amenities_icon[]';
+                    deleteInput.value = hiddenInput.value;
+                    document.querySelector('form').appendChild(deleteInput);
+                    console.log('Marked icon for deletion:', hiddenInput.value);
+                }
+            }
+            
+            // If this was an existing amenity (has a name input with a value), mark it for removal
+            if (nameInput && nameInput.value) {
+                const removedInput = document.createElement('input');
+                removedInput.type = 'hidden';
+                removedInput.name = 'removed_amenities[]';
+                removedInput.value = nameInput.value;
+                document.querySelector('form').appendChild(removedInput);
+                console.log('Marked amenity for removal:', nameInput.value);
+            }
+
+            // Remove any file input value if present
+            if (fileInput) {
+                fileInput.value = '';
+            }
+
+            // Remove the entire amenity item
+            item.remove();
+            
+            // Re-index the remaining amenities
+            reindexAmenities();
+            
+            console.log('Amenity removed, reindexed items');
+        }
+
+        // Function to set up icon preview and event listeners for a single file input
+        function setupAmenityFileInput(input) {
+            // Remove any existing change event listeners to prevent duplicates
+            const newInput = input.cloneNode(true);
+            input.parentNode.replaceChild(newInput, input);
+            
+            // Add new change event listener
+            newInput.addEventListener('change', function() {
+                // Clear any existing previews first
+                const previewDiv = this.closest('.row').querySelector('.icon-preview');
+                if (previewDiv) {
+                    previewDiv.innerHTML = '';
+                }
+                handleFileInputChange(this);
+            });
+            
+            // If there's an existing icon, show its preview
+            const previewDiv = newInput.closest('.row').querySelector('.icon-preview');
+            const hiddenInput = newInput.closest('.amenities_item').querySelector('input[type="hidden"][name^="existing_amenities_icon"]');
+            
+            if (hiddenInput && hiddenInput.value && previewDiv) {
+                const iconPath = hiddenInput.value;
+                if (iconPath) {
+                    // Check if we already have a preview for this icon
+                    if (!previewDiv.querySelector('img')) {
+                        const img = document.createElement('img');
+                        img.src = '{{ asset("storage/") }}/' + iconPath;
+                        img.alt = 'Current icon';
+                        img.style.maxWidth = '30px';
+                        img.style.maxHeight = '30px';
+                        img.className = 'ms-2';
+                        
+                        const preview = document.createElement('div');
+                        preview.className = 'mt-2';
+                        preview.innerHTML = '<small>Current Icon:</small>';
+                        preview.appendChild(img);
+                        
+                        // Add remove button for existing icon
+                        const removeBtn = document.createElement('button');
+                        removeBtn.type = 'button';
+                        removeBtn.className = 'btn btn-sm btn-outline-danger ms-2 remove-icon';
+                        removeBtn.innerHTML = '<i class="fas fa-trash"></i> Remove';
+                        removeBtn.dataset.iconPath = iconPath;
+                        
+                        preview.appendChild(removeBtn);
+                        previewDiv.appendChild(preview);
+                        
+                        // Add event listener to the remove button
+                        removeBtn.addEventListener('click', async function(e) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            
+                            const iconPath = this.dataset.iconPath;
+                            const amenityItem = this.closest('.amenities_item');
+                            const amenityIndex = Array.from(amenityItem.parentNode.children).indexOf(amenityItem);
+                            
+                            try {
+                                // Make an AJAX call to remove the icon
+                                const response = await fetch(`{{ route('admin.offplan.remove_amenity_icon', $offplan) }}`, {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                        'Accept': 'application/json',
+                                        'X-Requested-With': 'XMLHttpRequest'
+                                    },
+                                    body: JSON.stringify({
+                                        icon_path: iconPath,
+                                        amenity_index: amenityIndex
+                                    })
+                                });
+                                
+                                const result = await response.json();
+                                
+                                if (result.success) {
+                                    // Remove the preview
+                                    previewDiv.innerHTML = '';
+                                    
+                                    // Clear the file input
+                                    const fileInput = newInput.closest('.amenities_item').querySelector('input[type="file"]');
+                                    if (fileInput) {
+                                        fileInput.value = '';
+                                    }
+                                    
+                                    // Clear the hidden input value
+                                    if (hiddenInput) {
+                                        hiddenInput.value = '';
+                                    }
+                                    
+                                    console.log('Icon removed successfully');
+                                } else {
+                                    console.error('Failed to remove icon:', result.message || 'Unknown error');
+                                    alert('Failed to remove icon: ' + (result.message || 'Unknown error'));
+                                }
+                            } catch (error) {
+                                console.error('Error removing icon:', error);
+                                alert('Error removing icon: ' + error.message);
+                            }
+                        });
+                    }
+                }
+            }
+            
+            return newInput;
+        }
+
+        // Initialize existing amenities
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set up file input change handlers for existing amenities
+            document.querySelectorAll('.amenities_item input[type="file"]').forEach(input => {
+                setupAmenityFileInput(input);
+            });
+
+            // Set up remove button handlers for existing amenities
+            document.querySelectorAll('.amenities_item .remove-amenities').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleRemoveAmenity(this);
+                });
+            });
+            
+            // Log for debugging
+            console.log('Amenities initialization complete');
+        });
+
+        // Add new amenity field
         document.getElementById('add_amenities').addEventListener('click', function() {
-            var repeater = document.getElementById('amenities_repeater');
-            var index = repeater.children.length;
-            var newItem = document.createElement('div');
-            newItem.classList.add('amenities_item');
+            const repeater = document.getElementById('amenities_repeater');
+            const index = document.querySelectorAll('#amenities_repeater .amenities_item').length;
+            
+            const newItem = document.createElement('div');
+            newItem.classList.add('amenities_item', 'mb-3', 'p-3', 'border', 'rounded');
             newItem.innerHTML = `
-                <input type="text" class="form-control mb-2" name="amenities[${index}]" placeholder="amenities">
-                <button type="button" class="btn btn-danger btn-sm remove-amenities">Remove</button>
+                <div class="row">
+                    <div class="col-md-5">
+                        <label class="form-label">Amenity Name</label>
+                        <input type="text" class="form-control mb-2" name="amenities[${index}]" placeholder="Enter amenity name" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Icon (SVG recommended)</label>
+                        <input type="file" class="form-control mb-2 file-upload" name="amenities_icon[${index}]" accept="image/svg+xml,image/png,image/jpeg">
+                        <div class="icon-preview" id="icon-preview-${index}"></div>
+                    </div>
+                    <div class="col-md-1 d-flex align-items-end">
+                        <button type="button" class="btn btn-danger btn-sm remove-amenities">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
             `;
             repeater.appendChild(newItem);
+
+            // Set up event listeners for the new amenity
+            const fileInput = newItem.querySelector('input[type="file"]');
+            if (fileInput) {
+                fileInput.addEventListener('change', function() {
+                    handleFileInputChange(this);
+                });
+            }
+
+            const removeBtn = newItem.querySelector('.remove-amenities');
+            if (removeBtn) {
+                removeBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleRemoveAmenity(this);
+                });
+            }
+        });
+
+        // Function to re-index amenities after removal
+        function reindexAmenities() {
+            const items = document.querySelectorAll('#amenities_repeater .amenities_item');
+            items.forEach((item, index) => {
+                // Update amenities name
+                const nameInput = item.querySelector('input[type="text"]');
+                if (nameInput) {
+                    nameInput.name = `amenities[${index}]`;
+                }
+
+                // Update amenities_icon name
+                const fileInput = item.querySelector('input[type="file"]');
+                if (fileInput) {
+                    fileInput.name = `amenities_icon[${index}]`;
+                    // Update the preview ID
+                    const previewDiv = item.querySelector('.icon-preview');
+                    if (previewDiv) {
+                        previewDiv.id = `icon-preview-${index}`;
+                    }
+                }
+
+                // Update existing_amenities_icon name if it exists
+                const existingIconInput = item.querySelector('input[type="hidden"][name^="existing_amenities_icon"]');
+                if (existingIconInput) {
+                    existingIconInput.name = `existing_amenities_icon[${index}]`;
+                }
+            });
+        }
+
+
+        // Handle remove icon button click
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.remove-icon')) {
+                e.preventDefault();
+                const button = e.target.closest('.remove-icon');
+                const item = button.closest('.amenities_item');
+                const hiddenInput = item.querySelector('input[type="hidden"][name^="existing_amenities_icon"]');
+
+                if (hiddenInput && hiddenInput.value) {
+                    // Mark the icon for deletion on the server side
+                    const deleteInput = document.createElement('input');
+                    deleteInput.type = 'hidden';
+                    deleteInput.name = 'deleted_amenities_icon[]';
+                    deleteInput.value = hiddenInput.value;
+                    document.querySelector('form').appendChild(deleteInput);
+
+                    // Remove the preview and hidden input
+                    const previewDiv = button.closest('.mt-2');
+                    if (previewDiv) {
+                        previewDiv.remove();
+                    }
+                    hiddenInput.remove();
+
+                    // Reset the file input
+                    const fileInput = item.querySelector('input[type="file"]');
+                    if (fileInput) {
+                        fileInput.value = '';
+                    }
+                }
+            }
         });
         document.getElementById('add_near_by').addEventListener('click', function() {
             var repeater = document.getElementById('near_by_repeater');
@@ -657,8 +1066,10 @@
             if (event.target.classList.contains('remove-near-by')) {
                 event.target.parentElement.remove();
             }
-            if (event.target.classList.contains('remove-amenities')) {
-                event.target.parentElement.remove();
+            if (event.target.closest('.remove-amenities')) {
+                event.target.closest('.amenities_item').remove();
+                // Re-index the remaining amenities
+                reindexAmenities();
             }
             if (event.target.classList.contains('remove-agent-language')) {
                 event.target.parentElement.remove();
@@ -666,3 +1077,4 @@
         });
     </script>
 @endsection
+

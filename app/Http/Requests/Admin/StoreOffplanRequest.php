@@ -23,7 +23,10 @@ class StoreOffplanRequest extends FormRequest
             'features.*' => 'nullable|string',
             'near_by.*.title' => 'nullable|string',
             'near_by.*.distance' => 'nullable|numeric',
-            'amenities' => 'nullable',
+            'amenities' => 'nullable|array',
+            'amenities.*' => 'nullable|string',
+            'amenities_icon' => 'nullable|array',
+            'amenities_icon.*' => 'nullable|file|image|max:5120',
             'map_location' => 'nullable|string',
             // File uploads
             'main_photo' => 'nullable|file|image|max:5120', // 5MB max

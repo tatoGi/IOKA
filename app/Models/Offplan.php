@@ -60,9 +60,66 @@ class Offplan extends Model
         'interior_gallery' => 'array',
         'agent_languages' => 'array',
         'alt_texts' => 'array',
+        'meta_data' => 'array',
+        'meta_data->schema' => 'array',
         'amount' => 'string',
         'amount_dirhams' => 'string',
     ];
+    
+    /**
+     * The attributes that should be cast to native types.
+     *
+     * @var array
+     */
+    protected $jsonable = [
+        'amenities_icons'
+    ];
+    
+    /**
+     * Set the amenities_icons attribute.
+     *
+     * @param  mixed  $value
+     * @return void
+     */
+    public function setAmenitiesIconsAttribute($value)
+    {
+        if (is_array($value)) {
+            $this->attributes['amenities_icons'] = json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        } else {
+            $this->attributes['amenities_icons'] = $value;
+        }
+    }
+    
+    /**
+     * Get the amenities_icons attribute.
+     *
+     * @param  mixed  $value
+     * @return array
+     */
+    public function getAmenitiesAttribute($value)
+    {
+        $amenities = is_string($value) ? json_decode($value, true) : $value;
+        
+        if (!is_array($amenities)) {
+            return [];
+        }
+        
+        // Ensure each amenity has both name and icon
+        return array_map(function($amenity) {
+            if (is_array($amenity)) {
+                return [
+                    'name' => $amenity['name'] ?? '',
+                    'icon' => $amenity['icon'] ?? ''
+                ];
+            }
+            
+            // Handle legacy format (string only)
+            return [
+                'name' => $amenity,
+                'icon' => ''
+            ];
+        }, $amenities);
+    }
 
     public function locations()
     {

@@ -27,6 +27,9 @@ Route::middleware('admin_auth')->group(function () {
         Route::post('offplan/exterior-gallery', [OffplanController::class, 'storeExteriorGallery'])->name('offplan.exterior_gallery.store');
         Route::get('offplan/interior-gallery', [OffplanController::class, 'interiorGallery'])->name('offplan.interior_gallery');
         Route::post('offplan/interior-gallery', [OffplanController::class, 'storeInteriorGallery'])->name('offplan.interior_gallery.store');
+        
+        // Add route for removing amenity icon
+        Route::post('offplan/{offplan}/remove-amenity-icon', [OffplanController::class, 'removeAmenityIcon'])->name('offplan.remove_amenity_icon');
     });
 });
 include_once 'admin/login.php';

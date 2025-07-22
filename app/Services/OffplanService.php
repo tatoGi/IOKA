@@ -15,6 +15,55 @@ class OffplanService
         try {
             $altTexts = [];
 
+            // Handle amenities icons if they exist in the data array
+            if (isset($data['amenities']) && is_array($data['amenities'])) {
+                $deletedIcons = $request->input('deleted_amenities_icon', []);
+                
+                // Process deleted icons
+                if (is_array($deletedIcons)) {
+                    foreach ($deletedIcons as $deletedIcon) {
+                        if (!empty($deletedIcon)) {
+                            Storage::disk('public')->delete($deletedIcon);
+                            
+                            // Remove the icon from amenities array
+                            foreach ($data['amenities'] as &$amenity) {
+                                if (is_array($amenity) && isset($amenity['icon']) && $amenity['icon'] === $deletedIcon) {
+                                    $amenity['icon'] = '';
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                // Process file uploads for amenities
+                foreach ($data['amenities'] as $index => &$amenity) {
+                    if (!is_array($amenity)) {
+                        $amenity = [
+                            'name' => $amenity,
+                            'icon' => ''
+                        ];
+                    }
+                    
+                    // Handle file upload for this amenity
+                    if ($request->hasFile('amenities_icon.' . $index)) {
+                        $file = $request->file('amenities_icon.' . $index);
+                        if ($file && $file->isValid()) {
+                            // Delete old icon if exists
+                            if (!empty($amenity['icon'])) {
+                                Storage::disk('public')->delete($amenity['icon']);
+                            }
+                            // Store new icon
+                            $amenity['icon'] = $file->store('amenities_icons', 'public');
+                        }
+                    }
+                }
+                
+                // Clean up any empty amenities
+                $data['amenities'] = array_values(array_filter($data['amenities'], function($amenity) {
+                    return !empty($amenity['name']) || !empty($amenity['icon']);
+                }));
+            }
+
             // Handle main photo and its alt text
             if ($request->hasFile('main_photo')) {
                 $data['main_photo'] = $request->file('main_photo')->store('offplan_main_photos', 'public');
@@ -70,18 +119,18 @@ class OffplanService
             if ($request->has('agent_image_alt')) {
                 $altTexts['agent_image'] = $request->input('agent_image_alt');
             }
-            
+
             // Handle mobile main photo and its alt text
             if ($request->has('mobile_main_photo_compressed') && $request->input('mobile_main_photo_compressed') !== '') {
                 // Process base64 image data
                 $imageData = $request->input('mobile_main_photo_compressed');
                 $imageData = substr($imageData, strpos($imageData, ',') + 1);
                 $imageData = base64_decode($imageData);
-                
+
                 // Generate a unique filename
                 $filename = 'mobile_main_photo_' . time() . '.jpg';
                 $path = 'offplan_mobile_photos/' . $filename;
-                
+
                 // Store the image
                 if (Storage::disk('public')->put($path, $imageData)) {
                     $data['mobile_main_photo'] = $path;
@@ -90,18 +139,18 @@ class OffplanService
             if ($request->has('mobile_main_photo_alt')) {
                 $altTexts['mobile_main_photo'] = $request->input('mobile_main_photo_alt');
             }
-            
+
             // Handle mobile banner photo and its alt text
             if ($request->has('mobile_banner_photo_compressed') && $request->input('mobile_banner_photo_compressed') !== '') {
                 // Process base64 image data
                 $imageData = $request->input('mobile_banner_photo_compressed');
                 $imageData = substr($imageData, strpos($imageData, ',') + 1);
                 $imageData = base64_decode($imageData);
-                
+
                 // Generate a unique filename
                 $filename = 'mobile_banner_photo_' . time() . '.jpg';
                 $path = 'offplan_mobile_banners/' . $filename;
-                
+
                 // Store the image
                 if (Storage::disk('public')->put($path, $imageData)) {
                     $data['mobile_banner_photo'] = $path;
@@ -148,28 +197,93 @@ class OffplanService
         }
     }
 
-    public function updateOffplan(Offplan $offplan, array $data): Offplan
+    public function updateOffplan(Offplan $offplan, array $data)
     {
         try {
-            // Prepare array fields
-            $data['features'] = $data['features'] ?? [];
-            $data['near_by'] = $data['near_by'] ?? [];
+            DB::beginTransaction();
 
-            // Handle location if provided
-            $locationId = $data['location_id'] ?? null;
-            unset($data['location_id']);
+            // Log incoming data for debugging
+            Log::info('Updating offplan with data:', $data);
 
-            return DB::transaction(function () use ($offplan, $data, $locationId) {
-                $offplan->update($data);
-
-                if ($locationId !== null) {
-                    $offplan->locations()->sync([$locationId]);
+            // Ensure features is properly formatted as an array
+            if (!isset($data['features']) || !is_array($data['features'])) {
+                $data['features'] = [];
+            }
+            
+            // Clean and filter features
+            $features = array_values(array_filter(array_map('trim', $data['features']), 'strlen'));
+            
+            // Ensure amenities is properly formatted as an array
+            $amenities = [];
+            if (isset($data['amenities']) && is_array($data['amenities'])) {
+                // Process each amenity to ensure proper structure
+                foreach ($data['amenities'] as $amenity) {
+                    if (is_array($amenity)) {
+                        $name = trim($amenity['name'] ?? '');
+                        $icon = $amenity['icon'] ?? '';
+                        
+                        if (!empty($name) || !empty($icon)) {
+                            $amenities[] = [
+                                'name' => $name,
+                                'icon' => $icon
+                            ];
+                        }
+                    } elseif (is_string($amenity) && !empty(trim($amenity))) {
+                        $amenities[] = [
+                            'name' => trim($amenity),
+                            'icon' => ''
+                        ];
+                    }
                 }
+            }
 
-                return $offplan;
-            });
+            // Prepare the update data
+            $updateData = $data;
+            $updateData['features'] = $features;
+            $updateData['amenities'] = $amenities;
+            
+            // Log the prepared update data
+            Log::info('Final update data:', $updateData);
+            
+            // Update the offplan with the provided data
+            $offplan->fill($updateData);
+            $offplan->save();
+            
+            // Log the saved data for verification
+            Log::info('Offplan updated successfully:', [
+                'id' => $offplan->id,
+                'features' => $offplan->features,
+                'amenities' => $offplan->amenities
+            ]);
 
+            // Handle metadata if present
+            if (isset($data['metadata'])) {
+                $metadata = $offplan->metadata()->firstOrNew([]);
+                $metadata->fill($data['metadata']);
+                $offplan->metadata()->save($metadata);
+            }
+
+            // Handle locations if present
+            if (isset($data['location_id'])) {
+                $offplan->locations()->sync([$data['location_id']]);
+            }
+
+            // Handle alt texts - store as JSON in the alt_texts column
+            if (isset($data['alt_texts']) && is_array($data['alt_texts'])) {
+                $altTexts = [];
+                foreach ($data['alt_texts'] as $imagePath => $altText) {
+                    if ($altText) {
+                        $altTexts[$imagePath] = $altText;
+                    }
+                }
+                $offplan->alt_texts = $altTexts;
+                $offplan->save();
+            }
+
+            DB::commit();
+            return $offplan;
         } catch (\Exception $e) {
+            DB::rollBack();
             Log::error('Offplan update failed: ' . $e->getMessage());
             throw $e;
         }

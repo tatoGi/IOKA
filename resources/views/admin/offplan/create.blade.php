@@ -86,12 +86,28 @@
                                 <div class="mb-3">
                                     <label for="amenities" class="form-label">Amenities</label>
                                     <div id="amenities_repeater">
-                                        <div class="amenities_item">
-                                            <input type="text" class="form-control mb-2" name="amenities[0]" placeholder="amenities">
-                                            <button type="button" class="btn btn-danger btn-sm remove-amenities">Remove</button>
+                                        <div class="amenities_item mb-3 p-3 border rounded">
+                                            <div class="row">
+                                                <div class="col-md-5">
+                                                    <label class="form-label">Amenity Name</label>
+                                                    <input type="text" class="form-control mb-2" name="amenities[0]" placeholder="Enter amenity name" required>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label">Icon (SVG recommended)</label>
+                                                    <input type="file" class="form-control mb-2" name="amenities_icon[0]" accept="image/svg+xml,image/png,image/jpeg">
+                                                    <div class="icon-preview"></div>
+                                                </div>
+                                                <div class="col-md-1 d-flex align-items-end">
+                                                    <button type="button" class="btn btn-danger btn-sm remove-amenities">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                    <button type="button" class="btn btn-secondary" id="add_amenities">Add More</button>
+                                    <button type="button" class="btn btn-secondary mt-2" id="add_amenities">
+                                        <i class="fas fa-plus"></i> Add Amenity
+                                    </button>
                                 </div>
 
                             </div>
@@ -523,17 +539,130 @@
             `;
             repeater.appendChild(newItem);
         });
+        // Add new amenity field
         document.getElementById('add_amenities').addEventListener('click', function() {
             var repeater = document.getElementById('amenities_repeater');
             var index = repeater.children.length;
             var newItem = document.createElement('div');
-            newItem.classList.add('amenities_item');
+            newItem.classList.add('amenities_item', 'mb-3', 'p-3', 'border', 'rounded');
             newItem.innerHTML = `
-                <input type="text" class="form-control mb-2" name="amenities[${index}]" placeholder="amenities">
-                <button type="button" class="btn btn-danger btn-sm remove-amenities">Remove</button>
+                <div class="row">
+                    <div class="col-md-5">
+                        <label class="form-label">Amenity Name</label>
+                        <input type="text" class="form-control mb-2" name="amenities[${index}]" placeholder="Enter amenity name" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Icon (SVG recommended)</label>
+                        <input type="file" class="form-control mb-2" name="amenities_icon[${index}]" accept="image/svg+xml,image/png,image/jpeg">
+                        <div class="icon-preview"></div>
+                    </div>
+                    <div class="col-md-1 d-flex align-items-end">
+                        <button type="button" class="btn btn-danger btn-sm remove-amenities">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
             `;
             repeater.appendChild(newItem);
+            
+            // Add event listener to the new remove button
+            newItem.querySelector('.remove-amenities').addEventListener('click', function() {
+                const item = this.closest('.amenities_item');
+                const hiddenInput = item.querySelector('input[type="hidden"][name^="existing_amenities_icon"]');
+                
+                // If there's an existing icon, mark it for deletion
+                if (hiddenInput && hiddenInput.value) {
+                    const deleteInput = document.createElement('input');
+                    deleteInput.type = 'hidden';
+                    deleteInput.name = 'deleted_amenities_icon[]';
+                    deleteInput.value = hiddenInput.value;
+                    document.querySelector('form').appendChild(deleteInput);
+                }
+                
+                item.remove();
+                reindexAmenities();
+            });
+            
+            // Add event listener for file input change
+            const fileInput = newItem.querySelector('input[type="file"]');
+            if (fileInput) {
+                fileInput.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            const previewDiv = newItem.querySelector('.icon-preview');
+                            if (previewDiv) {
+                                previewDiv.innerHTML = `
+                                    <div class="mt-2">
+                                        <small>Preview:</small>
+                                        <img src="${e.target.result}" alt="Preview" style="max-width: 30px; max-height: 30px;" class="ms-2">
+                                    </div>
+                                `;
+                            }
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            }
         });
+        
+        // Function to re-index amenities after removal
+        function reindexAmenities() {
+            const items = document.querySelectorAll('#amenities_repeater .amenities_item');
+            items.forEach((item, index) => {
+                // Update amenities name
+                const nameInput = item.querySelector('input[type="text"]');
+                if (nameInput) {
+                    nameInput.name = `amenities[${index}]`;
+                }
+                
+                // Update amenities_icon name
+                const fileInput = item.querySelector('input[type="file"]');
+                if (fileInput) {
+                    fileInput.name = `amenities_icon[${index}]`;
+                }
+                
+                // Update existing_amenities_icon name if it exists
+                const existingIconInput = item.querySelector('input[type="hidden"][name^="existing_amenities_icon"]');
+                if (existingIconInput) {
+                    existingIconInput.name = `existing_amenities_icon[${index}]`;
+                }
+            });
+        }
+        
+        // Handle remove icon button click
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.remove-icon')) {
+                e.preventDefault();
+                const button = e.target.closest('.remove-icon');
+                const item = button.closest('.amenities_item');
+                const hiddenInput = item.querySelector('input[type="hidden"][name^="existing_amenities_icon"]');
+                
+                if (hiddenInput && hiddenInput.value) {
+                    // Mark the icon for deletion on the server side
+                    const deleteInput = document.createElement('input');
+                    deleteInput.type = 'hidden';
+                    deleteInput.name = 'deleted_amenities_icon[]';
+                    deleteInput.value = hiddenInput.value;
+                    document.querySelector('form').appendChild(deleteInput);
+                    
+                    // Remove the preview and hidden input
+                    const previewDiv = button.closest('.mt-2');
+                    if (previewDiv) {
+                        previewDiv.remove();
+                    }
+                    hiddenInput.remove();
+                    
+                    // Reset the file input
+                    const fileInput = item.querySelector('input[type="file"]');
+                    if (fileInput) {
+                        fileInput.value = '';
+                    }
+                }
+            }
+        });
+
         document.getElementById('add_near_by').addEventListener('click', function() {
             var repeater = document.getElementById('near_by_repeater');
             var index = repeater.children.length;
@@ -566,8 +695,10 @@
             if (event.target.classList.contains('remove-near-by')) {
                 event.target.parentElement.remove();
             }
-            if (event.target.classList.contains('remove-amenities')) {
-                event.target.parentElement.remove();
+            if (event.target.closest('.remove-amenities')) {
+                event.target.closest('.amenities_item').remove();
+                // Re-index the remaining amenities
+                reindexAmenities();
             }
             if (event.target.classList.contains('remove-agent-language')) {
                 event.target.parentElement.remove();
