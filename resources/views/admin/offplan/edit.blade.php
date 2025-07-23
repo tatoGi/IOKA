@@ -1070,18 +1070,81 @@
             repeater.appendChild(newItem);
         });
 
-        document.addEventListener('click', function(event) {
+        document.addEventListener('click', async function(event) {
+            // Handle feature removal
             if (event.target.classList.contains('remove-feature')) {
                 event.target.parentElement.remove();
+                return;
             }
+            
+            // Handle near-by removal
             if (event.target.classList.contains('remove-near-by')) {
                 event.target.parentElement.remove();
+                return;
             }
+            
+            // Handle image deletion
+            if (event.target.classList.contains('remove-image')) {
+                event.preventDefault();
+                const button = event.target;
+                const container = button.closest('.col-4.mb-3');
+                const type = button.getAttribute('data-type');
+                const path = button.getAttribute('data-path');
+                const offplanId = button.getAttribute('data-id');
+                
+                if (!confirm('Are you sure you want to delete this image?')) {
+                    return;
+                }
+                
+                try {
+                    // Create form data to send as multipart/form-data
+                    const formData = new FormData();
+                    formData.append('_token', '{{ csrf_token() }}');
+                    formData.append('type', type);
+                    formData.append('path', path);
+                    
+                    const response = await fetch(`/ioka_admin/offplan/${offplanId}/delete-image`, {
+                        method: 'POST',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json'
+                        },
+                        body: formData
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        // Remove the image container from the DOM
+                        container.remove();
+                        
+                        // Show a success message
+                        alert('Image deleted successfully');
+                        
+                        // If no more images, show a message
+                        const galleryContainer = document.getElementById(`${type}_preview`);
+                        if (galleryContainer && galleryContainer.querySelectorAll('.col-4.mb-3').length === 0) {
+                            const message = document.createElement('p');
+                            message.textContent = `No ${type.replace('_', ' ')} photos available.`;
+                            galleryContainer.querySelector('.row').appendChild(message);
+                        }
+                    } else {
+                        throw new Error(data.error || 'Failed to delete image');
+                    }
+                } catch (error) {
+                    console.error('Error deleting image:', error);
+                    alert('Error deleting image: ' + error.message);
+                }
+            }
+            
+            // Handle amenities removal
             if (event.target.closest('.remove-amenities')) {
                 event.target.closest('.amenities_item').remove();
                 // Re-index the remaining amenities
                 reindexAmenities();
             }
+            
+            // Handle agent language removal
             if (event.target.classList.contains('remove-agent-language')) {
                 event.target.parentElement.remove();
             }

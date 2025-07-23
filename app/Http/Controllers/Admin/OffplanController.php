@@ -4,14 +4,13 @@ namespace App\Http\Controllers\Admin;
 
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreOffplanRequest;
+use App\Models\Location;
 use App\Models\Offplan;
 use App\Services\OffplanService;
 use App\Traits\HandlesMetaData;
 use Illuminate\Http\Request;
-use App\Models\Location;
 
 class OffplanController extends Controller
 {
@@ -438,17 +437,44 @@ class OffplanController extends Controller
         return redirect()->route('admin.offplan.interior_gallery')->with('success', 'Interior photos uploaded successfully.');
     }
 
-    public function deleteImage(Request $request)
+    public function deleteImage(Request $request, Offplan $offplan)
     {
-        $type = $request->input('type');
-        $path = $request->input('path');
+        try {
+            $type = $request->input('type');
+            $path = $request->input('path');
+           
+            if (!$type || !$path) {
+                return response()->json(['error' => 'Missing required parameters'], 400);
+            }
 
-        if ($type && $path && Storage::disk('public')->exists($path)) {
-            Storage::disk('public')->delete($path);
+            // Delete the file from storage
+            if (Storage::disk('public')->exists($path)) {
+                Storage::disk('public')->delete($path);
+            }
+
+            // Update the offplan record to remove the reference to the deleted image
+            if ($type === 'exterior_gallery') {
+                $exteriorGallery = $offplan->exterior_gallery ?? [];
+                $exteriorGallery = array_filter($exteriorGallery, function($item) use ($path) {
+                    return $item !== $path;
+                });
+                $offplan->exterior_gallery = array_values($exteriorGallery); // Reindex array
+            } elseif ($type === 'interior_gallery') {
+                $interiorGallery = $offplan->interior_gallery ?? [];
+                $interiorGallery = array_filter($interiorGallery, function($item) use ($path) {
+                    return $item !== $path;
+                });
+                $offplan->interior_gallery = array_values($interiorGallery); // Reindex array
+            }
+           
+            $offplan->save();
+
             return response()->json(['success' => 'Image deleted successfully.']);
-        }
 
-        return response()->json(['error' => 'Image not found.'], 404);
+        } catch (\Exception $e) {
+            Log::error('Error deleting image: ' . $e->getMessage());
+            return response()->json(['error' => 'Error deleting image: ' . $e->getMessage()], 500);
+        }
     }
     
     /**
