@@ -55,12 +55,12 @@ class StoreOffplanRequest extends FormRequest
             'agent_languages' => 'nullable|array',
             'agent_languages.*' => 'string',
             // Alt text validation rules
-            'main_photo_alt' => 'nullable',
-            'banner_photo_alt' => 'nullable',
-            'exterior_gallery_alt.*' => 'nullable',
-            'interior_gallery_alt.*' => 'nullable',
-            'qr_photo_alt' => 'nullable',
-            'agent_image_alt' => 'nullable',
+            'main_photo_alt' => 'nullable|string',
+            'banner_photo_alt' => 'nullable|string',
+            'exterior_gallery_alt.*' => 'nullable|string',
+            'interior_gallery_alt.*' => 'nullable|string',
+            'qr_photo_alt' => 'nullable|string',
+            'agent_image_alt' => 'nullable|string',
         ];
     }
 
