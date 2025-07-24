@@ -620,7 +620,6 @@
 
                     fileDiv.innerHTML = `
                         <img src="${e.target.result}" alt="${file.name}" class="img-thumbnail" style="width: 100%; height: auto;">
-                        <input type="text" class="form-control mt-2" name="${previewId.replace('_preview', '')}_alt[]" placeholder="Alt text for photo ${i+1}">
                     `;
 
                     // Add to column and row
@@ -1077,32 +1076,6 @@
             repeater.appendChild(newItem);
         });
 
-        document.querySelectorAll('.remove-image').forEach(button => {
-            button.addEventListener('click', function() {
-                const id = this.getAttribute('data-id');
-                const type = this.getAttribute('data-type');
-                const path = this.getAttribute('data-path');
-
-                fetch(`/ioka_admin/offplan/${id}/delete-image`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}' // Ensure CSRF token is included
-                        },
-                        body: JSON.stringify({
-                            type,
-                            path
-                        })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            this.parentElement.remove();
-                        }
-                    })
-                    .catch(error => console.error('Error:', error));
-            });
-        });
 
         document.getElementById('add_agent_language').addEventListener('click', function() {
             var repeater = document.getElementById('agent_languages_repeater');
@@ -1133,7 +1106,10 @@
             if (event.target.classList.contains('remove-image')) {
                 event.preventDefault();
                 const button = event.target;
-                const container = button.closest('.col-4.mb-3');
+                // Try to find the closest container, first check for gallery items, then for single images
+                let container = button.closest('.col-4.mb-3') || 
+                               button.closest('.uploaded-file') || 
+                               button.closest('.uploaded-files');
                 const type = button.getAttribute('data-type');
                 const path = button.getAttribute('data-path');
                 const offplanId = button.getAttribute('data-id');
@@ -1161,18 +1137,28 @@
                     const data = await response.json();
                     
                     if (data.success) {
-                        // Remove the image container from the DOM
-                        container.remove();
+                        // Remove the image container from the DOM if found
+                        if (container) {
+                            container.remove();
+                        } else {
+                            // If we couldn't find a specific container, reload the page
+                            window.location.reload();
+                            return;
+                        }
                         
                         // Show a success message
                         alert('Image deleted successfully');
                         
-                        // If no more images, show a message
+                        // If this is a gallery item, check if we need to show a "no images" message
                         const galleryContainer = document.getElementById(`${type}_preview`);
-                        if (galleryContainer && galleryContainer.querySelectorAll('.col-4.mb-3').length === 0) {
-                            const message = document.createElement('p');
-                            message.textContent = `No ${type.replace('_', ' ')} photos available.`;
-                            galleryContainer.querySelector('.row').appendChild(message);
+                        if (galleryContainer) {
+                            const galleryItems = galleryContainer.querySelectorAll('.col-4.mb-3, .uploaded-file');
+                            if (galleryItems.length === 0) {
+                                const row = galleryContainer.querySelector('.row') || galleryContainer;
+                                const message = document.createElement('p');
+                                message.textContent = `No ${type.replace('_', ' ')} photos available.`;
+                                row.appendChild(message);
+                            }
                         }
                     } else {
                         throw new Error(data.error || 'Failed to delete image');

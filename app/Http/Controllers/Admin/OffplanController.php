@@ -465,15 +465,35 @@ class OffplanController extends Controller
                     return $item !== $path;
                 });
                 $offplan->interior_gallery = array_values($interiorGallery); // Reindex array
+            } elseif ($type === 'main_photo') {
+                // Clear the main_photo field in the database
+                $offplan->main_photo = null;
+                
+                // Also clear the alt text for the main photo if it exists
+                $altTexts = $offplan->alt_texts ?? [];
+                if (isset($altTexts['main_photo'])) {
+                    unset($altTexts['main_photo']);
+                    $offplan->alt_texts = $altTexts;
+                }
+            } elseif ($type === 'banner_photo') {
+                // Clear the banner_photo field in the database
+                $offplan->banner_photo = null;
+                
+                // Also clear the alt text for the banner photo if it exists
+                $altTexts = $offplan->alt_texts ?? [];
+                if (isset($altTexts['banner_photo'])) {
+                    unset($altTexts['banner_photo']);
+                    $offplan->alt_texts = $altTexts;
+                }
             }
            
             $offplan->save();
 
-            return response()->json(['success' => 'Image deleted successfully.']);
+            return response()->json(['success' => true, 'message' => 'Image deleted successfully.']);
 
         } catch (\Exception $e) {
             Log::error('Error deleting image: ' . $e->getMessage());
-            return response()->json(['error' => 'Error deleting image: ' . $e->getMessage()], 500);
+            return response()->json(['success' => false, 'error' => 'Error deleting image: ' . $e->getMessage()], 500);
         }
     }
     
