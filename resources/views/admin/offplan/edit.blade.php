@@ -208,7 +208,32 @@
                                             @endif
                                         </div>
                                     </div>
+                                    <div id="mobile-upload-mobile">
+                                        <x-mobile-image-upload
+                                            name="mobile_main_photo"
+                                            label="Mobile Photo"
+                                            altName="mobile_main_photo_alt"
+                                            altLabel="Mobile Photo Alt Text"
+                                            altValue="{{ old('mobile_main_photo_alt', $offplan->mobile_main_photo_alt) }}"
+                                            fieldId="mobile"
+                                            value="{{ old('mobile_image', $offplan->mobile_image) }}"
+                                            fieldIdentifier="mobile"
+                                            upload-url="{{ route('mobile.image.upload') }}"
+                                        />
+                                    </div>
+                                    @if($offplan->mobile_image)
+                                    <div class="mt-2">
+                                        <img src="{{ asset('storage/' . $offplan->mobile_image) }}" alt="{{ $offplan->mobile_image_alt }}" class="img-thumbnail" style="max-height: 150px;" alt="{{ $offplan->mobile_image_alt ?? '' }}">
+                                        <button type="button" class="btn btn-danger remove-mobile-image-btn">
+                                            <i class="fas fa-trash-alt me-1"></i> Remove Mobile Photo
+                                        </button>
+                                    </div>
+                                    @endif
                                 </div>
+                                
+                           
+                          
+                            
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="main_photo">Banner (1280 x 461)</label>
@@ -230,6 +255,27 @@
                                             @endif
                                         </div>
                                     </div>
+                                    <div id="mobile-upload-mobile">
+                                        <x-mobile-image-upload
+                                            name="banner_banner_photo"
+                                            label="Mobile Banner Photo"
+                                            altName="banner_banner_photo_alt"
+                                            altLabel="Mobile Banner Photo Alt Text"
+                                            altValue="{{ old('banner_banner_photo_alt', $offplan->banner_banner_photo_alt) }}"
+                                            fieldId="mobile"
+                                            value="{{ old('mobile_image', $offplan->mobile_image) }}"
+                                            fieldIdentifier="mobile"
+                                            upload-url="{{ route('mobile.image.upload') }}"
+                                        />
+                                    </div>
+                                    @if($offplan->mobile_image)
+                                    <div class="mt-2">
+                                        <img src="{{ asset('storage/' . $offplan->mobile_image) }}" alt="{{ $offplan->mobile_image_alt }}" class="img-thumbnail" style="max-height: 150px;" alt="{{ $offplan->mobile_image_alt ?? '' }}">
+                                        <button type="button" class="btn btn-danger remove-mobile-image-btn">
+                                            <i class="fas fa-trash-alt me-1"></i> Remove Mobile Photo
+                                        </button>
+                                    </div>
+                                    @endif
                                 </div>
                                 <div class="form-group col-md-4">
                                     <label for="banner_title">Banner Title</label>

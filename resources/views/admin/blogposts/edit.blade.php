@@ -141,16 +141,19 @@
                                     fieldId="mobile_banner_image"
                                     value="{{ old('mobile_banner_image', $blogPost->mobile_banner_image) }}"
                                     fieldIdentifier="mobile_banner_image"
+                                    upload-url="{{ route('mobile.image.upload') }}"
                                 />
                             </div>
                             @if($blogPost->mobile_banner_image)
+
                             <div class="mt-2">
+                                <img src="{{ asset('storage/' . $blogPost->mobile_banner_image) }}" alt="{{ $blogPost->mobile_banner_image_alt }}" class="img-thumbnail" width="200">
                                 <button type="button" class="btn btn-danger remove-mobile-banner-image-btn">
                                     <i class="fas fa-trash-alt me-1"></i> Remove Mobile Banner Photo
                                 </button>
                             </div>
                             @endif
-
+                           
                             <div id="mobile-upload-mobile">
                                 <x-mobile-image-upload
                                     name="mobile_image"
@@ -161,10 +164,12 @@
                                     fieldId="mobile"
                                     value="{{ old('mobile_image', $blogPost->mobile_image) }}"
                                     fieldIdentifier="mobile"
+                                    upload-url="{{ route('mobile.image.upload') }}"
                                 />
                             </div>
                             @if($blogPost->mobile_image)
                             <div class="mt-2">
+                                <img src="{{ asset('storage/' . $blogPost->mobile_image) }}" alt="{{ $blogPost->mobile_image_alt }}" class="img-thumbnail" style="max-height: 150px;" alt="{{ $blogPost->mobile_image_alt ?? '' }}">
                                 <button type="button" class="btn btn-danger remove-mobile-image-btn">
                                     <i class="fas fa-trash-alt me-1"></i> Remove Mobile Photo
                                 </button>

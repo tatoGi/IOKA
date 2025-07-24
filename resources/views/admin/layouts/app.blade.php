@@ -44,6 +44,8 @@
     <!-- TinyMCE Editor (Self-hosted version to avoid API key issues) -->
     <script src="https://cdn.jsdelivr.net/npm/tinymce@6.7.2/tinymce.min.js" referrerpolicy="origin"></script>
     <script src="{{ asset('admin/assets/tinymce-init.js') }}"></script>
+    <!-- Mobile Image Upload -->
+    <script src="{{ asset('js/mobile-upload.js') }}"></script>
     @stack('scripts')
 </body>
 

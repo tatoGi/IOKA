@@ -34,6 +34,10 @@ Route::middleware('admin_auth')->group(function () {
 });
 include_once 'admin/login.php';
 
+// Mobile image upload route
+Route::post('/mobile-image-upload', [\App\Http\Controllers\MobileImageController::class, 'upload'])
+    ->name('mobile.image.upload');
+
 include_once 'api.php';
 
 // Add this new route for clearing caches (consider protecting it in production)

@@ -107,6 +107,7 @@
                                 :altRequired="true"
                                 altValue="{{ old('mobile_banner_image_alt') }}"
                                 fieldId="mobile-upload-blog_mobile_banner_image"
+                                :uploadRoute="route('mobile.image.upload')"
                             />
 
                             <div class="mb-3">
@@ -126,6 +127,7 @@
                                 :altRequired="true"
                                 altValue="{{ old('mobile_image_alt') }}"
                                 fieldId="mobile-upload-blog_mobile_image"
+                                :uploadRoute="route('mobile.image.upload')"
                             />
 
                             <div class="mb-3">
@@ -185,7 +187,4 @@
 
 @push('scripts')
 <script src="{{ asset('storage/admin/assets/blogpost.js') }}"></script>
-    <script src="{{ asset('js/mobile-upload.js') }}"></script>
 @endpush
-
-
